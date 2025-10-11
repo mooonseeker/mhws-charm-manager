@@ -1,0 +1,198 @@
+/**
+ * MHWS护石管理器 - 护石计算工具
+ * 
+ * 提供等效孔位和核心技能价值的计算功能
+ */
+
+import type { Skill, SkillWithLevel, Slot, EquivalentSlots } from '@/types';
+
+/**
+ * 计算单个技能的等效孔位
+ * 
+ * 根据技能的类型、装饰品等级和技能等级，计算该技能等效的孔位数量
+ * 
+ * 规则：
+ * - 武器技能：level个对应装饰品等级的武器孔位
+ * - 防具技能：level个对应装饰品等级的防具孔位
+ * - 特殊技能：无对应孔位（返回全0）
+ * 
+ * @param skill - 技能定义
+ * @param level - 技能等级
+ * @returns 等效孔位统计对象
+ * 
+ * @example
+ * // 武器技能，2级装饰品，等级3
+ * calculateSkillEquivalentSlots(skill, 3) 
+ * // 返回: { weaponSlot2: 3, 其他为0 }
+ * 
+ * @example
+ * // 防具技能"精神抖擞"，2级装饰品，等级2
+ * calculateSkillEquivalentSlots(skill, 2)
+ * // 返回: { armorSlot2: 2, 其他为0 }
+ */
+export function calculateSkillEquivalentSlots(
+    skill: Skill,
+    level: number
+): EquivalentSlots {
+    // 初始化等效孔位为全0
+    const equivalentSlots: EquivalentSlots = {
+        weaponSlot1: 0,
+        weaponSlot2: 0,
+        weaponSlot3: 0,
+        armorSlot1: 0,
+        armorSlot2: 0,
+        armorSlot3: 0,
+    };
+
+    // 边界检查：等级必须在有效范围内
+    if (level <= 0 || level > skill.maxLevel) {
+        return equivalentSlots;
+    }
+
+    // 特殊技能无对应孔位
+    if (skill.type === 'special') {
+        return equivalentSlots;
+    }
+
+    // 根据技能类型和装饰品等级，累加对应的孔位
+    const decorationLevel = skill.decorationLevel;
+
+    if (skill.type === 'weapon') {
+        // 武器技能对应武器孔位
+        if (decorationLevel === 1) {
+            equivalentSlots.weaponSlot1 = level;
+        } else if (decorationLevel === 2) {
+            equivalentSlots.weaponSlot2 = level;
+        } else if (decorationLevel === 3) {
+            equivalentSlots.weaponSlot3 = level;
+        }
+    } else if (skill.type === 'armor') {
+        // 防具技能对应防具孔位
+        if (decorationLevel === 1) {
+            equivalentSlots.armorSlot1 = level;
+        } else if (decorationLevel === 2) {
+            equivalentSlots.armorSlot2 = level;
+        } else if (decorationLevel === 3) {
+            equivalentSlots.armorSlot3 = level;
+        }
+    }
+
+    return equivalentSlots;
+}
+
+/**
+ * 计算护石的总等效孔位
+ * 
+ * 将护石的所有技能转换为等效孔位，并加上护石自身的实际孔位
+ * 
+ * @param skills - 护石的技能列表
+ * @param slots - 护石的孔位列表
+ * @param skillsData - 完整的技能数据（用于查找技能定义）
+ * @returns 总等效孔位统计对象
+ * 
+ * @example
+ * const skills = [{ skillId: 'skill1', level: 2 }];
+ * const slots = [{ type: 'weapon', level: 1 }];
+ * calculateCharmEquivalentSlots(skills, slots, skillsData)
+ * // 返回技能等效孔位 + 实际孔位的总和
+ */
+export function calculateCharmEquivalentSlots(
+    skills: SkillWithLevel[],
+    slots: Slot[],
+    skillsData: Skill[]
+): EquivalentSlots {
+    // 初始化总等效孔位为全0
+    const totalEquivalentSlots: EquivalentSlots = {
+        weaponSlot1: 0,
+        weaponSlot2: 0,
+        weaponSlot3: 0,
+        armorSlot1: 0,
+        armorSlot2: 0,
+        armorSlot3: 0,
+    };
+
+    // 1. 累加技能的等效孔位
+    for (const skillWithLevel of skills) {
+        // 查找技能定义
+        const skill = skillsData.find(s => s.id === skillWithLevel.skillId);
+
+        if (!skill) {
+            // 技能不存在，跳过
+            console.warn(`技能ID ${skillWithLevel.skillId} 未找到`);
+            continue;
+        }
+
+        // 计算该技能的等效孔位
+        const skillSlots = calculateSkillEquivalentSlots(skill, skillWithLevel.level);
+
+        // 累加到总等效孔位
+        totalEquivalentSlots.weaponSlot1 += skillSlots.weaponSlot1;
+        totalEquivalentSlots.weaponSlot2 += skillSlots.weaponSlot2;
+        totalEquivalentSlots.weaponSlot3 += skillSlots.weaponSlot3;
+        totalEquivalentSlots.armorSlot1 += skillSlots.armorSlot1;
+        totalEquivalentSlots.armorSlot2 += skillSlots.armorSlot2;
+        totalEquivalentSlots.armorSlot3 += skillSlots.armorSlot3;
+    }
+
+    // 2. 累加护石自身的实际孔位
+    for (const slot of slots) {
+        if (slot.type === 'weapon') {
+            // 武器孔位
+            if (slot.level === 1) {
+                totalEquivalentSlots.weaponSlot1 += 1;
+            } else if (slot.level === 2) {
+                totalEquivalentSlots.weaponSlot2 += 1;
+            } else if (slot.level === 3) {
+                totalEquivalentSlots.weaponSlot3 += 1;
+            }
+        } else if (slot.type === 'armor') {
+            // 防具孔位
+            if (slot.level === 1) {
+                totalEquivalentSlots.armorSlot1 += 1;
+            } else if (slot.level === 2) {
+                totalEquivalentSlots.armorSlot2 += 1;
+            } else if (slot.level === 3) {
+                totalEquivalentSlots.armorSlot3 += 1;
+            }
+        }
+    }
+
+    return totalEquivalentSlots;
+}
+
+/**
+ * 计算核心技能价值
+ * 
+ * 根据等效孔位计算护石的核心技能价值
+ * 
+ * 规则（origin.md 第25-27行）：
+ * - 武器孔位：1级=1, 2级=2, 3级=3个核心技能
+ * - 防具孔位：1级=0, 2级=1, 3级=1个核心技能
+ * 
+ * @param equivalentSlots - 等效孔位统计
+ * @returns 核心技能价值（整数）
+ * 
+ * @example
+ * const slots = {
+ *   weaponSlot1: 1, weaponSlot2: 2, weaponSlot3: 0,
+ *   armorSlot1: 0, armorSlot2: 1, armorSlot3: 1
+ * };
+ * calculateKeySkillValue(slots)
+ * // 返回: 1*1 + 2*2 + 0*3 + 0*0 + 1*1 + 1*1 = 1 + 4 + 1 + 1 = 7
+ */
+export function calculateKeySkillValue(
+    equivalentSlots: EquivalentSlots
+): number {
+    let keySkillValue = 0;
+
+    // 武器孔位：1级=1, 2级=2, 3级=3个核心技能
+    keySkillValue += equivalentSlots.weaponSlot1 * 1;
+    keySkillValue += equivalentSlots.weaponSlot2 * 2;
+    keySkillValue += equivalentSlots.weaponSlot3 * 3;
+
+    // 防具孔位：2级=1, 3级=1个核心技能（1级不计入）
+    keySkillValue += equivalentSlots.armorSlot2 * 1;
+    keySkillValue += equivalentSlots.armorSlot3 * 1;
+
+    return keySkillValue;
+}
