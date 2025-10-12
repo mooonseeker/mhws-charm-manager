@@ -27,13 +27,14 @@ export function Navigation({ currentTab, onTabChange }: NavigationProps) {
                             key={id}
                             onClick={() => onTabChange(id)}
                             className={`
-                flex items-center gap-1.5 sm:gap-2
-                px-3 sm:px-4 md:px-6
+                flex items-center justify-center gap-1.5 sm:gap-2
+                px-6 sm:px-8 md:px-12
                 py-2 sm:py-2.5 md:py-3
                 landscape:py-2 mobile-landscape:py-1.5
                 font-medium transition-colors
+                min-w-[120px] sm:min-w-[140px] md:min-w-[160px]
                 ${currentTab === id
-                                    ? 'border-b-2 border-primary text-primary'
+                                    ? 'border-b-2 border-chart-1 text-chart-1'
                                     : 'text-muted-foreground hover:text-foreground'
                                 }
               `}
