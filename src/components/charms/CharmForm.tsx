@@ -151,7 +151,7 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
                             return (
                                 <div
                                     key={skillWithLevel.skillId}
-                                    className="flex items-center gap-2 p-2 bg-slate-50 rounded-md"
+                                    className="flex items-center gap-2 p-2 bg-muted rounded-md"
                                 >
                                     <span className="flex-1">
                                         {skill.name} Lv.{skillWithLevel.level}
@@ -192,7 +192,7 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
                         {slots.map((slot, index) => (
                             <div
                                 key={index}
-                                className="flex items-center gap-2 p-2 bg-slate-50 rounded-md"
+                                className="flex items-center gap-2 p-2 bg-muted rounded-md"
                             >
                                 <Select
                                     value={slot.type}
@@ -242,7 +242,7 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
             </div>
 
             {/* 等效孔位统计 */}
-            <div className="p-6 bg-slate-50 rounded-lg space-y-4">
+            <div className="p-6 bg-muted rounded-lg space-y-4">
                 <h3 className="font-medium text-base">等效孔位统计</h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>武器孔位1级: {equivalentSlots.weaponSlot1}</div>
@@ -252,9 +252,9 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
                     <div>武器孔位3级: {equivalentSlots.weaponSlot3}</div>
                     <div>防具孔位3级: {equivalentSlots.armorSlot3}</div>
                 </div>
-                <div className="pt-2 border-t border-slate-200">
+                <div className="pt-2 border-t border-border">
                     <div className="font-medium">
-                        核心技能价值: <span className="text-blue-600">{keySkillValue}</span>
+                        核心技能价值: <span className="text-primary">{keySkillValue}</span>
                     </div>
                 </div>
             </div>

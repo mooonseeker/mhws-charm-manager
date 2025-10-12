@@ -10,7 +10,7 @@ function App() {
 
   return (
     <AppProvider>
-      <div className="min-h-screen flex flex-col bg-slate-50">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header />
         <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
 

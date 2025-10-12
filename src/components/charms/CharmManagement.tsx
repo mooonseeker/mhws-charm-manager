@@ -32,7 +32,7 @@ export function CharmManagement() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">护石管理</h1>
-                    <p className="text-slate-500 mt-1">
+                    <p className="text-muted-foreground mt-1">
                         管理你的护石收藏，智能评估护石价值
                     </p>
                 </div>

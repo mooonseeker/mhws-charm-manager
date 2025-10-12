@@ -19,7 +19,7 @@ export function Navigation({ currentTab, onTabChange }: NavigationProps) {
     ];
 
     return (
-        <nav className="border-b bg-white">
+        <nav className="border-b bg-card">
             <div className="mx-auto w-[80%] px-4 sm:px-6 md:px-8 lg:px-10">
                 <div className="flex gap-0.5 sm:gap-1">
                     {tabs.map(({ id, label, icon: Icon }) => (
@@ -33,8 +33,8 @@ export function Navigation({ currentTab, onTabChange }: NavigationProps) {
                 landscape:py-2 mobile-landscape:py-1.5
                 font-medium transition-colors
                 ${currentTab === id
-                                    ? 'border-b-2 border-blue-600 text-blue-600'
-                                    : 'text-slate-600 hover:text-slate-900'
+                                    ? 'border-b-2 border-primary text-primary'
+                                    : 'text-muted-foreground hover:text-foreground'
                                 }
               `}
                         >

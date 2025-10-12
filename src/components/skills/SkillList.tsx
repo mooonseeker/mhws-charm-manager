@@ -57,7 +57,7 @@ export function SkillList({ onEdit }: SkillListProps) {
     return (
         <div className="space-y-6">
             {/* 筛选栏 - 响应式布局 */}
-            <div className="bg-white p-4 sm:p-6 rounded-lg border shadow-sm space-y-4">
+            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm space-y-4">
                 <div className="flex flex-wrap gap-2 sm:gap-3">
                     <Button
                         variant={typeFilter === 'all' ? 'default' : 'outline'}
@@ -100,21 +100,21 @@ export function SkillList({ onEdit }: SkillListProps) {
                             id="key-only"
                             checked={keyOnlyFilter}
                             onChange={(e) => setKeyOnlyFilter(e.target.checked)}
-                            className="rounded border-slate-300"
+                            className="rounded border-border"
                         />
                         <label htmlFor="key-only" className="cursor-pointer">
                             仅核心
                         </label>
                     </div>
 
-                    <div className="text-slate-600 ml-auto">
+                    <div className="text-muted-foreground ml-auto">
                         共 {filteredSkills.length} 个
                     </div>
                 </div>
             </div>
 
             {/* 技能表格 - 始终显示六栏布局 */}
-            <div className="bg-white rounded-lg border shadow-sm overflow-auto">
+            <div className="bg-card rounded-lg border shadow-sm overflow-auto">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -129,7 +129,7 @@ export function SkillList({ onEdit }: SkillListProps) {
                     <TableBody>
                         {filteredSkills.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-slate-500">
+                                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                                     暂无技能数据
                                 </TableCell>
                             </TableRow>

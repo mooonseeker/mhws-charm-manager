@@ -128,7 +128,7 @@ export function CharmList({ onEdit }: CharmListProps) {
     return (
         <div className="space-y-6">
             {/* 筛选器 - 响应式布局 */}
-            <div className="p-4 sm:p-6 bg-slate-50 rounded-lg space-y-4">
+            <div className="p-4 sm:p-6 bg-muted rounded-lg space-y-4">
                 <h3 className="font-medium text-base sm:text-lg">筛选条件</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                     <div className="space-y-3">
@@ -202,7 +202,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                     <TableHeader>
                         <TableRow>
                             <TableHead
-                                className="cursor-pointer hover:bg-slate-50"
+                                className="cursor-pointer hover:bg-muted"
                                 onClick={() => handleSortFieldChange('rarity')}
                             >
                                 <span className="hidden sm:inline">稀有度</span>
@@ -212,7 +212,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                             <TableHead>技能</TableHead>
                             <TableHead className="hidden md:table-cell">孔位</TableHead>
                             <TableHead
-                                className="cursor-pointer hover:bg-slate-50"
+                                className="cursor-pointer hover:bg-muted"
                                 onClick={() => handleSortFieldChange('keySkillValue')}
                             >
                                 <span className="hidden sm:inline">核心价值</span>
@@ -221,7 +221,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                             </TableHead>
                             <TableHead className="hidden lg:table-cell">等效孔位</TableHead>
                             <TableHead
-                                className="hidden xl:table-cell cursor-pointer hover:bg-slate-50"
+                                className="hidden xl:table-cell cursor-pointer hover:bg-muted"
                                 onClick={() => handleSortFieldChange('createdAt')}
                             >
                                 创建时间 <SortIcon field="createdAt" />
@@ -232,7 +232,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                     <TableBody>
                         {displayedCharms.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center text-slate-500">
+                                <TableCell colSpan={7} className="text-center text-muted-foreground">
                                     {charms.length === 0 ? '暂无护石' : '没有符合条件的护石'}
                                 </TableCell>
                             </TableRow>
@@ -255,7 +255,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                             ))}
                                             {/* 小屏幕显示孔位信息 */}
                                             {charm.slots.length > 0 && (
-                                                <div className="text-xs text-slate-500 md:hidden mt-1">
+                                                <div className="text-xs text-muted-foreground md:hidden mt-1">
                                                     孔位: {charm.slots.map((slot, index) => (
                                                         <span key={index}>
                                                             {slot.type === 'weapon' ? '武' : '防'}{slot.level}
@@ -268,7 +268,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                     </TableCell>
                                     <TableCell className="hidden md:table-cell">
                                         {charm.slots.length === 0 ? (
-                                            <span className="text-slate-400 text-sm">无</span>
+                                            <span className="text-muted-foreground text-sm">无</span>
                                         ) : (
                                             <div className="space-y-1">
                                                 {charm.slots.map((slot, index) => (
@@ -280,7 +280,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <span className="font-medium text-blue-600 text-sm sm:text-base">{charm.keySkillValue}</span>
+                                        <span className="font-medium text-primary text-sm sm:text-base">{charm.keySkillValue}</span>
                                     </TableCell>
                                     <TableCell className="hidden lg:table-cell">
                                         <div className="text-xs space-y-1">
@@ -288,7 +288,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                             <div>防: {charm.equivalentSlots.armorSlot1}/{charm.equivalentSlots.armorSlot2}/{charm.equivalentSlots.armorSlot3}</div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="hidden xl:table-cell text-xs text-slate-500">
+                                    <TableCell className="hidden xl:table-cell text-xs text-muted-foreground">
                                         {new Date(charm.createdAt).toLocaleDateString('zh-CN')}
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -321,7 +321,7 @@ export function CharmList({ onEdit }: CharmListProps) {
             </div>
 
             {/* 统计信息 */}
-            <div className="text-sm text-slate-600 font-medium">
+            <div className="text-sm text-muted-foreground font-medium">
                 显示 {displayedCharms.length} / {charms.length} 个护石
             </div>
         </div>
