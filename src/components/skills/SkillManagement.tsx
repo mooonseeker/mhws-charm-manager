@@ -45,9 +45,9 @@ export function SkillManagement() {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">技能管理</h1>
-                    <p className="text-muted-foreground mt-1">
+                <div className="flex items-baseline">
+                    <h1 className="font-bold tracking-tight">技能管理</h1>
+                    <p className="text-muted-foreground">
                         管理技能数据，设置技能类型和装饰品等级
                     </p>
                 </div>
