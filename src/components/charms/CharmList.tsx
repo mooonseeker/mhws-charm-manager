@@ -221,7 +221,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                             </TableHead>
                             <TableHead className="hidden lg:table-cell">等效孔位</TableHead>
                             <TableHead
-                                className="hidden xl:table-cell cursor-pointer hover:bg-muted"
+                                className="hidden lg:table-cell cursor-pointer hover:bg-muted"
                                 onClick={() => handleSortFieldChange('createdAt')}
                             >
                                 创建时间 <SortIcon field="createdAt" />
@@ -288,7 +288,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                             <div>防: {charm.equivalentSlots.armorSlot1}/{charm.equivalentSlots.armorSlot2}/{charm.equivalentSlots.armorSlot3}</div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="hidden xl:table-cell text-xs text-muted-foreground">
+                                    <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">
                                         {new Date(charm.createdAt).toLocaleDateString('zh-CN')}
                                     </TableCell>
                                     <TableCell className="text-right">
