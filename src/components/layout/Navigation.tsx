@@ -20,7 +20,7 @@ export function Navigation({ currentTab, onTabChange }: NavigationProps) {
 
     return (
         <nav className="border-b bg-white">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto w-[80%] px-4 sm:px-6 md:px-8 lg:px-10">
                 <div className="flex gap-0.5 sm:gap-1">
                     {tabs.map(({ id, label, icon: Icon }) => (
                         <button

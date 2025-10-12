@@ -73,8 +73,8 @@ export function SkillForm({ skill, open, onClose, onSubmit }: SkillFormProps) {
                     <DialogTitle>{skill ? '编辑技能' : '添加技能'}</DialogTitle>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-3">
                         <Label htmlFor="name">技能名称</Label>
                         <Input
                             id="name"
@@ -85,7 +85,7 @@ export function SkillForm({ skill, open, onClose, onSubmit }: SkillFormProps) {
                         />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                         <Label htmlFor="type">技能类型</Label>
                         <Select value={type} onValueChange={(v) => setType(v as SkillType)}>
                             <SelectTrigger id="type">
@@ -99,8 +99,8 @@ export function SkillForm({ skill, open, onClose, onSubmit }: SkillFormProps) {
                         </Select>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-3">
                             <Label htmlFor="maxLevel">最大等级</Label>
                             <Input
                                 id="maxLevel"
@@ -113,7 +113,7 @@ export function SkillForm({ skill, open, onClose, onSubmit }: SkillFormProps) {
                             />
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             <Label htmlFor="decorationLevel">装饰品等级</Label>
                             <Select
                                 value={decorationLevel.toString()}
@@ -142,7 +142,7 @@ export function SkillForm({ skill, open, onClose, onSubmit }: SkillFormProps) {
                         </Label>
                     </div>
 
-                    <DialogFooter>
+                    <DialogFooter className="pt-6 border-t">
                         <Button type="button" variant="outline" onClick={onClose}>
                             取消
                         </Button>

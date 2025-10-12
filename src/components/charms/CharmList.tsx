@@ -126,13 +126,13 @@ export function CharmList({ onEdit }: CharmListProps) {
     };
 
     return (
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-6">
             {/* 筛选器 - 响应式布局 */}
-            <div className="p-3 sm:p-4 bg-slate-50 rounded-lg space-y-3">
-                <h3 className="font-medium text-sm sm:text-base">筛选条件</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm">最小稀有度</Label>
+            <div className="p-4 sm:p-6 bg-slate-50 rounded-lg space-y-4">
+                <h3 className="font-medium text-base sm:text-lg">筛选条件</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div className="space-y-3">
+                        <Label className="text-sm font-medium">最小稀有度</Label>
                         <Input
                             type="number"
                             min={1}
@@ -142,8 +142,8 @@ export function CharmList({ onEdit }: CharmListProps) {
                             onChange={(e) => setMinRarity(e.target.value ? parseInt(e.target.value) : null)}
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm">最大稀有度</Label>
+                    <div className="space-y-3">
+                        <Label className="text-sm font-medium">最大稀有度</Label>
                         <Input
                             type="number"
                             min={1}
@@ -153,8 +153,8 @@ export function CharmList({ onEdit }: CharmListProps) {
                             onChange={(e) => setMaxRarity(e.target.value ? parseInt(e.target.value) : null)}
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm">最小核心技能价值</Label>
+                    <div className="space-y-3">
+                        <Label className="text-sm font-medium">最小核心技能价值</Label>
                         <Input
                             type="number"
                             min={0}
@@ -163,8 +163,8 @@ export function CharmList({ onEdit }: CharmListProps) {
                             onChange={(e) => setMinKeySkillValue(e.target.value ? parseInt(e.target.value) : null)}
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm">包含技能</Label>
+                    <div className="space-y-3">
+                        <Label className="text-sm font-medium">包含技能</Label>
                         <Select value={filterSkillId} onValueChange={setFilterSkillId}>
                             <SelectTrigger>
                                 <SelectValue placeholder="全部技能" />
@@ -197,7 +197,7 @@ export function CharmList({ onEdit }: CharmListProps) {
             </div>
 
             {/* 护石列表 - 响应式表格 */}
-            <div className="rounded-md border overflow-x-auto">
+            <div className="rounded-lg border shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -246,7 +246,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="space-y-0.5 sm:space-y-1">
+                                        <div className="space-y-1 sm:space-y-2">
                                             {charm.skills.map((skillWithLevel) => (
                                                 <div key={skillWithLevel.skillId} className="text-xs sm:text-sm">
                                                     {getSkillName(skillWithLevel.skillId)} Lv.{skillWithLevel.level}
@@ -270,7 +270,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                         {charm.slots.length === 0 ? (
                                             <span className="text-slate-400 text-sm">无</span>
                                         ) : (
-                                            <div className="space-y-0.5">
+                                            <div className="space-y-1">
                                                 {charm.slots.map((slot, index) => (
                                                     <div key={index} className="text-xs">
                                                         {slot.type === 'weapon' ? '武器' : '防具'} {slot.level}级
@@ -283,7 +283,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                         <span className="font-medium text-blue-600 text-sm sm:text-base">{charm.keySkillValue}</span>
                                     </TableCell>
                                     <TableCell className="hidden lg:table-cell">
-                                        <div className="text-xs space-y-0.5">
+                                        <div className="text-xs space-y-1">
                                             <div>武: {charm.equivalentSlots.weaponSlot1}/{charm.equivalentSlots.weaponSlot2}/{charm.equivalentSlots.weaponSlot3}</div>
                                             <div>防: {charm.equivalentSlots.armorSlot1}/{charm.equivalentSlots.armorSlot2}/{charm.equivalentSlots.armorSlot3}</div>
                                         </div>
@@ -321,7 +321,7 @@ export function CharmList({ onEdit }: CharmListProps) {
             </div>
 
             {/* 统计信息 */}
-            <div className="text-sm text-slate-500">
+            <div className="text-sm text-slate-600 font-medium">
                 显示 {displayedCharms.length} / {charms.length} 个护石
             </div>
         </div>

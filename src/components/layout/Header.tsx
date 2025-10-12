@@ -7,7 +7,7 @@ import { Shield } from 'lucide-react';
 export function Header() {
     return (
         <header className="border-b bg-gradient-to-r from-slate-900 to-slate-800 text-white">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 landscape:py-2 mobile-landscape:py-1.5">
+            <div className="mx-auto w-[80%] px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-5 landscape:py-3 mobile-landscape:py-2">
                 <div className="flex items-center gap-2 sm:gap-3">
                     <Shield className="h-6 w-6 sm:h-8 sm:w-8 mobile-landscape:h-5 mobile-landscape:w-5" />
                     <div>

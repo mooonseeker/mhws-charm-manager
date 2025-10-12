@@ -27,7 +27,7 @@ export function CharmManagement() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     return (
-        <div className="container mx-auto py-6 space-y-6">
+        <div className="py-8 space-y-8">
             {/* 页面头部 */}
             <div className="flex items-center justify-between">
                 <div>
@@ -45,7 +45,7 @@ export function CharmManagement() {
                             添加护石
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
                         <DialogHeader>
                             <DialogTitle>添加新护石</DialogTitle>
                             <DialogDescription>
@@ -61,14 +61,14 @@ export function CharmManagement() {
             </div>
 
             {/* 护石列表 */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>护石列表</CardTitle>
-                    <CardDescription>
+            <Card className="shadow-sm">
+                <CardHeader className="pb-6">
+                    <CardTitle className="text-xl">护石列表</CardTitle>
+                    <CardDescription className="text-base">
                         默认按核心技能价值和稀有度排序，点击表头可切换排序字段
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-0">
                     <CharmList
                         onEdit={() => {
                             // 编辑功能暂时禁用，可以后续实现

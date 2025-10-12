@@ -43,11 +43,16 @@ export function SkillManagement() {
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">技能管理</h2>
-                <Button onClick={handleAdd}>
-                    <Plus className="h-4 w-4 mr-2" />
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">技能管理</h1>
+                    <p className="text-slate-500 mt-1">
+                        管理技能数据，设置技能类型和装饰品等级
+                    </p>
+                </div>
+                <Button size="lg" onClick={handleAdd}>
+                    <Plus className="h-5 w-5 mr-2" />
                     添加技能
                 </Button>
             </div>

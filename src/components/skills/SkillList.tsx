@@ -41,10 +41,10 @@ export function SkillList({ onEdit }: SkillListProps) {
     };
 
     return (
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-6">
             {/* 筛选栏 - 响应式布局 */}
-            <div className="bg-white p-3 sm:p-4 rounded-lg border space-y-3">
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+            <div className="bg-white p-4 sm:p-6 rounded-lg border shadow-sm space-y-4">
+                <div className="flex flex-wrap gap-2 sm:gap-3">
                     <Button
                         variant={typeFilter === 'all' ? 'default' : 'outline'}
                         size="sm"
@@ -100,7 +100,7 @@ export function SkillList({ onEdit }: SkillListProps) {
             </div>
 
             {/* 技能表格 - 响应式：在md以上显示表格，小屏幕隐藏部分列 */}
-            <div className="bg-white rounded-lg border overflow-x-auto">
+            <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -123,7 +123,7 @@ export function SkillList({ onEdit }: SkillListProps) {
                             filteredSkills.map((skill) => (
                                 <TableRow key={skill.id}>
                                     <TableCell className="font-medium">
-                                        <div className="flex flex-col gap-1">
+                                        <div className="flex flex-col gap-2">
                                             <span>{skill.name}</span>
                                             <span className="text-xs text-slate-500 sm:hidden">
                                                 {SKILL_TYPE_LABELS[skill.type]}

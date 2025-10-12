@@ -119,10 +119,10 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* 稀有度选择 */}
-            <div className="space-y-2">
-                <Label>稀有度</Label>
+            <div className="space-y-3">
+                <Label className="text-base font-medium">稀有度</Label>
                 <Select value={rarity.toString()} onValueChange={(v) => setRarity(parseInt(v))}>
                     <SelectTrigger>
                         <SelectValue />
@@ -138,12 +138,12 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
             </div>
 
             {/* 技能选择 */}
-            <div className="space-y-2">
-                <Label>技能 ({selectedSkills.length}/3)</Label>
+            <div className="space-y-3">
+                <Label className="text-base font-medium">技能 ({selectedSkills.length}/3)</Label>
 
                 {/* 已选技能列表 */}
                 {selectedSkills.length > 0 && (
-                    <div className="space-y-2 mb-3">
+                    <div className="space-y-3 mb-4">
                         {selectedSkills.map((skillWithLevel) => {
                             const skill = allSkills.find((s) => s.id === skillWithLevel.skillId);
                             if (!skill) return null;
@@ -183,12 +183,12 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
             </div>
 
             {/* 孔位选择 */}
-            <div className="space-y-2">
-                <Label>孔位 ({slots.length}/3)</Label>
+            <div className="space-y-3">
+                <Label className="text-base font-medium">孔位 ({slots.length}/3)</Label>
 
                 {/* 已选孔位列表 */}
                 {slots.length > 0 && (
-                    <div className="space-y-2 mb-3">
+                    <div className="space-y-3 mb-4">
                         {slots.map((slot, index) => (
                             <div
                                 key={index}
@@ -242,9 +242,9 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
             </div>
 
             {/* 等效孔位统计 */}
-            <div className="p-4 bg-slate-50 rounded-lg space-y-3">
-                <h3 className="font-medium text-sm">等效孔位统计</h3>
-                <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="p-6 bg-slate-50 rounded-lg space-y-4">
+                <h3 className="font-medium text-base">等效孔位统计</h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>武器孔位1级: {equivalentSlots.weaponSlot1}</div>
                     <div>防具孔位1级: {equivalentSlots.armorSlot1}</div>
                     <div>武器孔位2级: {equivalentSlots.weaponSlot2}</div>
@@ -263,7 +263,7 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
             <CharmValidation validation={validation} />
 
             {/* 操作按钮 */}
-            <div className="flex gap-2 justify-end">
+            <div className="flex gap-3 justify-end pt-4 border-t">
                 {onCancel && (
                     <Button variant="outline" onClick={onCancel}>
                         取消

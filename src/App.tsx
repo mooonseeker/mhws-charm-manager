@@ -14,7 +14,7 @@ function App() {
         <Header />
         <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
 
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 landscape:py-3 mobile-landscape:py-2 flex-1">
+        <main className="mx-auto w-[80%] px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-8 md:py-10 landscape:py-4 mobile-landscape:py-3 flex-1">
           {currentTab === 'skills' && <SkillManagement />}
           {currentTab === 'charms' && <CharmManagement />}
           {currentTab === 'data' && <DataManagement />}
