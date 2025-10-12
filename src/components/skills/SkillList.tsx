@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pencil, Trash2, Star } from 'lucide-react';
 import { useSkills } from '@/contexts';
-import type { Skill, SkillType } from '@/types';
+import type { Skill, SkillType, SlotLevel } from '@/types';
 import { SKILL_TYPE_LABELS } from '@/types/constants';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +26,20 @@ export function SkillList({ onEdit }: SkillListProps) {
     const { skills, deleteSkill } = useSkills();
     const [typeFilter, setTypeFilter] = useState<SkillType | 'all'>('all');
     const [keyOnlyFilter, setKeyOnlyFilter] = useState(false);
+
+    // 获取装饰品等级图标
+    const getDecorationIcon = (skillType: SkillType, decorationLevel: SlotLevel) => {
+        switch (skillType) {
+            case 'weapon':
+                return `/weapon-slot-${decorationLevel}.png`;
+            case 'armor':
+                return `/armor-slot-${decorationLevel}.png`;
+            case 'special':
+                return `/special.png`;
+            default:
+                return `/special.png`;
+        }
+    };
 
     // 筛选技能
     const filteredSkills = skills.filter((skill) => {
@@ -99,17 +113,17 @@ export function SkillList({ onEdit }: SkillListProps) {
                 </div>
             </div>
 
-            {/* 技能表格 - 响应式：在md以上显示表格，小屏幕隐藏部分列 */}
-            <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+            {/* 技能表格 - 始终显示六栏布局 */}
+            <div className="bg-white rounded-lg border shadow-sm overflow-auto">
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>技能名称</TableHead>
-                            <TableHead className="hidden sm:table-cell">类型</TableHead>
-                            <TableHead className="text-center hidden md:table-cell">最大等级</TableHead>
-                            <TableHead className="text-center">装饰品</TableHead>
-                            <TableHead className="text-center">核心</TableHead>
-                            <TableHead className="text-right">操作</TableHead>
+                            <TableHead className="text-center min-w-[50px]">核心</TableHead>
+                            <TableHead className="min-w-[120px]">技能名称</TableHead>
+                            <TableHead className="min-w-[80px]">类型</TableHead>
+                            <TableHead className="text-center min-w-[80px]">装饰品等级</TableHead>
+                            <TableHead className="text-center min-w-[60px]">最大等级</TableHead>
+                            <TableHead className="text-right min-w-[100px]">操作</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -122,26 +136,29 @@ export function SkillList({ onEdit }: SkillListProps) {
                         ) : (
                             filteredSkills.map((skill) => (
                                 <TableRow key={skill.id}>
-                                    <TableCell className="font-medium">
-                                        <div className="flex flex-col gap-2">
-                                            <span>{skill.name}</span>
-                                            <span className="text-xs text-slate-500 sm:hidden">
-                                                {SKILL_TYPE_LABELS[skill.type]}
-                                            </span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="hidden sm:table-cell">
-                                        <Badge variant="outline" className="text-xs">
-                                            {SKILL_TYPE_LABELS[skill.type]}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-center hidden md:table-cell">{skill.maxLevel}</TableCell>
-                                    <TableCell className="text-center text-sm">{skill.decorationLevel}</TableCell>
                                     <TableCell className="text-center">
                                         {skill.isKey && (
                                             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 inline" />
                                         )}
                                     </TableCell>
+                                    <TableCell className="font-medium">
+                                        {skill.name}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline" className="text-xs">
+                                            {SKILL_TYPE_LABELS[skill.type]}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-center text-sm">
+                                        <div className="flex items-center justify-center gap-4">
+                                            <img
+                                                src={getDecorationIcon(skill.type, skill.decorationLevel)}
+                                                alt={`${SKILL_TYPE_LABELS[skill.type]}装饰品等级${skill.decorationLevel}`}
+                                                style={{ width: '2rem', height: '2rem' }}
+                                            />
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-center">{skill.maxLevel}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-1 sm:gap-2">
                                             <Button
