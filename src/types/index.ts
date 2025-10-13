@@ -20,9 +20,9 @@ export type SkillType = 'weapon' | 'armor' | 'special';
 export type SlotType = 'weapon' | 'armor';
 
 /**
- * 孔位等级（1-3级）
+ * 孔位等级（1-3级，-1表示特殊技能无装饰品）
  */
-export type SlotLevel = 1 | 2 | 3;
+export type SlotLevel = -1 | 1 | 2 | 3;
 
 /**
  * 技能完整定义

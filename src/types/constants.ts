@@ -49,6 +49,7 @@ export const SKILL_TYPE_LABELS: Record<SkillType, string> = {
  * 孔位等级标签映射
  */
 export const SLOT_LEVEL_LABELS: Record<SlotLevel, string> = {
+    [-1]: '无',
     1: '一级',
     2: '二级',
     3: '三级',

@@ -35,7 +35,7 @@ export function SkillForm({ skill, open, onClose, onSubmit }: SkillFormProps) {
     const [name, setName] = useState('');
     const [type, setType] = useState<SkillType>('armor');
     const [maxLevel, setMaxLevel] = useState(3);
-    const [decorationLevel, setDecorationLevel] = useState<SlotLevel>(2);
+    const [decorationLevel, setDecorationLevel] = useState<SlotLevel>(-1);
     const [isKey, setIsKey] = useState(false);
 
     useEffect(() => {
@@ -54,13 +54,22 @@ export function SkillForm({ skill, open, onClose, onSubmit }: SkillFormProps) {
         }
     }, [skill, open]);
 
+    // 当类型改变时，自动设置装饰品等级
+    useEffect(() => {
+        if (type === 'special') {
+            setDecorationLevel(-1);
+        } else if (decorationLevel === -1) {
+            setDecorationLevel(2);
+        }
+    }, [type]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSubmit({
             name: name.trim(),
             type,
             maxLevel,
-            decorationLevel,
+            decorationLevel: type === 'special' ? -1 : decorationLevel,
             isKey,
         });
         onClose();
@@ -113,22 +122,24 @@ export function SkillForm({ skill, open, onClose, onSubmit }: SkillFormProps) {
                             />
                         </div>
 
-                        <div className="space-y-3">
-                            <Label htmlFor="decorationLevel">装饰品等级</Label>
-                            <Select
-                                value={decorationLevel.toString()}
-                                onValueChange={(v) => setDecorationLevel(parseInt(v) as SlotLevel)}
-                            >
-                                <SelectTrigger id="decorationLevel">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="1">一级</SelectItem>
-                                    <SelectItem value="2">二级</SelectItem>
-                                    <SelectItem value="3">三级</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        {type !== 'special' && (
+                            <div className="space-y-3">
+                                <Label htmlFor="decorationLevel">装饰品等级</Label>
+                                <Select
+                                    value={decorationLevel.toString()}
+                                    onValueChange={(v) => setDecorationLevel(parseInt(v) as SlotLevel)}
+                                >
+                                    <SelectTrigger id="decorationLevel">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="1">一级</SelectItem>
+                                        <SelectItem value="2">二级</SelectItem>
+                                        <SelectItem value="3">三级</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center space-x-2">

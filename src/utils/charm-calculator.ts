@@ -54,6 +54,11 @@ export function calculateSkillEquivalentSlots(
         return equivalentSlots;
     }
 
+    // 检查装饰品等级是否有效
+    if (skill.decorationLevel <= 0) {
+        return equivalentSlots;
+    }
+
     // 根据技能类型和装饰品等级，累加对应的孔位
     const decorationLevel = skill.decorationLevel;
 

@@ -150,11 +150,15 @@ export function SkillList({ onEdit }: SkillListProps) {
                                     </TableCell>
                                     <TableCell className="text-center text-sm">
                                         <div className="flex items-center justify-center gap-4">
-                                            <img
-                                                src={getDecorationIcon(skill.type, skill.decorationLevel)}
-                                                alt={`${SKILL_TYPE_LABELS[skill.type]}装饰品等级${skill.decorationLevel}`}
-                                                style={{ width: '2rem', height: '2rem' }}
-                                            />
+                                            {skill.type === 'special' ? (
+                                                <span className="text-muted-foreground">—</span>
+                                            ) : (
+                                                <img
+                                                    src={getDecorationIcon(skill.type, skill.decorationLevel)}
+                                                    alt={`${SKILL_TYPE_LABELS[skill.type]}装饰品等级${skill.decorationLevel}`}
+                                                    style={{ width: '2rem', height: '2rem' }}
+                                                />
+                                            )}
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-center">{skill.maxLevel}</TableCell>
