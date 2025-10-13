@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 
 interface SkillListProps {
     onEdit: (skill: Skill) => void;
@@ -29,6 +30,7 @@ export function SkillList({ onEdit }: SkillListProps) {
     const { skills, deleteSkill } = useSkills();
     const [typeFilter, setTypeFilter] = useState<SkillType | 'all'>('all');
     const [keyOnlyFilter, setKeyOnlyFilter] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
     // 获取装饰品等级图标
@@ -49,6 +51,7 @@ export function SkillList({ onEdit }: SkillListProps) {
     const filteredSkills = skills.filter((skill) => {
         if (typeFilter !== 'all' && skill.type !== typeFilter) return false;
         if (keyOnlyFilter && !skill.isKey) return false;
+        if (searchQuery && !skill.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
         return true;
     });
 
@@ -62,7 +65,7 @@ export function SkillList({ onEdit }: SkillListProps) {
     // 当筛选条件变化时，重置到第一页
     useEffect(() => {
         setCurrentPage(1);
-    }, [typeFilter, keyOnlyFilter]);
+    }, [typeFilter, keyOnlyFilter, searchQuery]);
 
     const handleDelete = (skill: Skill) => {
         if (confirm(`确定要删除技能"${skill.name}"吗？`)) {
@@ -125,6 +128,13 @@ export function SkillList({ onEdit }: SkillListProps) {
                         <div className="text-muted-foreground text-sm">
                             共 {filteredSkills.length} 个
                         </div>
+                        <Input
+                            type="text"
+                            placeholder="搜索技能名称..."
+                            className="h-9 max-w-40"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
