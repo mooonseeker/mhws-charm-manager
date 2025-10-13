@@ -57,7 +57,12 @@ export const SLOT_LEVEL_LABELS: Record<SlotLevel, string> = {
 
 /**
  * 核心技能价值阈值
- * 
+ *
  * 用于判断护石是否低于平均水平
  */
 export const KEY_SKILL_VALUE_THRESHOLD = 2;
+
+/**
+ * 技能列表每页显示数量
+ */
+export const SKILLS_PER_PAGE = 16;

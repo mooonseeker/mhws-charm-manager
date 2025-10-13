@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Pencil, Trash2, Star } from 'lucide-react';
 import { useSkills } from '@/contexts';
 import type { Skill, SkillType, SlotLevel } from '@/types';
-import { SKILL_TYPE_LABELS } from '@/types/constants';
+import { SKILL_TYPE_LABELS, SKILLS_PER_PAGE } from '@/types/constants';
 import { Button } from '@/components/ui/button';
+import { Pagination } from '@/components/ui/pagination';
 import {
     Table,
     TableBody,
@@ -23,10 +24,12 @@ interface SkillListProps {
  * 技能列表组件
  * 显示所有技能并支持筛选、排序、编辑和删除
  */
+
 export function SkillList({ onEdit }: SkillListProps) {
     const { skills, deleteSkill } = useSkills();
     const [typeFilter, setTypeFilter] = useState<SkillType | 'all'>('all');
     const [keyOnlyFilter, setKeyOnlyFilter] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
 
     // 获取装饰品等级图标
     const getDecorationIcon = (skillType: SkillType, decorationLevel: SlotLevel) => {
@@ -48,6 +51,18 @@ export function SkillList({ onEdit }: SkillListProps) {
         if (keyOnlyFilter && !skill.isKey) return false;
         return true;
     });
+
+    // 分页计算
+    const totalPages = Math.ceil(filteredSkills.length / SKILLS_PER_PAGE);
+    const paginatedSkills = filteredSkills.slice(
+        (currentPage - 1) * SKILLS_PER_PAGE,
+        currentPage * SKILLS_PER_PAGE
+    );
+
+    // 当筛选条件变化时，重置到第一页
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [typeFilter, keyOnlyFilter]);
 
     const handleDelete = (skill: Skill) => {
         if (confirm(`确定要删除技能"${skill.name}"吗？`)) {
@@ -106,8 +121,15 @@ export function SkillList({ onEdit }: SkillListProps) {
                         </div>
                     </div>
 
-                    <div className="text-muted-foreground text-sm">
-                        共 {filteredSkills.length} 个
+                    <div className="flex items-center gap-4 justify-end">
+                        <div className="text-muted-foreground text-sm">
+                            共 {filteredSkills.length} 个
+                        </div>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
                     </div>
                 </div>
             </div>
@@ -133,7 +155,7 @@ export function SkillList({ onEdit }: SkillListProps) {
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            filteredSkills.map((skill) => (
+                            paginatedSkills.map((skill) => (
                                 <TableRow key={skill.id}>
                                     <TableCell className="text-center">
                                         {skill.isKey && (
