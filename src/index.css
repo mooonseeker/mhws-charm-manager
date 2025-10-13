@@ -109,6 +109,14 @@ button:focus-visible {
 }
 
 @theme inline {
+  /* 响应式断点配置 */
+  --breakpoint-sm: 640px;
+  /* 小型设备 */
+  --breakpoint-md: 768px;
+  /* 中型设备 */
+  --breakpoint-lg: 1024px;
+  /* 大型设备 */
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

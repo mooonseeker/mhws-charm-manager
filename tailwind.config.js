@@ -7,14 +7,9 @@ export default {
     ],
     theme: {
         extend: {
-            // 响应式断点配置
+            // 注意：响应式断点现在在 src/index.css 中使用 @theme 规则定义
+            // 方向断点保留在配置中
             screens: {
-                // 标准断点
-                'sm': '640px',   // 小型设备
-                'md': '768px',   // 中型设备
-                'lg': '1024px',  // 大型设备
-
-                // 方向断点
                 'portrait': { 'raw': '(orientation: portrait)' },
                 'landscape': { 'raw': '(orientation: landscape)' },
                 'mobile-landscape': { 'raw': '(max-width: 767px) and (orientation: landscape)' },

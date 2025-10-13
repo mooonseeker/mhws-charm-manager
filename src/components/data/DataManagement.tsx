@@ -88,8 +88,8 @@ export function DataManagement() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold mb-2">数据管理</h2>
+            <div className="flex items-baseline">
+                <h1 className="font-bold tracking-tight">数据管理</h1>
                 <p className="text-slate-600">管理您的技能和护石数据</p>
             </div>
 
@@ -189,6 +189,7 @@ export function DataManagement() {
                         </p>
                     </CardContent>
                 </Card>
+
                 {/* 数据统计 */}
                 <Card className="md:col-span-5">
                     <CardHeader>
