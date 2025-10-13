@@ -1,44 +1,83 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ============================================
+   Tailwind CSS 基础样式导入
+   ============================================ */
+@import "tailwindcss";
 
+/* ============================================
+   暗色模式变体定义
+   ============================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   根元素变量定义 - 默认主题（亮色模式）
+   ============================================ */
 :root {
+  /* 字体配置 */
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
+  /* 颜色方案和基础颜色 */
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #213547;
+  background-color: #ffffff;
 
+  /* 字体优化 */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* ========== 设计系统变量 - 亮色模式 ========== */
+
+  /* 圆角变量 */
   --radius: 0.625rem;
+
+  /* 基础颜色 */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+
+  /* 卡片组件 */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
+
+  /* 弹出层组件 */
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+
+  /* 主要按钮/元素 */
+  --primary: oklch(0.55 0.15 250);
   --primary-foreground: oklch(0.985 0 0);
+
+  /* 次要按钮/元素 */
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
+
+  /* 禁用状态 */
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+
+  /* 强调色 */
+  --accent: oklch(0.6 0.2 25);
+  --accent-foreground: oklch(0.985 0 0);
+
+  /* 破坏性操作 */
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  /* 边框和输入框 */
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+
+  /* 图表颜色 */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+
+  /* 侧边栏 */
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -49,22 +88,29 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* ============================================
+   基础元素样式
+   ============================================ */
+
+/* 链接样式 */
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--primary);
   text-decoration: inherit;
 }
 
 a:hover {
-  color: #535bf2;
+  color: var(--accent);
 }
 
+/* 主体样式 */
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
 }
 
+/* 标题样式 */
 h1 {
   font-size: 2em;
   line-height: 1.1;
@@ -72,6 +118,7 @@ h1 {
   margin-right: 1rem;
 }
 
+/* 按钮样式 */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -79,13 +126,13 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--secondary);
   cursor: pointer;
   transition: border-color 0.25s;
 }
 
 button:hover {
-  border-color: #646cff;
+  border-color: var(--primary);
 }
 
 button:focus,
@@ -93,22 +140,10 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
-
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
-@theme inline {
+/* ============================================
+   Tailwind 主题配置
+   ============================================ */
+@theme {
   /* 响应式断点配置 */
   --breakpoint-sm: 640px;
   /* 小型设备 */
@@ -116,11 +151,16 @@ button:focus-visible {
   /* 中型设备 */
   --breakpoint-lg: 1024px;
   /* 大型设备 */
+}
 
+@theme inline {
+  /* 圆角尺寸变量 */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* 颜色映射 - 将CSS变量映射到Tailwind颜色系统 */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -136,14 +176,19 @@ button:focus-visible {
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* 图表颜色映射 */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  /* 侧边栏颜色映射 */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -154,30 +199,57 @@ button:focus-visible {
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ============================================
+   暗色模式主题变量
+   ============================================ */
 .dark {
+  /* ========== 设计系统变量 - 暗色模式 ========== */
+
+  /* 基础颜色 */
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
+
+  /* 卡片组件 */
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
+
+  /* 弹出层组件 */
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+
+  /* 主要按钮/元素 */
+  --primary: oklch(0.7 0.12 250);
+  --primary-foreground: oklch(0.1 0 0);
+
+  /* 次要按钮/元素 */
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
+
+  /* 禁用状态 */
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+
+  /* 强调色 */
+  --accent: oklch(0.5 0.18 25);
   --accent-foreground: oklch(0.985 0 0);
+
+  /* 破坏性操作 */
   --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+
+  /* 边框和输入框 */
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+
+  /* 图表颜色 */
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
+
+  /* 侧边栏 */
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -188,6 +260,9 @@ button:focus-visible {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ============================================
+   Tailwind 基础层样式
+   ============================================ */
 @layer base {
   * {
     @apply border-border outline-ring/50;
