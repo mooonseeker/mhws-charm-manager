@@ -27,12 +27,12 @@ export function CharmManagement() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     return (
-        <div className="py-8 space-y-8">
+        <div className="space-y-6">
             {/* 页面头部 */}
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between items-center">
                 <div className="flex items-baseline">
                     <h1 className="font-bold tracking-tight">护石管理</h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-foreground">
                         管理你的护石收藏，智能评估护石价值
                     </p>
                 </div>

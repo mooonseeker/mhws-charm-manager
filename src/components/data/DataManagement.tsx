@@ -90,7 +90,7 @@ export function DataManagement() {
         <div className="space-y-6">
             <div className="flex items-baseline">
                 <h1 className="font-bold tracking-tight">数据管理</h1>
-                <p className="text-slate-600">管理您的技能和护石数据</p>
+                <p className="text-foreground">管理您的技能和护石数据</p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-5">
@@ -106,28 +106,26 @@ export function DataManagement() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <Button
+                        <div
                             onClick={handleExportJSON}
-                            className="w-full justify-start"
-                            variant="outline"
+                            className="inline-flex items-center justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full cursor-pointer"
                         >
                             <FileJson className="h-4 w-4 mr-2" />
-                            导出为 JSON
-                            <span className="ml-auto text-xs text-slate-500">
+                            导出全部数据为 JSON
+                            <span className="ml-auto text-xs text-muted-foreground">
                                 {skills.length} 技能 · {charms.length} 护石
                             </span>
-                        </Button>
-                        <Button
+                        </div>
+                        <div
                             onClick={handleExportCSV}
-                            className="w-full justify-start"
-                            variant="outline"
+                            className="inline-flex items-center justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full cursor-pointer"
                         >
                             <FileSpreadsheet className="h-4 w-4 mr-2" />
                             导出护石为 CSV
-                            <span className="ml-auto text-xs text-slate-500">
+                            <span className="ml-auto text-xs text-muted-foreground">
                                 {charms.length} 护石
                             </span>
-                        </Button>
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -159,7 +157,7 @@ export function DataManagement() {
                                 {importing ? '导入中...' : '选择 JSON 文件'}
                             </div>
                         </label>
-                        <p className="mt-2 text-xs text-slate-500">
+                        <p className="mt-2 text-xs text-muted-foreground">
                             仅支持本应用导出的 JSON 文件
                         </p>
                     </CardContent>
@@ -168,7 +166,7 @@ export function DataManagement() {
                 {/* 重置数据 */}
                 <Card className="md:col-span-1">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-red-600">
+                        <CardTitle className="flex items-center gap-2 text-destructive">
                             <Trash2 className="h-5 w-5" />
                             重置数据
                         </CardTitle>
@@ -184,7 +182,7 @@ export function DataManagement() {
                         >
                             重置数据
                         </Button>
-                        <p className="mt-2 text-xs text-slate-500 leading-tight">
+                        <p className="mt-2 text-xs text-muted-foreground leading-tight">
                             ⚠️ 警告：此操作将永久删除所有数据，且无法恢复！
                         </p>
                     </CardContent>
@@ -198,21 +196,21 @@ export function DataManagement() {
                     <CardContent>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
-                                <p className="text-sm text-slate-600">技能总数</p>
+                                <p className="text-sm text-foreground">技能总数</p>
                                 <p className="text-2xl font-bold">{skills.length}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-slate-600">核心技能</p>
+                                <p className="text-sm text-foreground">核心技能</p>
                                 <p className="text-2xl font-bold">
                                     {skills.filter((s) => s.isKey).length}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm text-slate-600">护石总数</p>
+                                <p className="text-sm text-foreground">护石总数</p>
                                 <p className="text-2xl font-bold">{charms.length}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-slate-600">平均核心技能价值</p>
+                                <p className="text-sm text-foreground">平均核心技能价值</p>
                                 <p className="text-2xl font-bold">
                                     {charms.length > 0
                                         ? (

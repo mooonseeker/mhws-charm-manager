@@ -1,4 +1,5 @@
 import { Sparkles, List, Database } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export type NavigationTab = 'skills' | 'charms' | 'data';
 
@@ -19,23 +20,23 @@ export function Navigation({ currentTab, onTabChange }: NavigationProps) {
     ];
 
     return (
-        <nav className="border-b bg-card">
+        <nav className="bg-card">
             <div className="mx-auto w-[80%] px-4 sm:px-6 md:px-8 lg:px-10">
                 <div className="flex gap-0.5 sm:gap-1">
                     {tabs.map(({ id, label, icon: Icon }) => (
-                        <button
+                        <Button
                             key={id}
                             onClick={() => onTabChange(id)}
                             className={`
-                flex items-center justify-center gap-1.5 sm:gap-2
-                px-6 sm:px-8 md:px-12
-                py-2 sm:py-2.5 md:py-3
-                landscape:py-2 mobile-landscape:py-1.5
-                font-medium transition-colors rounded-t-md mb-[-1px]
+                flex items-center justify-center
                 min-w-[120px] sm:min-w-[140px] md:min-w-[160px]
+                gap-1.5 sm:gap-2
+                px-6 sm:px-8 md:px-12
+                py-2 sm:py-2.5 md:py-3 landscape:py-2 mobile-landscape:py-1.5
+                border-2 transition-colors rounded-t-md rounded-b-none mb-[-1px]
                 ${currentTab === id
-                                    ? 'border-b-2 border-primary text-primary-foreground'
-                                    : 'text-muted-foreground hover:text-primary-foreground hover:bg-muted'
+                                    ? 'bg-background text-foreground  border-foreground border-b-background'
+                                    : 'border-transparent'
                                 }
               `}
                         >
@@ -43,7 +44,7 @@ export function Navigation({ currentTab, onTabChange }: NavigationProps) {
                             <span className="hidden sm:inline text-sm md:text-base mobile-landscape:text-sm">
                                 {label}
                             </span>
-                        </button>
+                        </Button>
                     ))}
                 </div>
             </div>

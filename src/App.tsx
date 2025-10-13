@@ -12,6 +12,7 @@ function App() {
     <AppProvider>
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
+        <div className="h-2"></div>
         <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
 
         <main className="mx-auto w-[80%] px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-8 md:py-10 landscape:py-4 mobile-landscape:py-3 flex-1">
