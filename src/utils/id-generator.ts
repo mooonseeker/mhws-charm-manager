@@ -1,17 +1,52 @@
 /**
  * MHWS护石管理器 - ID生成工具
- * 
+ *
  * 提供唯一ID生成功能
  */
 
+import hash from 'string-hash';
+
+/**
+ * 为技能名称生成确定性ID
+ *
+ * 为技能名称生成一个确定性的、同步的ID，保证相同名称始终对应相同ID
+ *
+ * @param name - 技能名称
+ * @returns 技能ID字符串
+ *
+ * @example
+ * generateSkillId('攻击') // 返回: "skill-12345"
+ * generateSkillId('防御') // 返回: "skill-67890"
+ */
+export function generateSkillId(name: string): string {
+    const uniqueHash = hash(name);
+    return `skill-${uniqueHash}`;
+}
+
+/**
+ * 生成护石ID
+ *
+ * 生成一个新的、非确定性的护石ID，使用时间戳和缩减的随机字符串
+ *
+ * @returns 护石ID字符串
+ *
+ * @example
+ * generateCharmId() // 返回: "charm-1634567890123-abcd"
+ */
+export function generateCharmId(): string {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 6); // 缩短至4位
+    return `charm-${timestamp}-${random}`;
+}
+
 /**
  * 生成唯一ID
- * 
+ *
  * 使用时间戳和随机字符串组合生成唯一ID
- * 
+ *
  * @param prefix - ID前缀（可选），用于区分不同类型的实体
  * @returns 唯一ID字符串
- * 
+ *
  * @example
  * generateId() // 返回: "1634567890123-abc123d"
  * generateId('charm') // 返回: "charm-1634567890123-abc123d"

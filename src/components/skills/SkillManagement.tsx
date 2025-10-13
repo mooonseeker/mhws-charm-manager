@@ -15,22 +15,33 @@ export function SkillManagement() {
     const { loading, error, addSkill, updateSkill } = useSkills();
     const [formOpen, setFormOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState<Skill | undefined>();
+    const [formError, setFormError] = useState<string | null>(null);
 
     const handleAdd = () => {
         setEditingSkill(undefined);
+        setFormError(null); // 打开表单时清除旧错误
         setFormOpen(true);
     };
 
     const handleEdit = (skill: Skill) => {
         setEditingSkill(skill);
+        setFormError(null); // 打开表单时清除旧错误
         setFormOpen(true);
     };
 
     const handleSubmit = (skillData: Omit<Skill, 'id'>) => {
         if (editingSkill) {
             updateSkill({ ...skillData, id: editingSkill.id });
+            setFormOpen(false);
         } else {
-            addSkill(skillData);
+            try {
+                addSkill(skillData);
+                setFormOpen(false); // 成功后关闭
+            } catch (error) {
+                if (error instanceof Error) {
+                    setFormError(error.message); // 将错误信息传递给表单
+                }
+            }
         }
     };
 
@@ -64,6 +75,7 @@ export function SkillManagement() {
                 open={formOpen}
                 onClose={() => setFormOpen(false)}
                 onSubmit={handleSubmit}
+                error={formError}
             />
         </div>
     );

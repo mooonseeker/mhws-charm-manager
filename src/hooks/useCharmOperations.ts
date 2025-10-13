@@ -12,7 +12,7 @@ import {
     calculateCharmEquivalentSlots,
     calculateKeySkillValue,
     validateCharm,
-    generateId,
+    generateCharmId,
 } from '@/utils';
 
 /**
@@ -85,7 +85,7 @@ export function useCharmOperations() {
 
             // 创建护石对象
             const newCharm: Charm = {
-                id: generateId('charm'),
+                id: generateCharmId(),
                 rarity: data.rarity,
                 skills: data.skills,
                 slots: data.slots,

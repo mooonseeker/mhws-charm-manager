@@ -6,8 +6,9 @@
 
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
 import type { Skill } from '@/types';
-import { loadSkills, saveSkills } from '@/utils';
+import { loadSkills, saveSkills, generateSkillId } from '@/utils';
 import { initialSkills } from '@/data/initial-skills';
+
 
 /**
  * 技能状态类型
@@ -112,8 +113,13 @@ export function SkillProvider({ children }: { children: ReactNode }) {
             if (savedSkills && savedSkills.length > 0) {
                 dispatch({ type: 'SET_SKILLS', payload: savedSkills });
             } else {
-                dispatch({ type: 'SET_SKILLS', payload: initialSkills });
-                saveSkills(initialSkills);
+                // 为初始数据生成确定性ID
+                const initialSkillsWithIds = initialSkills.map(skill => ({
+                    ...skill,
+                    id: generateSkillId(skill.name),
+                }));
+                dispatch({ type: 'SET_SKILLS', payload: initialSkillsWithIds });
+                saveSkills(initialSkillsWithIds);
             }
         } catch (error) {
             dispatch({ type: 'SET_ERROR', payload: '加载技能数据失败' });
@@ -134,13 +140,20 @@ export function SkillProvider({ children }: { children: ReactNode }) {
 
     /**
      * 添加技能
-     * 
+     *
      * @param skill - 技能数据（不包含ID）
+     * @throws {Error} 如果技能名称已存在
      */
     const addSkill = (skill: Omit<Skill, 'id'>) => {
+        // 检查名称是否重复（忽略大小写和前后空格）
+        if (state.skills.some(s => s.name.trim().toLowerCase() === skill.name.trim().toLowerCase())) {
+            throw new Error(`技能 "${skill.name}" 已存在。`);
+        }
+
+        // 使用确定性ID生成函数
         const newSkill: Skill = {
             ...skill,
-            id: `skill-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            id: generateSkillId(skill.name),
         };
         dispatch({ type: 'ADD_SKILL', payload: newSkill });
     };

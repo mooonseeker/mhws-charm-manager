@@ -23,6 +23,8 @@ export {
     generateId,
     generateIds,
     validateIdFormat,
+    generateSkillId,
+    generateCharmId,
 } from './id-generator';
 
 // 护石排序工具

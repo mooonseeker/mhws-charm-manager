@@ -25,13 +25,14 @@ interface SkillFormProps {
     open: boolean;
     onClose: () => void;
     onSubmit: (skill: Omit<Skill, 'id'>) => void;
+    error: string | null;
 }
 
 /**
  * 技能表单组件
  * 用于添加或编辑技能
  */
-export function SkillForm({ skill, open, onClose, onSubmit }: SkillFormProps) {
+export function SkillForm({ skill, open, onClose, onSubmit, error }: SkillFormProps) {
     const [name, setName] = useState('');
     const [type, setType] = useState<SkillType>('armor');
     const [maxLevel, setMaxLevel] = useState(3);
@@ -92,6 +93,7 @@ export function SkillForm({ skill, open, onClose, onSubmit }: SkillFormProps) {
                             placeholder="输入技能名称"
                             required
                         />
+                        {error && <p className="text-sm text-destructive pt-1">{error}</p>}
                     </div>
 
                     <div className="space-y-3">
