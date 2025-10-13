@@ -31,11 +31,11 @@ export function Navigation({ currentTab, onTabChange }: NavigationProps) {
                 px-6 sm:px-8 md:px-12
                 py-2 sm:py-2.5 md:py-3
                 landscape:py-2 mobile-landscape:py-1.5
-                font-medium transition-colors
+                font-medium transition-colors rounded-t-md mb-[-1px]
                 min-w-[120px] sm:min-w-[140px] md:min-w-[160px]
                 ${currentTab === id
-                                    ? 'border-b-2 border-chart-1 text-chart-1'
-                                    : 'text-muted-foreground hover:text-foreground'
+                                    ? 'border-b-2 border-primary text-primary-foreground'
+                                    : 'text-muted-foreground hover:text-primary-foreground hover:bg-muted'
                                 }
               `}
                         >

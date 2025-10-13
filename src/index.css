@@ -126,13 +126,13 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: var(--secondary);
+  background-color: var(--primary);
   cursor: pointer;
   transition: border-color 0.25s;
 }
 
 button:hover {
-  border-color: var(--primary);
+  border-color: var(--accent);
 }
 
 button:focus,
