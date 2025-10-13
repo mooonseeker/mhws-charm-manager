@@ -13,6 +13,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface SkillListProps {
     onEdit: (skill: Skill) => void;
@@ -56,74 +57,72 @@ export function SkillList({ onEdit }: SkillListProps) {
 
     return (
         <div className="space-y-6">
-            {/* 筛选栏 - 响应式布局 */}
-            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm space-y-4">
-                <div className="flex flex-wrap gap-2 sm:gap-3">
-                    <Button
-                        variant={typeFilter === 'all' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setTypeFilter('all')}
-                        className="text-xs sm:text-sm"
-                    >
-                        全部
-                    </Button>
-                    <Button
-                        variant={typeFilter === 'weapon' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setTypeFilter('weapon')}
-                        className="text-xs sm:text-sm"
-                    >
-                        武器
-                    </Button>
-                    <Button
-                        variant={typeFilter === 'armor' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setTypeFilter('armor')}
-                        className="text-xs sm:text-sm"
-                    >
-                        防具
-                    </Button>
-                    <Button
-                        variant={typeFilter === 'special' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setTypeFilter('special')}
-                        className="text-xs sm:text-sm"
-                    >
-                        特殊
-                    </Button>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3 text-sm">
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="key-only"
-                            checked={keyOnlyFilter}
-                            onChange={(e) => setKeyOnlyFilter(e.target.checked)}
-                            className="rounded border-border"
-                        />
-                        <label htmlFor="key-only" className="cursor-pointer">
-                            仅核心
-                        </label>
+            {/* 筛选栏 */}
+            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm">
+                <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <Button
+                            variant={typeFilter === 'all' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setTypeFilter('all')}
+                            className="text-xs sm:text-sm"
+                        >
+                            全部
+                        </Button>
+                        <Button
+                            variant={typeFilter === 'weapon' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setTypeFilter('weapon')}
+                            className="text-xs sm:text-sm"
+                        >
+                            武器
+                        </Button>
+                        <Button
+                            variant={typeFilter === 'armor' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setTypeFilter('armor')}
+                            className="text-xs sm:text-sm"
+                        >
+                            防具
+                        </Button>
+                        <Button
+                            variant={typeFilter === 'special' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setTypeFilter('special')}
+                            className="text-xs sm:text-sm"
+                        >
+                            特殊
+                        </Button>
+                        <div className="w-2"></div>
+                        <div className="flex items-center gap-2">
+                            <Checkbox
+                                id="key-only"
+                                checked={keyOnlyFilter}
+                                onCheckedChange={(checked) => setKeyOnlyFilter(checked === true)}
+                            />
+                            <label htmlFor="key-only" className="cursor-pointer text-xs sm:text-sm">
+                                仅核心
+                            </label>
+                        </div>
                     </div>
 
-                    <div className="text-muted-foreground ml-auto">
+                    <div className="text-muted-foreground text-sm">
                         共 {filteredSkills.length} 个
                     </div>
                 </div>
             </div>
 
-            {/* 技能表格 - 始终显示六栏布局 */}
+            {/* 技能表格 */}
             <div className="bg-card rounded-lg border shadow-sm overflow-auto">
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead className="text-center min-w-[50px]">核心</TableHead>
-                            <TableHead className="min-w-[120px]">技能名称</TableHead>
-                            <TableHead className="min-w-[80px]">类型</TableHead>
+                            <TableHead className="text-center min-w-[120px]">技能名称</TableHead>
+                            <TableHead className="text-center min-w-[80px]">类型</TableHead>
                             <TableHead className="text-center min-w-[80px]">装饰品等级</TableHead>
                             <TableHead className="text-center min-w-[60px]">最大等级</TableHead>
-                            <TableHead className="text-right min-w-[100px]">操作</TableHead>
+                            <TableHead className="text-right min-w-[80px]">操作</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -138,14 +137,14 @@ export function SkillList({ onEdit }: SkillListProps) {
                                 <TableRow key={skill.id}>
                                     <TableCell className="text-center">
                                         {skill.isKey && (
-                                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 inline" />
+                                            <Star className="h-4 w-4 fill-warning text-warning-foreground inline" />
                                         )}
                                     </TableCell>
-                                    <TableCell className="font-medium">
+                                    <TableCell className="text-center font-medium">
                                         {skill.name}
                                     </TableCell>
-                                    <TableCell>
-                                        <Badge variant="outline" className="text-xs">
+                                    <TableCell className="text-center">
+                                        <Badge variant="outline" className="text-center text-xs">
                                             {SKILL_TYPE_LABELS[skill.type]}
                                         </Badge>
                                     </TableCell>

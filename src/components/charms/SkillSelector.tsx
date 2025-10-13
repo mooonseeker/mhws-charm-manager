@@ -46,7 +46,7 @@ export function SkillSelector({ onSelect, excludeSkillIds = [] }: SkillSelectorP
     return (
         <div className="flex gap-2">
             <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                     placeholder="搜索技能..."
                     value={search}
@@ -54,11 +54,11 @@ export function SkillSelector({ onSelect, excludeSkillIds = [] }: SkillSelectorP
                     className="pl-9"
                 />
                 {search && availableSkills.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-y-auto z-10">
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto z-10">
                         {availableSkills.map((skill) => (
                             <button
                                 key={skill.id}
-                                className="w-full text-left px-3 py-2 hover:bg-slate-100"
+                                className="w-full text-left px-3 py-2 hover:bg-accent"
                                 onClick={() => {
                                     setSelectedSkillId(skill.id);
                                     setSearch(skill.name);

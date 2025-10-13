@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Edit, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Edit, Trash2, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { useCharms } from '@/contexts';
 import { useSkills } from '@/contexts';
 import type { Charm, CharmSortField, SortDirection } from '@/types';
@@ -46,6 +46,7 @@ export function CharmList({ onEdit }: CharmListProps) {
     const [maxRarity, setMaxRarity] = useState<number | null>(null);
     const [minKeySkillValue, setMinKeySkillValue] = useState<number | null>(null);
     const [filterSkillId, setFilterSkillId] = useState<string>('');
+    const [isFilterVisible, setIsFilterVisible] = useState(false);
 
     // 排序状态
     const [sortField, setSortField] = useState<CharmSortField>('keySkillValue');
@@ -127,106 +128,120 @@ export function CharmList({ onEdit }: CharmListProps) {
 
     return (
         <div className="space-y-6">
-            {/* 筛选器 - 响应式布局 */}
-            <div className="p-4 sm:p-6 bg-muted rounded-lg space-y-4">
-                <h3 className="font-medium text-base sm:text-lg">筛选条件</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                    <div className="space-y-3">
-                        <Label className="text-sm font-medium">最小稀有度</Label>
-                        <Input
-                            type="number"
-                            min={1}
-                            max={12}
-                            placeholder="1-12"
-                            value={minRarity ?? ''}
-                            onChange={(e) => setMinRarity(e.target.value ? parseInt(e.target.value) : null)}
-                        />
+            {/* 筛选器 */}
+            {isFilterVisible && (
+                <div className="p-4 sm:p-6 bg-muted rounded-lg space-y-4">
+                    <h3 className="font-medium text-base sm:text-lg">筛选条件</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                        <div className="space-y-3">
+                            <Label className="text-sm font-medium">最小稀有度</Label>
+                            <Input
+                                type="number"
+                                min={1}
+                                max={12}
+                                placeholder="1-12"
+                                value={minRarity ?? ''}
+                                onChange={(e) => setMinRarity(e.target.value ? parseInt(e.target.value) : null)}
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <Label className="text-sm font-medium">最大稀有度</Label>
+                            <Input
+                                type="number"
+                                min={1}
+                                max={12}
+                                placeholder="1-12"
+                                value={maxRarity ?? ''}
+                                onChange={(e) => setMaxRarity(e.target.value ? parseInt(e.target.value) : null)}
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <Label className="text-sm font-medium">最小核心技能价值</Label>
+                            <Input
+                                type="number"
+                                min={0}
+                                placeholder="0+"
+                                value={minKeySkillValue ?? ''}
+                                onChange={(e) => setMinKeySkillValue(e.target.value ? parseInt(e.target.value) : null)}
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <Label className="text-sm font-medium">包含技能</Label>
+                            <Select value={filterSkillId} onValueChange={setFilterSkillId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="全部技能" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">全部技能</SelectItem>
+                                    {skills.map((skill) => (
+                                        <SelectItem key={skill.id} value={skill.id}>
+                                            {skill.name} {skill.isKey && '⭐'}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
-                    <div className="space-y-3">
-                        <Label className="text-sm font-medium">最大稀有度</Label>
-                        <Input
-                            type="number"
-                            min={1}
-                            max={12}
-                            placeholder="1-12"
-                            value={maxRarity ?? ''}
-                            onChange={(e) => setMaxRarity(e.target.value ? parseInt(e.target.value) : null)}
-                        />
-                    </div>
-                    <div className="space-y-3">
-                        <Label className="text-sm font-medium">最小核心技能价值</Label>
-                        <Input
-                            type="number"
-                            min={0}
-                            placeholder="0+"
-                            value={minKeySkillValue ?? ''}
-                            onChange={(e) => setMinKeySkillValue(e.target.value ? parseInt(e.target.value) : null)}
-                        />
-                    </div>
-                    <div className="space-y-3">
-                        <Label className="text-sm font-medium">包含技能</Label>
-                        <Select value={filterSkillId} onValueChange={setFilterSkillId}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="全部技能" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">全部技能</SelectItem>
-                                {skills.map((skill) => (
-                                    <SelectItem key={skill.id} value={skill.id}>
-                                        {skill.name} {skill.isKey && '⭐'}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    {(minRarity || maxRarity || minKeySkillValue || (filterSkillId && filterSkillId !== 'all')) && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                setMinRarity(null);
+                                setMaxRarity(null);
+                                setMinKeySkillValue(null);
+                                setFilterSkillId('all');
+                            }}
+                        >
+                            清除筛选
+                        </Button>
+                    )}
                 </div>
-                {(minRarity || maxRarity || minKeySkillValue || (filterSkillId && filterSkillId !== 'all')) && (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                            setMinRarity(null);
-                            setMaxRarity(null);
-                            setMinKeySkillValue(null);
-                            setFilterSkillId('all');
-                        }}
-                    >
-                        清除筛选
-                    </Button>
-                )}
-            </div>
+            )}
 
-            {/* 护石列表 - 响应式表格 */}
+            {/* 护石列表 */}
             <div className="rounded-lg border shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead
-                                className="cursor-pointer hover:bg-muted"
+                                className="cursor-pointer hover:bg-muted text-center"
                                 onClick={() => handleSortFieldChange('rarity')}
                             >
                                 <span className="hidden sm:inline">稀有度</span>
                                 <span className="sm:hidden">R</span>
                                 {' '}<SortIcon field="rarity" />
                             </TableHead>
-                            <TableHead>技能</TableHead>
-                            <TableHead className="hidden md:table-cell">孔位</TableHead>
+                            <TableHead className="text-center">技能</TableHead>
+                            <TableHead className="hidden md:table-cell text-center">孔位</TableHead>
                             <TableHead
-                                className="cursor-pointer hover:bg-muted"
+                                className="cursor-pointer hover:bg-muted text-center"
                                 onClick={() => handleSortFieldChange('keySkillValue')}
                             >
                                 <span className="hidden sm:inline">核心价值</span>
                                 <span className="sm:hidden">价值</span>
                                 {' '}<SortIcon field="keySkillValue" />
                             </TableHead>
-                            <TableHead className="hidden lg:table-cell">等效孔位</TableHead>
+                            <TableHead className="hidden lg:table-cell text-center">等效孔位</TableHead>
                             <TableHead
-                                className="hidden lg:table-cell cursor-pointer hover:bg-muted"
+                                className="hidden lg:table-cell cursor-pointer hover:bg-muted text-center"
                                 onClick={() => handleSortFieldChange('createdAt')}
                             >
                                 创建时间 <SortIcon field="createdAt" />
                             </TableHead>
-                            <TableHead className="text-right">操作</TableHead>
+                            <TableHead className="text-right">
+                                <div className="flex items-center justify-end gap-1">
+                                    操作
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        onClick={() => setIsFilterVisible((prev) => !prev)}
+                                    >
+                                        <Filter className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -239,13 +254,13 @@ export function CharmList({ onEdit }: CharmListProps) {
                         ) : (
                             displayedCharms.map((charm) => (
                                 <TableRow key={charm.id}>
-                                    <TableCell>
+                                    <TableCell className="text-center">
                                         <Badge variant="outline" className="text-xs">
                                             <span className="hidden sm:inline">稀有度 </span>
                                             {charm.rarity}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="text-center">
                                         <div className="space-y-1 sm:space-y-2">
                                             {charm.skills.map((skillWithLevel) => (
                                                 <div key={skillWithLevel.skillId} className="text-xs sm:text-sm">
@@ -266,7 +281,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="hidden md:table-cell">
+                                    <TableCell className="hidden md:table-cell text-center">
                                         {charm.slots.length === 0 ? (
                                             <span className="text-muted-foreground text-sm">无</span>
                                         ) : (
@@ -279,16 +294,16 @@ export function CharmList({ onEdit }: CharmListProps) {
                                             </div>
                                         )}
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="text-center">
                                         <span className="font-medium text-primary text-sm sm:text-base">{charm.keySkillValue}</span>
                                     </TableCell>
-                                    <TableCell className="hidden lg:table-cell">
+                                    <TableCell className="hidden lg:table-cell text-center">
                                         <div className="text-xs space-y-1">
                                             <div>武: {charm.equivalentSlots.weaponSlot1}/{charm.equivalentSlots.weaponSlot2}/{charm.equivalentSlots.weaponSlot3}</div>
                                             <div>防: {charm.equivalentSlots.armorSlot1}/{charm.equivalentSlots.armorSlot2}/{charm.equivalentSlots.armorSlot3}</div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">
+                                    <TableCell className="hidden lg:table-cell text-xs text-muted-foreground text-center">
                                         {new Date(charm.createdAt).toLocaleDateString('zh-CN')}
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -309,7 +324,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                                 onClick={() => handleDelete(charm.id)}
                                                 className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:px-3"
                                             >
-                                                <Trash2 className="h-4 w-4 text-red-500" />
+                                                <Trash2 className="h-4 w-4 text-destructive" />
                                             </Button>
                                         </div>
                                     </TableCell>

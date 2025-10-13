@@ -65,6 +65,10 @@
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
 
+  /* 警告色彩 */
+  --warning: oklch(0.8 0.15 85);
+  --warning-foreground: oklch(0.2 0.05 85);
+
   /* 边框和输入框 */
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -159,6 +163,10 @@ h1 {
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  /* 警告色彩映射 */
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
   /* 图表颜色映射 */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -214,6 +222,10 @@ h1 {
   /* 破坏性操作 */
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
+
+  /* 警告色彩 */
+  --warning: oklch(0.7 0.2 85);
+  --warning-foreground: oklch(0.95 0 85);
 
   /* 边框和输入框 */
   --border: oklch(1 0 0 / 10%);
