@@ -72,7 +72,7 @@ export function SkillList({ onEdit }: SkillListProps) {
 
     return (
         <div className="space-y-6">
-            {/* 筛选栏 */}
+            {/* 菜单栏 */}
             <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm">
                 <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">

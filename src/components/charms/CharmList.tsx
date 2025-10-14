@@ -1,10 +1,11 @@
 import { ChevronDown, ChevronUp, Filter, Pencil, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Pagination } from '@/components/ui/pagination';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
@@ -12,7 +13,8 @@ import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
 import { useCharms, useSkills } from '@/contexts';
-import { sortCharms, sortCharmsDefault } from '@/utils';
+import { CHARMS_PER_PAGE } from '@/types/constants';
+import { sortCharms } from '@/utils';
 
 import type { Charm, CharmSortField, SortDirection } from '@/types';
 
@@ -44,8 +46,12 @@ export function CharmList({ onEdit }: CharmListProps) {
     const [sortField, setSortField] = useState<CharmSortField>('keySkillValue');
     const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
-    // 筛选和排序护石
-    const displayedCharms = useMemo(() => {
+    // 分页和搜索状态
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // 筛选护石
+    const searchedCharms = useMemo(() => {
         let filtered = [...charms];
 
         // 按稀有度筛选
@@ -68,14 +74,34 @@ export function CharmList({ onEdit }: CharmListProps) {
             );
         }
 
-        // 排序
-        if (sortField === 'keySkillValue' && sortDirection === 'desc' && !minRarity && !maxRarity && !minKeySkillValue && !filterSkillId) {
-            // 使用默认排序
-            return sortCharmsDefault(filtered);
-        } else {
-            return sortCharms(filtered, sortField, sortDirection);
+        // 按搜索关键词筛选
+        if (searchQuery) {
+            filtered = filtered.filter((c) =>
+                c.skills.some((s) => {
+                    const skill = skills.find((sk) => sk.id === s.skillId);
+                    const skillName = skill?.name || '未知技能';
+                    return skillName.toLowerCase().includes(searchQuery.toLowerCase());
+                })
+            );
         }
-    }, [charms, minRarity, maxRarity, minKeySkillValue, filterSkillId, sortField, sortDirection]);
+
+        return filtered;
+    }, [charms, minRarity, maxRarity, minKeySkillValue, filterSkillId, searchQuery, skills]);
+
+    // 排序和分页护石
+    const paginatedCharms = useMemo(() => {
+        // 排序
+        const sorted = sortCharms(searchedCharms, sortField, sortDirection);
+
+        // 分页
+        return sorted.slice(
+            (currentPage - 1) * CHARMS_PER_PAGE,
+            currentPage * CHARMS_PER_PAGE
+        );
+    }, [searchedCharms, sortField, sortDirection, currentPage]);
+
+    // 计算总页数
+    const totalPages = Math.ceil(searchedCharms.length / CHARMS_PER_PAGE);
 
     // 切换排序字段
     const handleSortFieldChange = (field: CharmSortField) => {
@@ -88,6 +114,11 @@ export function CharmList({ onEdit }: CharmListProps) {
             setSortDirection('desc');
         }
     };
+
+    // 当筛选条件变化时，重置到第一页
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [minRarity, maxRarity, minKeySkillValue, filterSkillId, searchQuery]);
 
     // 删除护石
     const handleDelete = (id: string) => {
@@ -125,7 +156,40 @@ export function CharmList({ onEdit }: CharmListProps) {
 
     return (
         <div className="space-y-6">
-            {/* 筛选器 */}
+            {/* 菜单栏 */}
+            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm">
+                <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <Button
+                            variant="default"
+                            size="sm"
+                            className="text-xs sm:text-sm"
+                        >
+                            全部
+                        </Button>
+                    </div>
+
+                    <div className="flex items-center gap-4 justify-end">
+                        <div className="text-muted-foreground text-sm">
+                            共 {searchedCharms.length} 个护石
+                        </div>
+                        <Input
+                            type="text"
+                            placeholder="搜索技能名称..."
+                            className="h-9 max-w-40"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* 可折叠筛选器 */}
             {isFilterVisible && (
                 <div className="p-4 sm:p-6 bg-muted rounded-lg space-y-4">
                     <h3 className="font-medium text-base sm:text-lg">筛选条件</h3>
@@ -242,14 +306,14 @@ export function CharmList({ onEdit }: CharmListProps) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {displayedCharms.length === 0 ? (
+                        {paginatedCharms.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center text-muted-foreground">
                                     {charms.length === 0 ? '暂无护石' : '没有符合条件的护石'}
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            displayedCharms.map((charm) => (
+                            paginatedCharms.map((charm) => (
                                 <TableRow key={charm.id}>
                                     <TableCell className="text-center">
                                         <Badge variant="outline" className="text-xs" style={{
@@ -345,11 +409,6 @@ export function CharmList({ onEdit }: CharmListProps) {
                         )}
                     </TableBody>
                 </Table>
-            </div>
-
-            {/* 统计信息 */}
-            <div className="text-sm text-muted-foreground font-medium">
-                显示 {displayedCharms.length} / {charms.length} 个护石
             </div>
         </div>
     );
