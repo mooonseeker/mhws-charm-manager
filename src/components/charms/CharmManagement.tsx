@@ -9,7 +9,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CharmList } from './CharmList';
 import { CharmForm } from './CharmForm';
 
@@ -61,22 +60,12 @@ export function CharmManagement() {
             </div>
 
             {/* 护石列表 */}
-            <Card className="shadow-sm">
-                <CardHeader className="pb-6">
-                    <CardTitle className="text-xl">护石列表</CardTitle>
-                    <CardDescription className="text-base">
-                        默认按核心技能价值和稀有度排序，点击表头可切换排序字段
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-0">
-                    <CharmList
-                        onEdit={() => {
-                            // 编辑功能暂时禁用，可以后续实现
-                            setIsEditDialogOpen(true);
-                        }}
-                    />
-                </CardContent>
-            </Card>
+            <CharmList
+                onEdit={() => {
+                    // 编辑功能暂时禁用，可以后续实现
+                    setIsEditDialogOpen(true);
+                }}
+            />
 
             {/* 编辑对话框（预留） */}
             {isEditDialogOpen && (

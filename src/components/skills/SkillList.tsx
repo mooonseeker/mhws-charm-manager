@@ -149,12 +149,12 @@ export function SkillList({ onEdit }: SkillListProps) {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="text-center min-w-[50px]">核心</TableHead>
-                            <TableHead className="text-center min-w-[120px]">技能名称</TableHead>
-                            <TableHead className="text-center min-w-[80px]">类型</TableHead>
-                            <TableHead className="text-center min-w-[80px]">装饰品等级</TableHead>
-                            <TableHead className="text-center min-w-[60px]">最大等级</TableHead>
-                            <TableHead className="text-right min-w-[80px]">操作</TableHead>
+                            <TableHead className="text-center min-w-[50px] bg-primary text-primary-foreground">核心</TableHead>
+                            <TableHead className="text-center min-w-[120px] bg-primary text-primary-foreground">技能名称</TableHead>
+                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">类型</TableHead>
+                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">装饰品等级</TableHead>
+                            <TableHead className="text-center min-w-[60px] bg-primary text-primary-foreground">最大等级</TableHead>
+                            <TableHead className="text-right min-w-[80px] bg-primary text-primary-foreground">操作</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -210,7 +210,7 @@ export function SkillList({ onEdit }: SkillListProps) {
                                                 onClick={() => handleDelete(skill)}
                                                 className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
                                             >
-                                                <Trash2 className="h-4 w-4" />
+                                                <Trash2 className="h-4 w-4 text-destructive" />
                                             </Button>
                                         </div>
                                     </TableCell>

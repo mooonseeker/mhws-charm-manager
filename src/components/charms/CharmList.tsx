@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Edit, Trash2, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { Pencil, Trash2, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { useCharms } from '@/contexts';
 import { useSkills } from '@/contexts';
 import type { Charm, CharmSortField, SortDirection } from '@/types';
@@ -205,31 +205,31 @@ export function CharmList({ onEdit }: CharmListProps) {
                     <TableHeader>
                         <TableRow>
                             <TableHead
-                                className="cursor-pointer hover:bg-muted text-center"
+                                className="cursor-pointer text-center bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
                                 onClick={() => handleSortFieldChange('rarity')}
                             >
                                 <span className="hidden sm:inline">稀有度</span>
                                 <span className="sm:hidden">R</span>
                                 {' '}<SortIcon field="rarity" />
                             </TableHead>
-                            <TableHead className="text-center">技能</TableHead>
-                            <TableHead className="hidden md:table-cell text-center">孔位</TableHead>
+                            <TableHead className="text-center bg-primary text-primary-foreground">技能</TableHead>
+                            <TableHead className="hidden md:table-cell text-center bg-primary text-primary-foreground">孔位</TableHead>
                             <TableHead
-                                className="cursor-pointer hover:bg-muted text-center"
+                                className="cursor-pointer text-center bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
                                 onClick={() => handleSortFieldChange('keySkillValue')}
                             >
                                 <span className="hidden sm:inline">核心价值</span>
                                 <span className="sm:hidden">价值</span>
                                 {' '}<SortIcon field="keySkillValue" />
                             </TableHead>
-                            <TableHead className="hidden lg:table-cell text-center">等效孔位</TableHead>
+                            <TableHead className="hidden lg:table-cell text-center bg-primary text-primary-foreground">等效孔位</TableHead>
                             <TableHead
-                                className="hidden lg:table-cell cursor-pointer hover:bg-muted text-center"
+                                className="hidden lg:table-cell cursor-pointer text-center bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
                                 onClick={() => handleSortFieldChange('createdAt')}
                             >
                                 创建时间 <SortIcon field="createdAt" />
                             </TableHead>
-                            <TableHead className="text-right">
+                            <TableHead className="text-right bg-primary text-primary-foreground">
                                 <div className="flex items-center justify-end gap-1">
                                     操作
                                     <Button
@@ -313,16 +313,16 @@ export function CharmList({ onEdit }: CharmListProps) {
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={() => onEdit(charm)}
-                                                    className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:px-3"
+                                                    className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
                                                 >
-                                                    <Edit className="h-4 w-4" />
+                                                    <Pencil className="h-4 w-4" />
                                                 </Button>
                                             )}
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleDelete(charm.id)}
-                                                className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:px-3"
+                                                className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
                                             >
                                                 <Trash2 className="h-4 w-4 text-destructive" />
                                             </Button>
