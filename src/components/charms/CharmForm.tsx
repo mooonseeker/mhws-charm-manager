@@ -239,20 +239,19 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
                 )}
             </div>
 
-            {/* 等效孔位统计 */}
-            <div className="p-6 bg-muted rounded-lg space-y-4">
-                <h3 className="font-medium text-base">等效孔位统计</h3>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>武器孔位1级: {equivalentSlots.weaponSlot1}</div>
-                    <div>防具孔位1级: {equivalentSlots.armorSlot1}</div>
-                    <div>武器孔位2级: {equivalentSlots.weaponSlot2}</div>
-                    <div>防具孔位2级: {equivalentSlots.armorSlot2}</div>
-                    <div>武器孔位3级: {equivalentSlots.weaponSlot3}</div>
-                    <div>防具孔位3级: {equivalentSlots.armorSlot3}</div>
+            {/* 护石价值评估 */}
+            <div className="flex items-center justify-between gap-4 p-4 bg-muted rounded-lg">
+                <div className="font-medium">
+                    核心技能价值: <span className="text-primary">{keySkillValue}</span>
                 </div>
-                <div className="pt-2 border-t border-border">
-                    <div className="font-medium">
-                        核心技能价值: <span className="text-primary">{keySkillValue}</span>
+                <div className="text-sm flex gap-2 md:gap-4">
+                    <div className="flex items-center gap-1">
+                        <img src="/weapon.png" alt="WeaponSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
+                        {equivalentSlots.weaponSlot3}/{equivalentSlots.weaponSlot2}/{equivalentSlots.weaponSlot1}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <img src="/armor.png" alt="ArmorSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
+                        {equivalentSlots.armorSlot3}/{equivalentSlots.armorSlot2}/{equivalentSlots.armorSlot1}
                     </div>
                 </div>
             </div>
