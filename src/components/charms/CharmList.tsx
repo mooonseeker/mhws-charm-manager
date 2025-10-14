@@ -260,7 +260,11 @@ export function CharmList({ onEdit }: CharmListProps) {
                             displayedCharms.map((charm) => (
                                 <TableRow key={charm.id}>
                                     <TableCell className="text-center">
-                                        <Badge variant="outline" className="text-xs">
+                                        <Badge variant="outline" className="text-xs" style={{
+                                            color: charm.rarity === 12 ? 'black' : `var(--rarity-${charm.rarity})`,
+                                            borderColor: charm.rarity === 12 ? 'var(--border)' : `var(--rarity-${charm.rarity})`,
+                                            background: charm.rarity === 12 ? `var(--rarity-${charm.rarity})` : 'transparent'
+                                        }}>
                                             R{charm.rarity}
                                         </Badge>
                                     </TableCell>

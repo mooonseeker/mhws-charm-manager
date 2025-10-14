@@ -74,22 +74,19 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
 
-  /* 图表颜色 */
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-
-  /* 侧边栏 */
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* 稀有度颜色 */
+  --rarity-1: oklch(0.7 0 0);        /* R1 灰色 */
+  --rarity-2: oklch(0.9 0 0);        /* R2 白色 */
+  --rarity-3: oklch(0.85 0.16 142);  /* R3 浅绿色 */
+  --rarity-4: oklch(0.55 0.18 142);  /* R4 鲜绿色 */
+  --rarity-5: oklch(0.7 0.08 240);   /* R5 浅蓝色 */
+  --rarity-6: oklch(0.65 0.18 285);  /* R6 紫色 */
+  --rarity-7: oklch(0.7 0.18 300);   /* R7 紫色 */
+  --rarity-8: oklch(0.75 0.18 45);   /* R8 橙色 */
+  --rarity-9: oklch(0.65 0.2 25);    /* R9 红色 */
+  --rarity-10: oklch(0.5 0.15 250);  /* R10 深蓝色 */
+  --rarity-11: oklch(0.85 0.15 85);  /* R11 金色 */
+  --rarity-12: linear-gradient(135deg, #c8c8c8 0%, #f8f8f8 40%, #c0c0c0 60%, #a8a8a8 100%);  /* R12 银色 */
 }
 
 /* ============================================
@@ -167,22 +164,20 @@ h1 {
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
 
-  /* 图表颜色映射 */
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
 
-  /* 侧边栏颜色映射 */
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  /* 稀有度颜色映射 */
+  --color-rarity-1: var(--rarity-1);
+  --color-rarity-2: var(--rarity-2);
+  --color-rarity-3: var(--rarity-3);
+  --color-rarity-4: var(--rarity-4);
+  --color-rarity-5: var(--rarity-5);
+  --color-rarity-6: var(--rarity-6);
+  --color-rarity-7: var(--rarity-7);
+  --color-rarity-8: var(--rarity-8);
+  --color-rarity-9: var(--rarity-9);
+  --color-rarity-10: var(--rarity-10);
+  --color-rarity-11: var(--rarity-11);
+  --color-rarity-12: var(--rarity-12);
 }
 
 /* ============================================
@@ -231,23 +226,6 @@ h1 {
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
-
-  /* 图表颜色 */
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-
-  /* 侧边栏 */
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
 }
 
 /* ============================================
