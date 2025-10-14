@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { AppProvider } from '@/contexts';
-import { Header, Navigation, Footer, type NavigationTab } from '@/components/layout';
-import { SkillManagement } from '@/components/skills';
+
 import { CharmManagement } from '@/components/charms';
 import { DataManagement } from '@/components/data';
+import { Footer, Header, Navigation } from '@/components/layout';
+import { SkillManagement } from '@/components/skills';
+import { AppProvider } from '@/contexts';
+
+import type { NavigationTab } from '@/components/layout';
 
 function App() {
   const [currentTab, setCurrentTab] = useState<NavigationTab>('charms');

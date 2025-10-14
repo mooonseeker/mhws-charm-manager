@@ -1,6 +1,7 @@
-import { useOrientation, type OrientationType } from './useOrientation';
 import { useMediaQuery } from './useMediaQuery';
+import { useOrientation } from './useOrientation';
 
+import type { OrientationType } from './useOrientation';
 export type DeviceType = 'mobile' | 'tablet' | 'desktop';
 export type ScreenSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 

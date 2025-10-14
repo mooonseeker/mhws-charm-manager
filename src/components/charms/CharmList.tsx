@@ -1,28 +1,20 @@
-import { useState, useMemo } from 'react';
-import { Pencil, Trash2, ChevronDown, ChevronUp, Filter } from 'lucide-react';
-import { useCharms } from '@/contexts';
-import { useSkills } from '@/contexts';
-import type { Charm, CharmSortField, SortDirection } from '@/types';
-import { sortCharms, sortCharmsDefault } from '@/utils';
-import { Button } from '@/components/ui/button';
+import { ChevronDown, ChevronUp, Filter, Pencil, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+
 import { Badge } from '@/components/ui/badge';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from '@/components/ui/select';
+import {
+    Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+} from '@/components/ui/table';
+import { useCharms, useSkills } from '@/contexts';
+import { sortCharms, sortCharmsDefault } from '@/utils';
+
+import type { Charm, CharmSortField, SortDirection } from '@/types';
 
 interface CharmListProps {
     onEdit?: (charm: Charm) => void;

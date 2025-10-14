@@ -1,21 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Pencil, Trash2, Star } from 'lucide-react';
-import { useSkills } from '@/contexts';
-import type { Skill, SkillType, SlotLevel } from '@/types';
-import { SKILL_TYPE_LABELS, SKILLS_PER_PAGE } from '@/types/constants';
-import { Button } from '@/components/ui/button';
-import { Pagination } from '@/components/ui/pagination';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Pencil, Star, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
+import {
+    Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+} from '@/components/ui/table';
+import { useSkills } from '@/contexts';
+import { SKILL_TYPE_LABELS, SKILLS_PER_PAGE } from '@/types/constants';
+
+import type { Skill, SkillType, SlotLevel } from '@/types';
 
 interface SkillListProps {
     onEdit: (skill: Skill) => void;
@@ -119,14 +116,14 @@ export function SkillList({ onEdit }: SkillListProps) {
                                 onCheckedChange={(checked) => setKeyOnlyFilter(checked === true)}
                             />
                             <label htmlFor="key-only" className="cursor-pointer text-xs sm:text-sm">
-                                仅核心
+                                仅核心技能
                             </label>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4 justify-end">
                         <div className="text-muted-foreground text-sm">
-                            共 {filteredSkills.length} 个
+                            共 {filteredSkills.length} 个技能
                         </div>
                         <Input
                             type="text"

@@ -5,16 +5,13 @@
  */
 
 import { useCallback } from 'react';
-import { useCharms } from '@/contexts';
-import { useSkills } from '@/contexts';
-import type { SkillWithLevel, Slot, Charm } from '@/types';
+
+import { useCharms, useSkills } from '@/contexts';
 import {
-    calculateCharmEquivalentSlots,
-    calculateKeySkillValue,
-    validateCharm,
-    generateCharmId,
+    calculateCharmEquivalentSlots, calculateKeySkillValue, generateCharmId, validateCharm
 } from '@/utils';
 
+import type { SkillWithLevel, Slot, Charm } from '@/types';
 /**
  * 护石操作Hook
  * 

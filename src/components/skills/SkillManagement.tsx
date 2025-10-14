@@ -1,11 +1,14 @@
-import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useSkills } from '@/contexts';
-import type { Skill } from '@/types';
+import { useState } from 'react';
+
+import { ErrorMessage, Loading } from '@/components/common';
 import { Button } from '@/components/ui/button';
-import { SkillList } from './SkillList';
+import { useSkills } from '@/contexts';
+
 import { SkillForm } from './SkillForm';
-import { Loading, ErrorMessage } from '@/components/common';
+import { SkillList } from './SkillList';
+
+import type { Skill } from '@/types';
 
 /**
  * 技能管理主组件

@@ -4,12 +4,10 @@
  * 提供美观的主题切换功能，支持亮色、暗色和跟随系统三种模式
  */
 
-import { Moon, Sun, Monitor } from 'lucide-react';
+import { Monitor, Moon, Sun } from 'lucide-react';
+
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useTheme } from '@/contexts';
-import {
-    ToggleGroup,
-    ToggleGroupItem,
-} from '@/components/ui/toggle-group';
 
 /**
  * 主题切换按钮组件

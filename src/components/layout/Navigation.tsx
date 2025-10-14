@@ -1,4 +1,5 @@
-import { Sparkles, List, Database } from 'lucide-react';
+import { Database, List, Sparkles } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 
 export type NavigationTab = 'skills' | 'charms' | 'data';

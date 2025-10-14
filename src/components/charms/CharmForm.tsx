@@ -1,27 +1,25 @@
-import { useState, useMemo } from 'react';
 import { X } from 'lucide-react';
-import { useSkills } from '@/contexts';
-import { useCharmOperations } from '@/hooks';
-import type { SkillWithLevel, Slot, SlotType, SlotLevel } from '@/types';
-import { calculateCharmEquivalentSlots, calculateKeySkillValue } from '@/utils';
+import { useMemo, useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+    Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
-import { SkillSelector } from './SkillSelector';
+import { useSkills } from '@/contexts';
+import { useCharmOperations } from '@/hooks';
+import { calculateCharmEquivalentSlots, calculateKeySkillValue } from '@/utils';
+
 import { CharmValidation } from './CharmValidation';
-import { Badge } from '@/components/ui/badge';
+import { SkillSelector } from './SkillSelector';
+
+import type { SkillWithLevel, Slot, SlotType, SlotLevel } from '@/types';
 
 interface CharmFormProps {
     onSuccess?: () => void;
     onCancel?: () => void;
 }
-
 /**
  * 护石表单组件
  * 

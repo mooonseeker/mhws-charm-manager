@@ -1,17 +1,14 @@
-import { useState } from 'react';
 import { Search } from 'lucide-react';
-import { useSkills } from '@/contexts';
-import type { SkillWithLevel } from '@/types';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+    Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from '@/components/ui/select';
+import { useSkills } from '@/contexts';
+
+import type { SkillWithLevel } from '@/types';
 interface SkillSelectorProps {
     onSelect: (skill: SkillWithLevel) => void;
     excludeSkillIds?: string[];

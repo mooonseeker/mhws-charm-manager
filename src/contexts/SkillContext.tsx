@@ -4,11 +4,13 @@
  * 使用Context API + useReducer管理技能的全局状态
  */
 
-import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
-import type { Skill } from '@/types';
-import { loadSkills, saveSkills, generateSkillId } from '@/utils';
-import { initialSkills } from '@/data/initial-skills';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useReducer } from 'react';
 
+import { initialSkills } from '@/data/initial-skills';
+import { generateSkillId, loadSkills, saveSkills } from '@/utils';
+
+import type { Skill } from '@/types';
 
 /**
  * 技能状态类型

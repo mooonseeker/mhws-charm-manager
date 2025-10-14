@@ -5,8 +5,9 @@
  */
 
 import type { Charm, SkillWithLevel, Slot, CharmValidationResult, Skill } from '@/types';
-import { calculateCharmEquivalentSlots, calculateKeySkillValue } from './charm-calculator';
 import { KEY_SKILL_VALUE_THRESHOLD } from '@/types/constants';
+
+import { calculateCharmEquivalentSlots, calculateKeySkillValue } from './charm-calculator';
 
 /**
  * 比较两个护石的技能

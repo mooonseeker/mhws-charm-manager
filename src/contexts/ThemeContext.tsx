@@ -4,7 +4,9 @@
  * 使用Context API管理应用主题状态，支持亮色、暗色和跟随系统三种模式
  */
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+
+import type { ReactNode } from 'react';
 
 /**
  * 主题类型

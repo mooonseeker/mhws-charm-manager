@@ -1,4 +1,5 @@
 import { AlertTriangle, Info } from 'lucide-react';
+
 import type { CharmValidationResult } from '@/types';
 
 interface CharmValidationProps {

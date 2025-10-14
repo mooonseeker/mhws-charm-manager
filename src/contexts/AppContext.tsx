@@ -4,9 +4,10 @@
  * 组合所有Context Provider，提供统一的应用状态管理
  */
 
-import { type ReactNode } from 'react';
-import { SkillProvider } from './SkillContext';
+import type { ReactNode } from 'react';
+
 import { CharmProvider } from './CharmContext';
+import { SkillProvider } from './SkillContext';
 import { ThemeProvider } from './ThemeContext';
 
 /**
