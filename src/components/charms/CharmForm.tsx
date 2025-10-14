@@ -48,8 +48,14 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
     // 实时验证
     const validation = useMemo(() => {
         if (selectedSkills.length === 0) return null;
-        return validateNewCharm({ rarity, skills: selectedSkills, slots });
-    }, [rarity, selectedSkills, slots, validateNewCharm]);
+        return validateNewCharm({
+            rarity,
+            skills: selectedSkills,
+            slots,
+            equivalentSlots,
+            keySkillValue,
+        });
+    }, [rarity, selectedSkills, slots, equivalentSlots, keySkillValue, validateNewCharm]);
 
     // 添加技能
     const handleAddSkill = (skill: SkillWithLevel) => {

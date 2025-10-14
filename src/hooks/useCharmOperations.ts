@@ -127,11 +127,9 @@ export function useCharmOperations() {
      * ```
      */
     const validateNewCharm = useCallback(
-        (data: {
-            rarity: number;
-            skills: SkillWithLevel[];
-            slots: Slot[];
-        }) => {
+        (
+            data: Omit<Charm, 'id' | 'createdAt'>
+        ) => {
             return validateCharm(data, charms, skills);
         },
         [charms, skills]

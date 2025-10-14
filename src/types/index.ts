@@ -108,18 +108,38 @@ export interface Charm {
 }
 
 /**
+ * 护石验证状态
+ *
+ * - `ACCEPTED_AS_FIRST`: 数据库为空，直接接受
+ * - `ACCEPTED_BY_MAX_VALUE`: 因核心价值最高而快速接受
+ * - `ACCEPTED_BY_MAX_SLOTS`: 因等效孔位最高而快速接受
+ * - `ACCEPTED_AS_UNIQUE_SKILL`: 因拥有独特的核心/高级技能而接受
+ * - `ACCEPTED`: 通过详细比较后接受
+ * - `REJECTED_AS_INFERIOR`: 因存在绝对更优的护石而被拒绝
+ */
+export type CharmValidationStatus =
+    | 'ACCEPTED_AS_FIRST'
+    | 'ACCEPTED_BY_MAX_VALUE'
+    | 'ACCEPTED_BY_MAX_SLOTS'
+    | 'ACCEPTED_AS_UNIQUE_SKILL'
+    | 'ACCEPTED'
+    | 'REJECTED_AS_INFERIOR';
+
+/**
  * 护石验证结果
- * 
+ *
  * @property isValid - 是否通过验证
- * @property warnings - 警告消息列表
- * @property isInferior - （可选）是否落后于现有护石
- * @property isBelowAverage - （可选）是否低于平均水平
+ * @property status - 验证状态的枚举
+ * @property warnings - （可选）警告消息列表
+ * @property betterCharm - （可选）当 status 为 REJECTED_AS_INFERIOR 时提供，指更优的护石
+ * @property outclassedCharms - （可选）当找到被完爆的护石时提供
  */
 export interface CharmValidationResult {
     isValid: boolean;
-    warnings: string[];
-    isInferior?: boolean;
-    isBelowAverage?: boolean;
+    status: CharmValidationStatus;
+    warnings?: string[];
+    betterCharm?: Charm;
+    outclassedCharms?: Charm[];
 }
 
 /**
