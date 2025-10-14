@@ -116,6 +116,11 @@ export function CharmList({ onEdit }: CharmListProps) {
         return skill?.isKey || false;
     };
 
+    // 获取装饰品等级图标
+    const getDecorationIcon = (slotType: 'weapon' | 'armor', level: number) => {
+        return `/${slotType}-slot-${level}.png`;
+    };
+
     // 渲染排序图标
     const SortIcon = ({ field }: { field: CharmSortField }) => {
         if (sortField !== field) return null;
@@ -256,8 +261,7 @@ export function CharmList({ onEdit }: CharmListProps) {
                                 <TableRow key={charm.id}>
                                     <TableCell className="text-center">
                                         <Badge variant="outline" className="text-xs">
-                                            <span className="hidden sm:inline">稀有度 </span>
-                                            {charm.rarity}
+                                            R{charm.rarity}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-center">
@@ -282,25 +286,37 @@ export function CharmList({ onEdit }: CharmListProps) {
                                         </div>
                                     </TableCell>
                                     <TableCell className="hidden md:table-cell text-center">
-                                        {charm.slots.length === 0 ? (
-                                            <span className="text-muted-foreground text-sm">无</span>
-                                        ) : (
-                                            <div className="space-y-1">
-                                                {charm.slots.map((slot, index) => (
-                                                    <div key={index} className="text-xs">
-                                                        {slot.type === 'weapon' ? '武器' : '防具'} {slot.level}级
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
+                                        <div className="flex justify-center gap-2">
+                                            {Array.from({ length: 3 }, (_, index) => {
+                                                const slot = charm.slots[index];
+                                                return slot ? (
+                                                    <img
+                                                        key={index}
+                                                        src={getDecorationIcon(slot.type, slot.level)}
+                                                        alt={`${slot.type === 'weapon' ? 'WeaponSlot' : 'ArmorSlot'} ${slot.level}级`}
+                                                        style={{ width: '2rem', height: '2rem' }}
+                                                    />
+                                                ) : (
+                                                    <span key={index} className="text-muted-foreground text-sm" style={{ width: '2rem', height: '2rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        —
+                                                    </span>
+                                                );
+                                            })}
+                                        </div>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <span className="font-medium text-primary text-sm sm:text-base">{charm.keySkillValue}</span>
                                     </TableCell>
                                     <TableCell className="hidden lg:table-cell text-center">
-                                        <div className="text-xs space-y-1">
-                                            <div>武: {charm.equivalentSlots.weaponSlot1}/{charm.equivalentSlots.weaponSlot2}/{charm.equivalentSlots.weaponSlot3}</div>
-                                            <div>防: {charm.equivalentSlots.armorSlot1}/{charm.equivalentSlots.armorSlot2}/{charm.equivalentSlots.armorSlot3}</div>
+                                        <div className="text-sm flex flex-col md:flex-row gap-2 md:gap-4 justify-center">
+                                            <div className="flex items-center gap-1">
+                                                <img src="/weapon.png" alt="WeaponSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
+                                                {charm.equivalentSlots.weaponSlot3}/{charm.equivalentSlots.weaponSlot2}/{charm.equivalentSlots.weaponSlot1}
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <img src="/armor.png" alt="ArmorSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
+                                                {charm.equivalentSlots.armorSlot3}/{charm.equivalentSlots.armorSlot2}/{charm.equivalentSlots.armorSlot1}
+                                            </div>
                                         </div>
                                     </TableCell>
                                     <TableCell className="hidden lg:table-cell text-xs text-muted-foreground text-center">
