@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { useSkills } from '@/contexts';
 import { useCharmOperations } from '@/hooks';
 import { calculateCharmEquivalentSlots, calculateKeySkillValue } from '@/utils';
@@ -125,20 +126,24 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
     return (
         <div className="space-y-8">
             {/* 稀有度选择 */}
-            <div className="space-y-3">
-                <Label className="text-base font-medium">稀有度</Label>
-                <Select value={rarity.toString()} onValueChange={(v) => setRarity(parseInt(v))}>
-                    <SelectTrigger>
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {Array.from({ length: 12 }, (_, i) => i + 1).map((r) => (
-                            <SelectItem key={r} value={r.toString()}>
-                                稀有度 {r}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+            <div className="flex items-center gap-2">
+                <Label className="text-base font-medium w-16 shrink-0">稀有度</Label>
+                <Badge variant="outline" className="text-sm font-medium w-12 justify-center mr-4" style={{
+                    color: rarity === 12 ? 'black' : `var(--rarity-${rarity})`,
+                    borderColor: rarity === 12 ? 'var(--border)' : `var(--rarity-${rarity})`,
+                    background: rarity === 12 ? `var(--rarity-${rarity})` : 'transparent'
+                }}>
+                    R{rarity}
+                </Badge>
+                <div className="flex-1 min-w-0">
+                    <Slider
+                        value={[rarity]}
+                        onValueChange={(values) => setRarity(values[0])}
+                        min={1}
+                        max={12}
+                        step={1}
+                    />
+                </div>
             </div>
 
             {/* 技能选择 */}
