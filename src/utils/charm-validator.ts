@@ -4,7 +4,7 @@
  * 提供护石验证和比较功能，判断新护石是否值得添加
  */
 
-import type { Charm, SkillWithLevel, Slot, CharmValidationResult, Skill, EquivalentSlots } from '@/types';
+import type { Charm, SkillWithLevel, Slot, CharmValidationResult, Skill, EquivalentSlots, CharmValidationStatus } from '@/types';
 import { KEY_SKILL_VALUE_THRESHOLD } from '@/types/constants';
 
 type SlotComparisonResult = 'superior' | 'inferior' | 'equal' | 'incomparable';
@@ -46,30 +46,52 @@ function compareEquivalentSlots(
 }
 
 /**
- * 比较两个护石的技能
- * 
- * 检查newSkills的技能是否完全被existingSkills包含且等级更低或相等
- * 
- * 规则：
- * - newSkills中的每个技能都必须在existingSkills中存在
- * - 且对应技能的等级必须小于或等于existingSkills中的等级
- * 
- * @param newSkills - 新护石的技能列表
- * @param existingSkills - 现有护石的技能列表
- * @returns true表示新护石的技能落后于现有护石
- * 
- * @example
- * const newSkills = [{ skillId: 'skill1', level: 2 }];
- * const existingSkills = [{ skillId: 'skill1', level: 3 }];
- * areSkillsInferior(newSkills, existingSkills) // 返回 true
- * 
- * @example
- * const newSkills = [{ skillId: 'skill1', level: 2 }];
- * const existingSkills = [{ skillId: 'skill2', level: 3 }];
- * areSkillsInferior(newSkills, existingSkills) // 返回 false (不同技能)
+ * 检查一个护石是否在所有方面都优于或等于另一个护石（“完爆”/ "Dominate"）
+ *
+ * @param dominator - 潜在的优胜护石
+ * @param dominated - 潜在的劣势护石
+ * @returns 如果 dominator 全方位优于或等于 dominated 且至少有一项严格更优，则返回 true
  */
+function isDominating(
+    dominator: Omit<Charm, 'id' | 'createdAt'>,
+    dominated: Charm,
+): boolean {
+    const slotComparison = compareEquivalentSlots(dominator.equivalentSlots, dominated.equivalentSlots);
+
+    // 1. 孔位不能比对方差
+    if (slotComparison === 'inferior') {
+        return false;
+    }
+
+    const dominatorSkillsMap = new Map(dominator.skills.map(s => [s.skillId, s.level]));
+    let isSkillStrictlySuperior = false;
+
+    // 2. 检查 dominator 是否覆盖 dominated 的所有技能，且等级不低于对方
+    for (const dominatedSkill of dominated.skills) {
+        const dominatorLevel = dominatorSkillsMap.get(dominatedSkill.skillId);
+        // 如果 dominator 缺少 dominated 的某个技能，或者等级更低，则不能完爆
+        if (!dominatorLevel || dominatorLevel < dominatedSkill.level) {
+            return false;
+        }
+        if (dominatorLevel > dominatedSkill.level) {
+            isSkillStrictlySuperior = true;
+        }
+    }
+
+    // 如果 dominator 的技能数量比 dominated 多，也算技能更优
+    // （前提是它已经包含了 dominated 的所有技能，这一点已在上面的循环中确认）
+    if (dominator.skills.length > dominated.skills.length) {
+        isSkillStrictlySuperior = true;
+    }
+
+    // 3. 两者不能完全相同，必须至少有一项严格更优
+    const isSlotStrictlySuperior = slotComparison === 'superior';
+
+    return isSlotStrictlySuperior || isSkillStrictlySuperior;
+}
+
 /**
- * 验证护石是否应该添加（重构版）
+ * 验证护石是否应该添加（V3版 - 采用完爆检查逻辑）
  *
  * @param newCharm - 新护石（需包含计算好的`equivalentSlots`和`keySkillValue`）
  * @param existingCharms - 现有护石列表
@@ -79,26 +101,39 @@ function compareEquivalentSlots(
 export function validateCharm(
     newCharm: Omit<Charm, 'id' | 'createdAt'>,
     existingCharms: Charm[],
-    skillsData: Skill[]
+    skillsData: Skill[],
 ): CharmValidationResult {
-    // Phase 0: 快速通道，如果没有现有护石则直接接受
+    // Phase 0: 如果数据库为空，直接接受
     if (existingCharms.length === 0) {
         return { isValid: true, status: 'ACCEPTED_AS_FIRST' };
     }
 
-    // Phase 1: 准备阶段 & 快速通道检查
+    // Phase 1: 全面完爆检查
+    // 1.1: 检查新护石是否被任何现有护石完爆（绝对劣势）
+    for (const existingCharm of existingCharms) {
+        if (isDominating(existingCharm, newCharm as Charm)) {
+            return { isValid: false, status: 'REJECTED_AS_INFERIOR', betterCharm: existingCharm };
+        }
+    }
+
+    // 1.2: 检查新护石完爆了哪些现有护石（绝对优势）
+    const outclassedCharms = existingCharms.filter(existingCharm =>
+        isDominating(newCharm, existingCharm)
+    );
+
+    // Phase 2: 确定接受理由（不再提前返回）
+    let status: CharmValidationStatus = 'ACCEPTED';
+
     const stats = existingCharms.reduce(
         (acc, charm) => {
             acc.maxKeySkillValue = Math.max(acc.maxKeySkillValue, charm.keySkillValue);
-            acc.totalKeySkillValue += charm.keySkillValue;
-
             acc.maxEqSlots.weaponSlot1 = Math.max(acc.maxEqSlots.weaponSlot1, charm.equivalentSlots.weaponSlot1);
             acc.maxEqSlots.weaponSlot2 = Math.max(acc.maxEqSlots.weaponSlot2, charm.equivalentSlots.weaponSlot2);
             acc.maxEqSlots.weaponSlot3 = Math.max(acc.maxEqSlots.weaponSlot3, charm.equivalentSlots.weaponSlot3);
             acc.maxEqSlots.armorSlot1 = Math.max(acc.maxEqSlots.armorSlot1, charm.equivalentSlots.armorSlot1);
             acc.maxEqSlots.armorSlot2 = Math.max(acc.maxEqSlots.armorSlot2, charm.equivalentSlots.armorSlot2);
             acc.maxEqSlots.armorSlot3 = Math.max(acc.maxEqSlots.armorSlot3, charm.equivalentSlots.armorSlot3);
-
+            acc.totalKeySkillValue += charm.keySkillValue;
             return acc;
         },
         {
@@ -107,105 +142,57 @@ export function validateCharm(
             maxEqSlots: { weaponSlot1: 0, weaponSlot2: 0, weaponSlot3: 0, armorSlot1: 0, armorSlot2: 0, armorSlot3: 0 },
         }
     );
-    const avgKeySkillValue = stats.totalKeySkillValue / existingCharms.length;
 
-    // 1.1: 快速通道 - 核心价值
     if (newCharm.keySkillValue > stats.maxKeySkillValue) {
-        return { isValid: true, status: 'ACCEPTED_BY_MAX_VALUE' };
-    }
-    // 1.2: 快速通道 - 等效孔位
-    const newEqSlots = newCharm.equivalentSlots;
-    if (
-        newEqSlots.weaponSlot1 > stats.maxEqSlots.weaponSlot1 ||
-        newEqSlots.weaponSlot2 > stats.maxEqSlots.weaponSlot2 ||
-        newEqSlots.weaponSlot3 > stats.maxEqSlots.weaponSlot3 ||
-        newEqSlots.armorSlot1 > stats.maxEqSlots.armorSlot1 ||
-        newEqSlots.armorSlot2 > stats.maxEqSlots.armorSlot2 ||
-        newEqSlots.armorSlot3 > stats.maxEqSlots.armorSlot3
+        status = 'ACCEPTED_BY_MAX_VALUE';
+    } else if (
+        newCharm.equivalentSlots.weaponSlot1 > stats.maxEqSlots.weaponSlot1 ||
+        newCharm.equivalentSlots.weaponSlot2 > stats.maxEqSlots.weaponSlot2 ||
+        newCharm.equivalentSlots.weaponSlot3 > stats.maxEqSlots.weaponSlot3 ||
+        newCharm.equivalentSlots.armorSlot1 > stats.maxEqSlots.armorSlot1 ||
+        newCharm.equivalentSlots.armorSlot2 > stats.maxEqSlots.armorSlot2 ||
+        newCharm.equivalentSlots.armorSlot3 > stats.maxEqSlots.armorSlot3
     ) {
-        return { isValid: true, status: 'ACCEPTED_BY_MAX_SLOTS' };
-    }
+        status = 'ACCEPTED_BY_MAX_SLOTS';
+    } else {
+        // 检查是否拥有独特技能（基于旧的锚点技能逻辑）
+        const newCharmSkillsWithData = newCharm.skills.map(s => ({
+            ...s,
+            skillData: skillsData.find(sd => sd.id === s.skillId),
+        }));
+        const coreSkills = newCharmSkillsWithData.filter(s => s.skillData?.isKey);
+        let anchorSkills: typeof newCharmSkillsWithData = [];
 
-    // Phase 2: 精确对比检查 (Skill-Centric Comparison)
-    // 2.1: 确定锚点技能
-    const newCharmSkillsWithData = newCharm.skills.map(s => ({
-        ...s,
-        skillData: skillsData.find(sd => sd.id === s.skillId),
-    }));
-    const coreSkills = newCharmSkillsWithData.filter(s => s.skillData?.isKey);
-    let anchorSkills: typeof newCharmSkillsWithData = [];
-
-    if (coreSkills.length > 0) {
-        anchorSkills = coreSkills;
-    } else if (newCharmSkillsWithData.length > 0) {
-        const maxLevel = Math.max(...newCharmSkillsWithData.map(s => s.level));
-        anchorSkills = newCharmSkillsWithData.filter(s => s.level === maxLevel);
-    }
-
-    // 处理无技能护石的特殊情况
-    if (anchorSkills.length === 0) {
-        const existingNoSkillCharms = existingCharms.filter(c => c.skills.length === 0);
-        for (const existing of existingNoSkillCharms) {
-            const slotComparison = compareEquivalentSlots(newCharm.equivalentSlots, existing.equivalentSlots);
-            // 如果比任何一个现有的无技能护石要差或相等，则拒绝
-            if (slotComparison === 'inferior' || slotComparison === 'equal') {
-                return { isValid: false, status: 'REJECTED_AS_INFERIOR', betterCharm: existing };
-            }
-        }
-        return { isValid: true, status: 'ACCEPTED' };
-    }
-
-    const outclassedCharms: Charm[] = [];
-
-    // 2.2: 遍历锚点技能
-    for (const anchorSkill of anchorSkills) {
-        const relevantCharms = existingCharms.filter(c =>
-            c.skills.some(s => s.skillId === anchorSkill.skillId)
-        );
-
-        if (relevantCharms.length === 0) {
-            return { isValid: true, status: 'ACCEPTED_AS_UNIQUE_SKILL' };
+        if (coreSkills.length > 0) {
+            anchorSkills = coreSkills;
+        } else if (newCharmSkillsWithData.length > 0) {
+            const maxLevel = Math.max(...newCharmSkillsWithData.map(s => s.level));
+            anchorSkills = newCharmSkillsWithData.filter(s => s.level === maxLevel);
         }
 
-        for (const relevantCharm of relevantCharms) {
-            const existingSkill = relevantCharm.skills.find(s => s.skillId === anchorSkill.skillId)!;
-            const slotComparison = compareEquivalentSlots(newCharm.equivalentSlots, relevantCharm.equivalentSlots);
-
-            const skillLevelSuperior = anchorSkill.level > existingSkill.level;
-            const skillLevelInferior = anchorSkill.level < existingSkill.level;
-            const skillLevelEqual = anchorSkill.level === existingSkill.level;
-
-            const slotsSuperior = slotComparison === 'superior';
-            const slotsInferior = slotComparison === 'inferior';
-            const slotsEqual = slotComparison === 'equal';
-
-            // 检查"绝对劣势"
-            if ((skillLevelInferior || skillLevelEqual) && (slotsInferior || slotsEqual)) {
-                if (skillLevelInferior || slotsInferior) { // 至少一项严格更差
-                    return { isValid: false, status: 'REJECTED_AS_INFERIOR', betterCharm: relevantCharm };
-                }
-            }
-
-            // 检查"绝对优势"
-            if ((skillLevelSuperior || skillLevelEqual) && (slotsSuperior || slotsEqual)) {
-                if (skillLevelSuperior || slotsSuperior) { // 至少一项严格更优
-                    if (!outclassedCharms.find(c => c.id === relevantCharm.id)) {
-                        outclassedCharms.push(relevantCharm);
-                    }
-                }
+        if (anchorSkills.length > 0) {
+            const hasUniqueAnchor = anchorSkills.some(anchor =>
+                !existingCharms.some(c => c.skills.some(s => s.skillId === anchor.skillId))
+            );
+            if (hasUniqueAnchor) {
+                status = 'ACCEPTED_AS_UNIQUE_SKILL';
             }
         }
     }
 
-    // Phase 3: 最终裁定和警告
+    // Phase 3: 生成警告
     const warnings: string[] = [];
-    if (newCharm.keySkillValue < avgKeySkillValue - KEY_SKILL_VALUE_THRESHOLD) {
-        warnings.push(`该护石的核心技能价值(${newCharm.keySkillValue.toFixed(1)})明显低于平均值(${avgKeySkillValue.toFixed(1)})`);
+    if (existingCharms.length > 0) {
+        const avgKeySkillValue = stats.totalKeySkillValue / existingCharms.length;
+        if (newCharm.keySkillValue < avgKeySkillValue - KEY_SKILL_VALUE_THRESHOLD) {
+            warnings.push(`该护石的核心技能价值(${newCharm.keySkillValue.toFixed(1)})明显低于平均值(${avgKeySkillValue.toFixed(1)})`);
+        }
     }
 
+    // Phase 4: 组装并返回最终结果
     return {
         isValid: true,
-        status: 'ACCEPTED',
+        status,
         warnings: warnings.length > 0 ? warnings : undefined,
         outclassedCharms: outclassedCharms.length > 0 ? outclassedCharms : undefined,
     };
