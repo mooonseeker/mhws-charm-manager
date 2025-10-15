@@ -171,108 +171,107 @@ export function CharmForm({ charmToEdit, onSuccess, onCancel }: CharmFormProps) 
                 </div>
             </div>
 
-            {/* 技能选择 */}
-            <div className="space-y-3">
-                <Label className="text-base font-medium">技能 ({selectedSkills.length}/3)</Label>
+            {/* 技能和孔位并排布局 */}
+            <div className="grid grid-cols-2 gap-6">
+                {/* 技能选择 */}
+                <div className="flex flex-col gap-3">
+                    <Label className="text-base font-medium space-y-3">技能 ({selectedSkills.length}/3)</Label>
 
-                {/* 已选技能列表 */}
-                {selectedSkills.length > 0 && (
-                    <div className="space-y-3 mb-4">
-                        {selectedSkills.map((skillWithLevel) => {
-                            const skill = allSkills.find((s) => s.id === skillWithLevel.skillId);
-                            if (!skill) return null;
+                    {selectedSkills.slice(0, 3).map((skillWithLevel, index) => {
+                        const skill = allSkills.find((s) => s.id === skillWithLevel.skillId);
+                        if (!skill) return (
+                            <div key={`empty-skill-${index}`} className="h-10"></div>
+                        );
 
-                            return (
-                                <div
-                                    key={skillWithLevel.skillId}
-                                    className="flex items-center gap-2 p-2 bg-muted rounded-md"
-                                >
-                                    <span className="flex-1">
-                                        {skill.name} Lv.{skillWithLevel.level}
-                                        {skill.isKey && ' ⭐'}
-                                    </span>
-                                    <Badge variant="outline">
-                                        {skill.type === 'weapon' ? '武器' : skill.type === 'armor' ? '防具' : '特殊'}
-                                    </Badge>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleRemoveSkill(skillWithLevel.skillId)}
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-
-                {/* 技能选择器 */}
-                {selectedSkills.length < 3 && (
-                    <SkillSelector
-                        onSelect={handleAddSkill}
-                        excludeSkillIds={selectedSkills.map((s) => s.skillId)}
-                    />
-                )}
-            </div>
-
-            {/* 孔位选择 */}
-            <div className="space-y-3">
-                <Label className="text-base font-medium">孔位 ({slots.length}/3)</Label>
-
-                {/* 已选孔位列表 */}
-                {slots.length > 0 && (
-                    <div className="space-y-3 mb-4">
-                        {slots.map((slot, index) => (
+                        return (
                             <div
-                                key={index}
-                                className="flex items-center gap-2 p-2 bg-muted rounded-md"
+                                key={skillWithLevel.skillId}
+                                className="flex items-center gap-2 p-2 bg-muted rounded-md h-10"
                             >
-                                <Select
-                                    value={slot.type}
-                                    onValueChange={(v) => handleUpdateSlot(index, v as SlotType, slot.level)}
-                                >
-                                    <SelectTrigger className="w-32">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="weapon">武器孔位</SelectItem>
-                                        <SelectItem value="armor">防具孔位</SelectItem>
-                                    </SelectContent>
-                                </Select>
-
-                                <Select
-                                    value={slot.level.toString()}
-                                    onValueChange={(v) => handleUpdateSlot(index, slot.type, parseInt(v) as SlotLevel)}
-                                >
-                                    <SelectTrigger className="w-24">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="1">1级</SelectItem>
-                                        <SelectItem value="2">2级</SelectItem>
-                                        <SelectItem value="3">3级</SelectItem>
-                                    </SelectContent>
-                                </Select>
-
+                                <span className="flex-1">
+                                    {skill.name} Lv.{skillWithLevel.level}
+                                    {skill.isKey && ' ⭐'}
+                                </span>
+                                <Badge variant="outline">
+                                    {skill.type === 'weapon' ? '武器' : skill.type === 'armor' ? '防具' : '特殊'}
+                                </Badge>
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => handleRemoveSlot(index)}
+                                    onClick={() => handleRemoveSkill(skillWithLevel.skillId)}
                                 >
                                     <X className="h-4 w-4" />
                                 </Button>
                             </div>
-                        ))}
-                    </div>
-                )}
+                        );
+                    })}
+                    {/* 填充空槽位 */}
+                    {[...Array(Math.max(0, 3 - selectedSkills.length))].map((_, index) => (
+                        <div key={`empty-skill-${selectedSkills.length + index}`} className="h-10 bg-muted rounded-md"></div>
+                    ))}
 
-                {/* 添加孔位按钮 */}
-                {slots.length < 3 && (
+                    {/* 技能选择器 */}
+                    <SkillSelector
+                        onSelect={handleAddSkill}
+                        excludeSkillIds={selectedSkills.map((s) => s.skillId)}
+                    />
+                </div>
+
+                {/* 孔位选择 */}
+                <div className="flex flex-col gap-3">
+                    <Label className="text-base font-medium space-y-3">孔位 ({slots.length}/3)</Label>
+
+                    {slots.slice(0, 3).map((slot, index) => (
+                        <div
+                            key={index}
+                            className="flex items-center gap-2 p-2 bg-muted rounded-md h-10"
+                        >
+                            <Select
+                                value={slot.type}
+                                onValueChange={(v) => handleUpdateSlot(index, v as SlotType, slot.level)}
+                            >
+                                <SelectTrigger className="w-32">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="weapon">武器孔</SelectItem>
+                                    <SelectItem value="armor">防具孔</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <Select
+                                value={slot.level.toString()}
+                                onValueChange={(v) => handleUpdateSlot(index, slot.type, parseInt(v) as SlotLevel)}
+                            >
+                                <SelectTrigger className="w-24">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="1">1级</SelectItem>
+                                    <SelectItem value="2">2级</SelectItem>
+                                    <SelectItem value="3">3级</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRemoveSlot(index)}
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ))}
+                    {/* 填充空槽位 */}
+                    {[...Array(Math.max(0, 3 - slots.length))].map((_, index) => (
+                        <div key={`empty-slot-${slots.length + index}`} className="h-10 bg-muted rounded-md"></div>
+                    ))}
+
+                    {/* 添加孔位按钮 */}
                     <Button variant="outline" onClick={handleAddSlot} className="w-full">
                         添加孔位
                     </Button>
-                )}
+                </div>
             </div>
 
             {/* 护石价值评估 */}

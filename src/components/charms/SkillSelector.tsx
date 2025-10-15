@@ -41,14 +41,14 @@ export function SkillSelector({ onSelect, excludeSkillIds = [] }: SkillSelectorP
     };
 
     return (
-        <div className="flex gap-2">
+        <div className="flex gap-2 h-10">
             <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                     placeholder="搜索技能..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pl-9"
+                    className="pl-9 h-10"
                 />
                 {search && availableSkills.length > 0 && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto z-10">
@@ -70,7 +70,7 @@ export function SkillSelector({ onSelect, excludeSkillIds = [] }: SkillSelectorP
 
             {selectedSkill && (
                 <Select value={level.toString()} onValueChange={(v) => setLevel(parseInt(v))}>
-                    <SelectTrigger className="w-24">
+                    <SelectTrigger className="w-24 h-10">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -83,7 +83,7 @@ export function SkillSelector({ onSelect, excludeSkillIds = [] }: SkillSelectorP
                 </Select>
             )}
 
-            <Button onClick={handleAdd} disabled={!selectedSkillId}>
+            <Button onClick={handleAdd} disabled={!selectedSkillId} className="h-10">
                 添加
             </Button>
         </div>
