@@ -9,6 +9,8 @@ import {
 import { CharmForm } from './CharmForm';
 import { CharmList } from './CharmList';
 
+import type { Charm } from '@/types';
+
 /**
  * 护石管理主组件
  * 
@@ -19,8 +21,8 @@ import { CharmList } from './CharmList';
  * - 智能验证系统
  */
 export function CharmManagement() {
-    const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [charmToEdit, setCharmToEdit] = useState<Charm | null>(null);
 
     return (
         <div className="space-y-6">
@@ -34,23 +36,30 @@ export function CharmManagement() {
                 </div>
 
                 {/* 添加护石按钮 */}
-                <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
                     <DialogTrigger asChild>
-                        <Button size="lg">
+                        <Button size="lg" onClick={() => setCharmToEdit(null)}>
                             <Plus className="mr-2 h-5 w-5" />
                             添加护石
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
                         <DialogHeader>
-                            <DialogTitle>添加新护石</DialogTitle>
+                            <DialogTitle>{charmToEdit ? '编辑护石' : '添加新护石'}</DialogTitle>
                             <DialogDescription>
-                                填写护石信息，系统将自动计算等效孔位和核心技能价值
+                                {charmToEdit ? '修改护石信息，系统将重新计算等效孔位和核心技能价值' : '填写护石信息，系统将自动计算等效孔位和核心技能价值'}
                             </DialogDescription>
                         </DialogHeader>
                         <CharmForm
-                            onSuccess={() => setIsAddDialogOpen(false)}
-                            onCancel={() => setIsAddDialogOpen(false)}
+                            charmToEdit={charmToEdit}
+                            onSuccess={() => {
+                                setIsFormOpen(false);
+                                setCharmToEdit(null);
+                            }}
+                            onCancel={() => {
+                                setIsFormOpen(false);
+                                setCharmToEdit(null);
+                            }}
                         />
                     </DialogContent>
                 </Dialog>
@@ -58,31 +67,11 @@ export function CharmManagement() {
 
             {/* 护石列表 */}
             <CharmList
-                onEdit={() => {
-                    // 编辑功能暂时禁用，可以后续实现
-                    setIsEditDialogOpen(true);
+                onEdit={(charm) => {
+                    setCharmToEdit(charm);
+                    setIsFormOpen(true);
                 }}
             />
-
-            {/* 编辑对话框（预留） */}
-            {isEditDialogOpen && (
-                <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                    <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                            <DialogTitle>编辑护石</DialogTitle>
-                            <DialogDescription>
-                                编辑功能即将推出
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="py-8 text-center text-slate-500">
-                            编辑功能正在开发中...
-                        </div>
-                        <div className="flex justify-end">
-                            <Button onClick={() => setIsEditDialogOpen(false)}>关闭</Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            )}
         </div>
     );
 }

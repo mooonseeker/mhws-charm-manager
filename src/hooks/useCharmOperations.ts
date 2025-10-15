@@ -44,7 +44,7 @@ import type { SkillWithLevel, Slot, Charm } from '@/types';
  * ```
  */
 export function useCharmOperations() {
-    const { charms, addCharm } = useCharms();
+    const { charms, addCharm, updateCharm: updateCharmInContext } = useCharms();
     const { skills } = useSkills();
 
     /**
@@ -135,8 +135,68 @@ export function useCharmOperations() {
         [charms, skills]
     );
 
+    /**
+     * 更新护石并重新计算价值
+     *
+     * 根据ID找到护石，更新其数据并重新计算等效孔位和核心技能价值
+     *
+     * @param id - 要更新的护石ID
+     * @param data - 更新后的护石基础数据（稀有度、技能、孔位）
+     * @returns 更新后的完整护石对象
+     *
+     * @example
+     * ```tsx
+     * const updatedCharm = updateAndRecalculateCharm('charm-001', {
+     *   rarity: 11,
+     *   skills: [{ skillId: 'skill-002', level: 3 }],
+     *   slots: [{ type: 'weapon', level: 2 }]
+     * });
+     * ```
+     */
+    const updateAndRecalculateCharm = useCallback(
+        (id: string, data: {
+            rarity: number;
+            skills: SkillWithLevel[];
+            slots: Slot[];
+        }): Charm => {
+            // 找到现有护石
+            const existingCharm = charms.find(c => c.id === id);
+            if (!existingCharm) {
+                throw new Error(`Charm with id ${id} not found`);
+            }
+
+            // 计算等效孔位
+            const equivalentSlots = calculateCharmEquivalentSlots(
+                data.skills,
+                data.slots,
+                skills
+            );
+
+            // 计算核心技能价值
+            const keySkillValue = calculateKeySkillValue(equivalentSlots);
+
+            // 创建更新后的护石对象
+            const updatedCharm: Charm = {
+                id,
+                rarity: data.rarity,
+                skills: data.skills,
+                slots: data.slots,
+                equivalentSlots,
+                keySkillValue,
+                createdAt: existingCharm.createdAt, // 保持原始创建时间
+            };
+
+            // 更新到状态
+            updateCharmInContext(updatedCharm);
+
+            return updatedCharm;
+        },
+        [charms, skills, updateCharmInContext]
+    );
+
     return {
         createCharm,
         validateNewCharm,
+        updateAndRecalculateCharm,
     };
 }

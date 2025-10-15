@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,9 +15,10 @@ import { calculateCharmEquivalentSlots, calculateKeySkillValue } from '@/utils';
 import { CharmValidation } from './CharmValidation';
 import { SkillSelector } from './SkillSelector';
 
-import type { SkillWithLevel, Slot, SlotType, SlotLevel } from '@/types';
+import type { SkillWithLevel, Slot, SlotType, SlotLevel, Charm } from '@/types';
 
 interface CharmFormProps {
+    charmToEdit?: Charm | null;
     onSuccess?: () => void;
     onCancel?: () => void;
 }
@@ -31,13 +32,27 @@ interface CharmFormProps {
  * - 实时等效孔位和核心技能价值显示
  * - 智能验证提示
  */
-export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
+export function CharmForm({ charmToEdit, onSuccess, onCancel }: CharmFormProps) {
     const { skills: allSkills } = useSkills();
-    const { createCharm, validateNewCharm } = useCharmOperations();
+    const { createCharm, validateNewCharm, updateAndRecalculateCharm } = useCharmOperations();
 
     const [rarity, setRarity] = useState(10);
     const [selectedSkills, setSelectedSkills] = useState<SkillWithLevel[]>([]);
     const [slots, setSlots] = useState<Slot[]>([]);
+
+    // 编辑模式：用传入的护石数据初始化表单
+    useEffect(() => {
+        if (charmToEdit) {
+            setRarity(charmToEdit.rarity);
+            setSelectedSkills(charmToEdit.skills);
+            setSlots(charmToEdit.slots);
+        } else {
+            // 添加模式：重置表单
+            setRarity(10);
+            setSelectedSkills([]);
+            setSlots([]);
+        }
+    }, [charmToEdit]);
 
     // 实时计算等效孔位和核心技能价值
     const { equivalentSlots, keySkillValue } = useMemo(() => {
@@ -113,12 +128,22 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
             return;
         }
 
-        createCharm({ rarity, skills: selectedSkills, slots });
+        if (charmToEdit) {
+            // 编辑模式：更新现有护石
+            updateAndRecalculateCharm(charmToEdit.id, {
+                rarity,
+                skills: selectedSkills,
+                slots,
+            });
+        } else {
+            // 添加模式：创建新护石
+            createCharm({ rarity, skills: selectedSkills, slots });
 
-        // 重置表单
-        setRarity(10);
-        setSelectedSkills([]);
-        setSlots([]);
+            // 重置表单
+            setRarity(10);
+            setSelectedSkills([]);
+            setSlots([]);
+        }
 
         onSuccess?.();
     };
@@ -278,7 +303,7 @@ export function CharmForm({ onSuccess, onCancel }: CharmFormProps) {
                     </Button>
                 )}
                 <Button onClick={handleSubmit} disabled={selectedSkills.length === 0}>
-                    添加护石
+                    {charmToEdit ? '更新护石' : '添加护石'}
                 </Button>
             </div>
         </div>
