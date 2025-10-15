@@ -15,7 +15,7 @@ import type { Skill } from '@/types';
  * 整合技能列表和表单功能
  */
 export function SkillManagement() {
-    const { loading, error, addSkill, updateSkill } = useSkills();
+    const { loading, error, addSkill, updateSkill, skills } = useSkills();
     const [formOpen, setFormOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState<Skill | undefined>();
     const [formError, setFormError] = useState<string | null>(null);
@@ -34,8 +34,15 @@ export function SkillManagement() {
 
     const handleSubmit = (skillData: Omit<Skill, 'id'>) => {
         if (editingSkill) {
-            updateSkill({ ...skillData, id: editingSkill.id });
-            setFormOpen(false);
+            // 编辑模式下，同样检查重复（虽然表单已经检查，但这里是后备）
+            try {
+                updateSkill({ ...skillData, id: editingSkill.id });
+                setFormOpen(false);
+            } catch (error) {
+                if (error instanceof Error) {
+                    setFormError(error.message);
+                }
+            }
         } else {
             try {
                 addSkill(skillData);
@@ -79,6 +86,7 @@ export function SkillManagement() {
                 onClose={() => setFormOpen(false)}
                 onSubmit={handleSubmit}
                 error={formError}
+                skills={skills}
             />
         </div>
     );

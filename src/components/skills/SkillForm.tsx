@@ -20,18 +20,20 @@ interface SkillFormProps {
     onClose: () => void;
     onSubmit: (skill: Omit<Skill, 'id'>) => void;
     error: string | null;
+    skills: Skill[];
 }
 
 /**
  * 技能表单组件
  * 用于添加或编辑技能
  */
-export function SkillForm({ skill, open, onClose, onSubmit, error }: SkillFormProps) {
+export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: SkillFormProps) {
     const [name, setName] = useState('');
     const [type, setType] = useState<SkillType>('armor');
     const [maxLevel, setMaxLevel] = useState(3);
     const [decorationLevel, setDecorationLevel] = useState<SlotLevel>(-1);
     const [isKey, setIsKey] = useState(false);
+    const [localError, setLocalError] = useState<string | null>(null);
 
     useEffect(() => {
         if (skill) {
@@ -47,6 +49,7 @@ export function SkillForm({ skill, open, onClose, onSubmit, error }: SkillFormPr
             setDecorationLevel(2);
             setIsKey(false);
         }
+        setLocalError(null);
     }, [skill, open]);
 
     // 当类型改变时，自动设置装饰品等级
@@ -60,8 +63,26 @@ export function SkillForm({ skill, open, onClose, onSubmit, error }: SkillFormPr
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const trimmedName = name.trim();
+
+        // 检查名称是否重复（忽略大小写和前后空格）
+        const isDuplicate = skills.some(s => {
+            // 编辑模式下，排除当前编辑的技能
+            if (skill) {
+                return s.id !== skill.id && s.name.trim().toLowerCase() === trimmedName.toLowerCase();
+            }
+            return s.name.trim().toLowerCase() === trimmedName.toLowerCase();
+        });
+
+        if (isDuplicate) {
+            setLocalError(`技能 "${trimmedName}" 已存在。`);
+            return;
+        }
+        setLocalError(null);
+
         onSubmit({
-            name: name.trim(),
+            name: trimmedName,
             type,
             maxLevel,
             decorationLevel: type === 'special' ? -1 : decorationLevel,
@@ -80,14 +101,24 @@ export function SkillForm({ skill, open, onClose, onSubmit, error }: SkillFormPr
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-3">
                         <Label htmlFor="name">技能名称</Label>
-                        <Input
-                            id="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="输入技能名称"
-                            required
-                        />
-                        {error && <p className="text-sm text-destructive pt-1">{error}</p>}
+                        <div className="relative">
+                            <Input
+                                id="name"
+                                value={name}
+                                onChange={(e) => {
+                                    setName(e.target.value);
+                                    setLocalError(null); // 输入时清除错误
+                                }}
+                                placeholder="输入技能名称"
+                                required
+                                className={(localError || error) ? "pr-20" : ""}
+                            />
+                            {(localError || error) && (
+                                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-destructive">
+                                    {localError || error}
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     <div className="space-y-3">
