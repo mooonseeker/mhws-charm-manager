@@ -78,7 +78,7 @@ export function useCharmOperations() {
             );
 
             // 计算核心技能价值
-            const keySkillValue = calculateKeySkillValue(equivalentSlots);
+            const keySkillValue = calculateKeySkillValue(data.skills, data.slots, skills);
 
             // 创建护石对象
             const newCharm: Charm = {
@@ -173,7 +173,7 @@ export function useCharmOperations() {
             );
 
             // 计算核心技能价值
-            const keySkillValue = calculateKeySkillValue(equivalentSlots);
+            const keySkillValue = calculateKeySkillValue(data.skills, data.slots, skills);
 
             // 创建更新后的护石对象
             const updatedCharm: Charm = {

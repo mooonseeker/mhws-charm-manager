@@ -55,7 +55,7 @@ export function CharmManagement() {
     // 实时计算等效孔位和核心技能价值
     const { equivalentSlots, keySkillValue } = useMemo(() => {
         const eq = calculateCharmEquivalentSlots(selectedSkills, slots, allSkills);
-        const kv = calculateKeySkillValue(eq);
+        const kv = calculateKeySkillValue(selectedSkills, slots, allSkills);
         return { equivalentSlots: eq, keySkillValue: kv };
     }, [selectedSkills, slots, allSkills]);
 

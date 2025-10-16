@@ -167,37 +167,56 @@ export function calculateCharmEquivalentSlots(
 
 /**
  * 计算核心技能价值
- * 
- * 根据等效孔位计算护石的核心技能价值
- * 
- * 规则（origin.md 第25-27行）：
- * - 武器孔位：1级=1, 2级=2, 3级=3个核心技能
- * - 防具孔位：1级=0, 2级=1, 3级=1个核心技能
- * 
- * @param equivalentSlots - 等效孔位统计
+ *
+ * 根据护石的技能和孔位直接计算核心技能价值。
+ *
+ * 规则：
+ * 1. 核心技能价值：只计算核心技能（isKey=true）的等级，直接累加。
+ * 2. 孔位价值：
+ *    - 武器孔位：1级=1, 2级=2, 3级=3
+ *    - 防具孔位：1级=0, 2级=1, 3级=1
+ *
+ * @param skills - 护石的技能列表
+ * @param slots - 护石的孔位列表
+ * @param skillsData - 完整的技能数据（用于查找技能定义）
  * @returns 核心技能价值（整数）
- * 
+ *
  * @example
- * const slots = {
- *   weaponSlot1: 1, weaponSlot2: 2, weaponSlot3: 0,
- *   armorSlot1: 0, armorSlot2: 1, armorSlot3: 1
- * };
- * calculateKeySkillValue(slots)
- * // 返回: 1*1 + 2*2 + 0*3 + 0*0 + 1*1 + 1*1 = 1 + 4 + 1 + 1 = 7
+ * // 护石有 2 级核心技能 A，3 级非核心技能 B，以及一个 2 级武器孔位
+ * // 核心技能价值 = (A 技能等级 2) + (2 级武器孔位价值 2) = 4
+ * calculateKeySkillValue(skills, slots, skillsData)
+ * // 返回: 4
  */
 export function calculateKeySkillValue(
-    equivalentSlots: EquivalentSlots
+    skills: SkillWithLevel[],
+    slots: Slot[],
+    skillsData: Skill[]
 ): number {
     let keySkillValue = 0;
 
-    // 武器孔位：1级=1, 2级=2, 3级=3个核心技能
-    keySkillValue += equivalentSlots.weaponSlot1 * 1;
-    keySkillValue += equivalentSlots.weaponSlot2 * 2;
-    keySkillValue += equivalentSlots.weaponSlot3 * 3;
+    // 1. 计算核心技能的价值 (直接累加技能等级)
+    for (const skillWithLevel of skills) {
+        // 查找技能定义
+        const skill = skillsData.find(s => s.id === skillWithLevel.skillId);
 
-    // 防具孔位：2级=1, 3级=1个核心技能（1级不计入）
-    keySkillValue += equivalentSlots.armorSlot2 * 1;
-    keySkillValue += equivalentSlots.armorSlot3 * 1;
+        if (skill && skill.isKey) {
+            // 如果是核心技能，直接累加其等级
+            keySkillValue += skillWithLevel.level;
+        }
+    }
+
+    // 2. 计算孔位的价值
+    for (const slot of slots) {
+        if (slot.type === 'weapon') {
+            // 武器孔位：1级=1, 2级=2, 3级=3
+            keySkillValue += slot.level;
+        } else if (slot.type === 'armor') {
+            // 防具孔位：2级=1, 3级=1（1级不计入）
+            if (slot.level === 2 || slot.level === 3) {
+                keySkillValue += 1;
+            }
+        }
+    }
 
     return keySkillValue;
 }
