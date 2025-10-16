@@ -1,4 +1,4 @@
-import { ThemeToggle } from '@/components/common';
+import { ThemeToggle } from '@/components/layout';
 
 /**
  * 应用头部组件

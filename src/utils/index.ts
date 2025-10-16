@@ -20,8 +20,6 @@ export {
 
 // ID生成工具
 export {
-    generateId,
-    generateIds,
     validateIdFormat,
     generateSkillId,
     generateCharmId,
