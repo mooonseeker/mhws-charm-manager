@@ -76,7 +76,7 @@ export function CharmForm({
             </div>
 
             {/* 技能和孔位并排布局 */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-[60%_40%] gap-6">
                 {/* 技能选择 */}
                 <div className="flex flex-col gap-3">
                     <Label className="text-base font-medium space-y-3">技能 ({selectedSkills.length}/3)</Label>

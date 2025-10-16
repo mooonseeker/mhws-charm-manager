@@ -191,7 +191,7 @@ export function CharmManagement() {
                                 className="w-80 p-0 border-none shadow-lg"
                                 align="start"
                                 side="right"
-                                sideOffset={20}
+                                sideOffset={50}
                             >
                                 <CharmValidation validation={validation} />
                             </PopoverContent>

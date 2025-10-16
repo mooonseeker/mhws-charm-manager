@@ -1,29 +1,15 @@
 import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { useMemo } from 'react';
 
-import { useSkills } from '@/contexts';
+import { CharmCard } from './CharmCard';
 
 import type { LucideIcon } from 'lucide-react';
-import type { CharmValidationResult, Charm, Skill, CharmValidationStatus } from '@/types';
+import type { CharmValidationResult, CharmValidationStatus } from '@/types';
 
 interface CharmValidationProps {
     validation: CharmValidationResult | null;
 }
 
-/**
- * 格式化护石的技能和孔位以供显示
- */
-const formatCharmDetails = (charm: Charm, allSkills: Skill[]): string => {
-    const skillsStr = charm.skills
-        .map(s => {
-            const skill = allSkills.find(sk => sk.id === s.skillId);
-            return `${skill?.name || '未知技能'} Lv.${s.level}`;
-        })
-        .join(', ');
-
-    const slotsStr = charm.slots.map(s => `[${s.level}]`).join('');
-    return `(R${charm.rarity}) ${skillsStr} ${slotsStr}`;
-}
 
 // 主题配置
 interface ValidationTheme {
@@ -87,7 +73,6 @@ const getStatusMessage = (status: CharmValidationStatus): string => {
  * 显示来自新验证逻辑的详细信息
  */
 export function CharmValidation({ validation }: CharmValidationProps) {
-    const { skills: allSkills } = useSkills();
 
     // 使用 useMemo 优化性能，避免在每次渲染时都重新计算
     const displayConfig = useMemo(() => {
@@ -110,49 +95,21 @@ export function CharmValidation({ validation }: CharmValidationProps) {
         // 2. 获取主信息
         const message = getStatusMessage(status);
 
-        // 3. 整合所有详细信息（警告和护石列表）
-        const detailItems: { key: string; text: string; className: string }[] = [];
-
-        // 添加警告信息
-        warnings?.forEach((warning, index) => {
-            detailItems.push({
-                key: `warn-${index}`,
-                text: `• ${warning}`,
-                className: theme.listClass,
-            });
-        });
-
-        // 如果被拒绝，显示更优护石
-        if (betterCharm) {
-            detailItems.push({
-                key: 'better-charm',
-                text: `• 上位替代: ${formatCharmDetails(betterCharm, allSkills)}`,
-                className: theme.charmListClass,
-            });
-        }
-
-        // 显示可被替代的旧护石
-        outclassedCharms?.forEach((charm, index) => {
-            detailItems.push({
-                key: `out-${index}`,
-                text: `• 下位替代: ${formatCharmDetails(charm, allSkills)}`,
-                className: theme.charmListClass,
-            });
-        });
-
         return {
             theme,
             message,
-            detailItems,
+            warnings,
+            betterCharm,
+            outclassedCharms,
         };
-    }, [validation, allSkills]);
+    }, [validation]);
 
     if (!displayConfig) {
         return null;
     }
 
-    const { theme, message, detailItems } = displayConfig;
-    const { Icon, containerClass, iconClass, titleClass } = theme;
+    const { theme, message, warnings, betterCharm, outclassedCharms } = displayConfig;
+    const { Icon, containerClass, iconClass, titleClass, listClass } = theme;
 
     return (
         <div className={containerClass}>
@@ -160,15 +117,38 @@ export function CharmValidation({ validation }: CharmValidationProps) {
                 <Icon className={iconClass} />
                 <div className="flex-1">
                     <p className={titleClass}>{message}</p>
-                    {detailItems.length > 0 && (
-                        <ul className="text-sm space-y-1 mt-2">
-                            {detailItems.map(item => (
-                                <li key={item.key} className={item.className}>
-                                    {item.text}
+                    {(warnings?.length || betterCharm || outclassedCharms?.length) ? (
+                        <ul className="text-sm space-y-2 mt-2">
+                            {/* 渲染警告信息 */}
+                            {warnings?.map((warning, index) => (
+                                <li key={`warn-${index}`} className={listClass}>
+                                    • {warning}
                                 </li>
                             ))}
+
+                            {/* 渲染上位替代护石 */}
+                            {betterCharm && (
+                                <>
+                                    <li className={listClass}>• 存在以下1个上位替代：</li>
+                                    <div className="mt-2 mb-4">
+                                        <CharmCard charm={betterCharm} />
+                                    </div>
+                                </>
+                            )}
+
+                            {/* 渲染下位替代护石 */}
+                            {outclassedCharms?.length ? (
+                                <>
+                                    <li className={listClass}>• 可上位替代以下{outclassedCharms.length}个护石：</li>
+                                    <div className="mt-2 mb-4 space-y-2">
+                                        {outclassedCharms.slice(0, 3).map((charm, index) => (
+                                            <CharmCard key={`out-${index}`} charm={charm} />
+                                        ))}
+                                    </div>
+                                </>
+                            ) : null}
                         </ul>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </div>

@@ -77,9 +77,13 @@ export function CharmCard({ charm, className }: CharmCardProps) {
                             key={index}
                             src={getDecorationIcon(slot.type, slot.level)}
                             alt={`${slot.type === 'weapon' ? 'WeaponSlot' : 'ArmorSlot'} ${slot.level}级`}
-                            className="slot-icon w-8 h-8"
+                            className="slot-icon w-6 h-6"
                         />
-                    ) : null;
+                    ) : (
+                        <span key={index} className="text-muted-foreground text-sm" style={{ width: '1.5rem', height: '1.5rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                            —
+                        </span>
+                    );
                 })}
             </div>
 
