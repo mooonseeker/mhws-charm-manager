@@ -185,7 +185,7 @@ export function validateCharm(
     if (existingCharms.length > 0) {
         const avgKeySkillValue = stats.totalKeySkillValue / existingCharms.length;
         if (newCharm.keySkillValue < avgKeySkillValue - KEY_SKILL_VALUE_THRESHOLD) {
-            warnings.push(`该护石的核心技能价值(${newCharm.keySkillValue.toFixed(1)})明显低于平均值(${avgKeySkillValue.toFixed(1)})`);
+            warnings.push(`该护石核心价值(${newCharm.keySkillValue.toFixed(1)})明显低于平均值(${avgKeySkillValue.toFixed(1)})`);
         }
     }
 
