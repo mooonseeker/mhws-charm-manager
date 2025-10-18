@@ -32,7 +32,7 @@ export function CharmManagement() {
     const { createCharm, updateAndRecalculateCharm } = useCharmOperations();
 
     // 表单状态
-    const [rarity, setRarity] = useState(10);
+    const [rarity, setRarity] = useState(7);
     const [selectedSkills, setSelectedSkills] = useState<SkillWithLevel[]>([]);
     const [slots, setSlots] = useState<Slot[]>([]);
 
@@ -45,7 +45,7 @@ export function CharmManagement() {
                 setSlots(charmToEdit.slots);
             } else {
                 // 添加模式：重置表单
-                setRarity(10);
+                setRarity(7);
                 setSelectedSkills([]);
                 setSlots([]);
             }

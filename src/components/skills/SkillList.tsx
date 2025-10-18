@@ -48,7 +48,17 @@ export function SkillList({ onEdit }: SkillListProps) {
     const filteredSkills = skills.filter((skill) => {
         if (typeFilter !== 'all' && skill.type !== typeFilter) return false;
         if (keyOnlyFilter && !skill.isKey) return false;
-        if (searchQuery && !skill.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+        if (searchQuery) {
+            // 检查是否为精确匹配（以等号开头）
+            const isExactMatch = searchQuery.startsWith('=');
+            const keyword = isExactMatch ? searchQuery.slice(1) : searchQuery;
+
+            const matches = isExactMatch
+                ? skill.name.toLowerCase() === keyword.toLowerCase()
+                : skill.name.toLowerCase().includes(keyword.toLowerCase());
+
+            if (!matches) return false;
+        }
         return true;
     });
 

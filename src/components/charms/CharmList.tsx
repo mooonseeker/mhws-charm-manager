@@ -76,11 +76,17 @@ export function CharmList({ onEdit }: CharmListProps) {
 
         // 按搜索关键词筛选
         if (searchQuery) {
+            // 检查是否为精确匹配（以等号开头）
+            const isExactMatch = searchQuery.startsWith('=');
+            const keyword = isExactMatch ? searchQuery.slice(1) : searchQuery;
+
             filtered = filtered.filter((c) =>
                 c.skills.some((s) => {
                     const skill = skills.find((sk) => sk.id === s.skillId);
                     const skillName = skill?.name || '未知技能';
-                    return skillName.toLowerCase().includes(searchQuery.toLowerCase());
+                    return isExactMatch
+                        ? skillName.toLowerCase() === keyword.toLowerCase()
+                        : skillName.toLowerCase().includes(keyword.toLowerCase());
                 })
             );
         }
