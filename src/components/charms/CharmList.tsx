@@ -9,6 +9,7 @@ import { Pagination } from '@/components/ui/pagination';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
@@ -36,8 +37,7 @@ export function CharmList({ onEdit }: CharmListProps) {
     const { skills } = useSkills();
 
     // 筛选状态
-    const [minRarity, setMinRarity] = useState<number | null>(null);
-    const [maxRarity, setMaxRarity] = useState<number | null>(null);
+    const [rarityRange, setRarityRange] = useState<[number, number]>([1, 12]);
     const [minKeySkillValue, setMinKeySkillValue] = useState<number | null>(null);
     const [filterSkillId, setFilterSkillId] = useState<string>('');
     const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -50,16 +50,23 @@ export function CharmList({ onEdit }: CharmListProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
+    // 计算动态稀有度范围
+    const rarityBounds = useMemo(() => {
+        if (charms.length === 0) return { min: 1, max: 12 };
+        const rarities = charms.map(c => c.rarity);
+        return {
+            min: Math.min(...rarities),
+            max: Math.max(...rarities)
+        };
+    }, [charms]);
+
     // 筛选护石
     const searchedCharms = useMemo(() => {
         let filtered = [...charms];
 
         // 按稀有度筛选
-        if (minRarity !== null) {
-            filtered = filtered.filter((c) => c.rarity >= minRarity);
-        }
-        if (maxRarity !== null) {
-            filtered = filtered.filter((c) => c.rarity <= maxRarity);
+        if (rarityRange) {
+            filtered = filtered.filter((c) => c.rarity >= rarityRange[0] && c.rarity <= rarityRange[1]);
         }
 
         // 按核心技能价值筛选
@@ -92,7 +99,7 @@ export function CharmList({ onEdit }: CharmListProps) {
         }
 
         return filtered;
-    }, [charms, minRarity, maxRarity, minKeySkillValue, filterSkillId, searchQuery, skills]);
+    }, [charms, rarityRange, minKeySkillValue, filterSkillId, searchQuery, skills]);
 
     // 排序和分页护石
     const paginatedCharms = useMemo(() => {
@@ -121,10 +128,15 @@ export function CharmList({ onEdit }: CharmListProps) {
         }
     };
 
+    // 当稀有度边界变化时，同步滑块状态
+    useEffect(() => {
+        setRarityRange([rarityBounds.min, rarityBounds.max]);
+    }, [rarityBounds]);
+
     // 当筛选条件变化时，重置到第一页
     useEffect(() => {
         setCurrentPage(1);
-    }, [minRarity, maxRarity, minKeySkillValue, filterSkillId, searchQuery]);
+    }, [rarityRange, minKeySkillValue, filterSkillId, searchQuery]);
 
     // 删除护石
     const handleDelete = (id: string) => {
@@ -170,9 +182,26 @@ export function CharmList({ onEdit }: CharmListProps) {
                             variant="default"
                             size="sm"
                             className="text-xs sm:text-sm"
+                            onClick={() => {
+                                setRarityRange([rarityBounds.min, rarityBounds.max]);
+                                setMinKeySkillValue(null);
+                                setFilterSkillId('all');
+                                setSearchQuery('');
+                            }}
                         >
                             全部
                         </Button>
+                        <div className="flex items-center gap-2">
+                            <Badge variant="outline">Rare</Badge>
+                            <Slider
+                                value={rarityRange}
+                                onValueChange={(value) => setRarityRange(value as [number, number])}
+                                min={rarityBounds.min}
+                                max={rarityBounds.max}
+                                step={1}
+                                className="w-48 -mt-5"
+                            />
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-4 justify-end">
@@ -201,28 +230,6 @@ export function CharmList({ onEdit }: CharmListProps) {
                     <h3 className="font-medium text-base sm:text-lg">筛选条件</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                         <div className="space-y-3">
-                            <Label className="text-sm font-medium">最小稀有度</Label>
-                            <Input
-                                type="number"
-                                min={1}
-                                max={12}
-                                placeholder="1-12"
-                                value={minRarity ?? ''}
-                                onChange={(e) => setMinRarity(e.target.value ? parseInt(e.target.value) : null)}
-                            />
-                        </div>
-                        <div className="space-y-3">
-                            <Label className="text-sm font-medium">最大稀有度</Label>
-                            <Input
-                                type="number"
-                                min={1}
-                                max={12}
-                                placeholder="1-12"
-                                value={maxRarity ?? ''}
-                                onChange={(e) => setMaxRarity(e.target.value ? parseInt(e.target.value) : null)}
-                            />
-                        </div>
-                        <div className="space-y-3">
                             <Label className="text-sm font-medium">最小核心技能价值</Label>
                             <Input
                                 type="number"
@@ -249,13 +256,12 @@ export function CharmList({ onEdit }: CharmListProps) {
                             </Select>
                         </div>
                     </div>
-                    {(minRarity || maxRarity || minKeySkillValue || (filterSkillId && filterSkillId !== 'all')) && (
+                    {(rarityRange[0] !== rarityBounds.min || rarityRange[1] !== rarityBounds.max || minKeySkillValue || (filterSkillId && filterSkillId !== 'all')) && (
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                                setMinRarity(null);
-                                setMaxRarity(null);
+                                setRarityRange([rarityBounds.min, rarityBounds.max]);
                                 setMinKeySkillValue(null);
                                 setFilterSkillId('all');
                             }}
