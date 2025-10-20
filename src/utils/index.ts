@@ -47,9 +47,9 @@ export {
 // 数据导入导出工具
 export {
     exportToJSON,
+    exportDataToJSON,
     importFromJSON,
     validateImportData,
-    exportCharmsToCSV,
 } from './import-export';
 
 // 导入导出类型

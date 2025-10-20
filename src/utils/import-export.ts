@@ -8,17 +8,19 @@ import type { Skill, Charm } from '@/types';
 
 /**
  * 数据导出格式
- * 
+ *
  * @property version - 数据格式版本号
  * @property exportedAt - 导出时间（ISO 8601格式）
- * @property skills - 技能列表
- * @property charms - 护石列表
+ * @property dataType - 数据类型 ('all' | 'skills' | 'charms')
+ * @property skills - 技能列表（可选）
+ * @property charms - 护石列表（可选）
  */
 export interface ExportData {
     version: string;
     exportedAt: string;
-    skills: Skill[];
-    charms: Charm[];
+    dataType: 'all' | 'skills' | 'charms';
+    skills?: Skill[];
+    charms?: Charm[];
 }
 
 /**
@@ -34,26 +36,46 @@ export interface ValidationResult {
 
 /**
  * 导出数据为JSON文件
- * 
- * 创建包含技能和护石数据的JSON文件并触发浏览器下载
- * 文件名格式：mhws-charms-YYYY-MM-DD.json
- * 
- * @param skills - 技能列表
- * @param charms - 护石列表
- * 
+ *
+ * 创建包含指定类型数据的JSON文件并触发浏览器下载
+ * 文件名格式根据数据类型动态生成：
+ * - all: mhws-charms-YYYY-MM-DD.json
+ * - skills: mhws-charms-skills-YYYY-MM-DD.json
+ * - charms: mhws-charms-charms-YYYY-MM-DD.json
+ *
+ * @param dataType - 数据类型 ('all' | 'skills' | 'charms')
+ * @param skills - 技能列表（仅当 dataType 为 'all' 或 'skills' 时有效）
+ * @param charms - 护石列表（仅当 dataType 为 'all' 或 'charms' 时有效）
+ *
  * @example
  * ```typescript
- * exportToJSON(skills, charms);
+ * // 导出全部数据
+ * exportDataToJSON('all', skills, charms);
  * // 下载文件：mhws-charms-2025-10-11.json
+ *
+ * // 仅导出技能
+ * exportDataToJSON('skills', skills, []);
+ * // 下载文件：mhws-charms-skills-2025-10-11.json
  * ```
  */
-export function exportToJSON(skills: Skill[], charms: Charm[]): void {
+export function exportDataToJSON(
+    dataType: 'all' | 'skills' | 'charms',
+    skills: Skill[],
+    charms: Charm[]
+): void {
     const data: ExportData = {
         version: '1.0.0',
         exportedAt: new Date().toISOString(),
-        skills,
-        charms,
+        dataType,
     };
+
+    // 根据数据类型设置相应数据
+    if (dataType === 'all' || dataType === 'skills') {
+        data.skills = skills;
+    }
+    if (dataType === 'all' || dataType === 'charms') {
+        data.charms = charms;
+    }
 
     const blob = new Blob([JSON.stringify(data, null, 2)], {
         type: 'application/json',
@@ -62,11 +84,29 @@ export function exportToJSON(skills: Skill[], charms: Charm[]): void {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `mhws-charms-${new Date().toISOString().split('T')[0]}.json`;
+
+    // 根据数据类型生成文件名
+    const dateStr = new Date().toISOString().split('T')[0];
+    const fileName = dataType === 'all'
+        ? `mhws-charms-${dateStr}.json`
+        : `mhws-charms-${dataType}-${dateStr}.json`;
+
+    link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+}
+
+/**
+ * @deprecated 请使用 exportDataToJSON 函数
+ * 导出数据为JSON文件（兼容性函数）
+ *
+ * @param skills - 技能列表
+ * @param charms - 护石列表
+ */
+export function exportToJSON(skills: Skill[], charms: Charm[]): void {
+    exportDataToJSON('all', skills, charms);
 }
 
 /**
@@ -98,12 +138,29 @@ export function importFromJSON(file: File): Promise<ExportData> {
                 const data = JSON.parse(content) as ExportData;
 
                 // 基础验证
-                if (!data.version || !data.skills || !data.charms) {
+                if (!data.version || !data.dataType) {
                     throw new Error('Invalid data format');
                 }
 
+                // 根据数据类型验证必需字段
+                if (data.dataType === 'all') {
+                    if (!Array.isArray(data.skills) || !Array.isArray(data.charms)) {
+                        throw new Error('Invalid data format for all data type');
+                    }
+                } else if (data.dataType === 'skills') {
+                    if (!Array.isArray(data.skills)) {
+                        throw new Error('Invalid data format for skills data type');
+                    }
+                } else if (data.dataType === 'charms') {
+                    if (!Array.isArray(data.charms)) {
+                        throw new Error('Invalid data format for charms data type');
+                    }
+                } else {
+                    throw new Error('Unknown data type');
+                }
+
                 resolve(data);
-            } catch (error) {
+            } catch (parseError) {
                 reject(new Error('导入失败：文件格式不正确'));
             }
         };
@@ -118,12 +175,12 @@ export function importFromJSON(file: File): Promise<ExportData> {
 
 /**
  * 验证导入的数据
- * 
- * 检查导入数据的完整性和正确性
- * 
+ *
+ * 检查导入数据的完整性和正确性，根据数据类型验证相应字段
+ *
  * @param data - 要验证的导入数据
  * @returns 验证结果，包含是否有效和错误列表
- * 
+ *
  * @example
  * ```typescript
  * const result = validateImportData(importedData);
@@ -140,119 +197,39 @@ export function validateImportData(data: ExportData): ValidationResult {
         errors.push('缺少版本信息');
     }
 
-    if (!Array.isArray(data.skills)) {
-        errors.push('技能数据格式不正确');
+    if (!data.dataType) {
+        errors.push('缺少数据类型信息');
     }
 
-    if (!Array.isArray(data.charms)) {
-        errors.push('护石数据格式不正确');
+    // 根据数据类型验证相应字段
+    if (data.dataType === 'all' || data.dataType === 'skills') {
+        if (!Array.isArray(data.skills)) {
+            errors.push('技能数据格式不正确');
+        } else {
+            // 验证技能数据
+            data.skills.forEach((skill, index) => {
+                if (!skill.id || !skill.name || !skill.type) {
+                    errors.push(`技能 ${index + 1} 缺少必需字段`);
+                }
+            });
+        }
     }
 
-    // 验证技能数据
-    if (Array.isArray(data.skills)) {
-        data.skills.forEach((skill, index) => {
-            if (!skill.id || !skill.name || !skill.type) {
-                errors.push(`技能 ${index + 1} 缺少必需字段`);
-            }
-        });
-    }
-
-    // 验证护石数据
-    if (Array.isArray(data.charms)) {
-        data.charms.forEach((charm, index) => {
-            if (!charm.id || !charm.rarity || !Array.isArray(charm.skills)) {
-                errors.push(`护石 ${index + 1} 缺少必需字段`);
-            }
-        });
+    if (data.dataType === 'all' || data.dataType === 'charms') {
+        if (!Array.isArray(data.charms)) {
+            errors.push('护石数据格式不正确');
+        } else {
+            // 验证护石数据
+            data.charms.forEach((charm, index) => {
+                if (!charm.id || !charm.rarity || !Array.isArray(charm.skills)) {
+                    errors.push(`护石 ${index + 1} 缺少必需字段`);
+                }
+            });
+        }
     }
 
     return {
         isValid: errors.length === 0,
         errors,
     };
-}
-
-/**
- * 导出护石为CSV格式
- * 
- * 将护石列表导出为CSV文件，包含稀有度、技能、孔位等信息
- * 使用UTF-8 BOM以确保中文正确显示
- * 文件名格式：mhws-charms-YYYY-MM-DD.csv
- * 
- * @param charms - 护石列表
- * @param skills - 技能列表（用于查找技能名称）
- * 
- * @example
- * ```typescript
- * exportCharmsToCSV(charms, skills);
- * // 下载文件：mhws-charms-2025-10-11.csv
- * ```
- */
-export function exportCharmsToCSV(charms: Charm[], skills: Skill[]): void {
-    // 创建技能ID到名称的映射
-    const skillMap = new Map(skills.map(s => [s.id, s.name]));
-
-    // CSV头部
-    const headers = [
-        '稀有度',
-        '技能1',
-        '技能1等级',
-        '技能2',
-        '技能2等级',
-        '技能3',
-        '技能3等级',
-        '孔位',
-        '核心技能价值',
-        '创建时间',
-    ];
-
-    // CSV内容
-    const rows = charms.map(charm => {
-        const skillsData = charm.skills.map(s => ({
-            name: skillMap.get(s.skillId) || s.skillId,
-            level: s.level,
-        }));
-
-        // 补齐到3个技能
-        while (skillsData.length < 3) {
-            skillsData.push({ name: '', level: 0 });
-        }
-
-        const slotsStr = charm.slots
-            .map(s => `${s.type === 'weapon' ? 'W' : 'A'}${s.level}`)
-            .join(',');
-
-        return [
-            charm.rarity,
-            skillsData[0].name,
-            skillsData[0].level || '',
-            skillsData[1].name,
-            skillsData[1].level || '',
-            skillsData[2].name,
-            skillsData[2].level || '',
-            slotsStr,
-            charm.keySkillValue,
-            new Date(charm.createdAt).toLocaleString('zh-CN'),
-        ];
-    });
-
-    // 构建CSV
-    const csvContent = [
-        headers.join(','),
-        ...rows.map(row => row.join(',')),
-    ].join('\n');
-
-    // 下载（使用UTF-8 BOM确保中文正确显示）
-    const blob = new Blob(['\ufeff' + csvContent], {
-        type: 'text/csv;charset=utf-8;',
-    });
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `mhws-charms-${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
 }

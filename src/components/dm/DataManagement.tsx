@@ -1,4 +1,4 @@
-import { Download, FileJson, FileSpreadsheet, Trash2, Upload } from 'lucide-react';
+import { Download, FileJson, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 import { CharmCard } from '@/components/charms/CharmCard';
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCharms, useSkills } from '@/contexts';
 import {
-    clearStorage, exportCharmsToCSV, exportToJSON, importFromJSON, sortCharms, validateImportData
+    clearStorage, exportDataToJSON, importFromJSON, sortCharms, validateImportData
 } from '@/utils';
 
 import type { Charm } from '@/types';
@@ -20,6 +20,41 @@ export function DataManagement() {
     const { charms, resetCharms, importCharms } = useCharms();
     const [importing, setImporting] = useState(false);
 
+    // 导出选项配置
+    const exportOptions = [
+        {
+            type: 'all' as const,
+            label: '导出全部数据为 JSON',
+            stats: `${skills.length} 技能 · ${charms.length} 护石`
+        },
+        {
+            type: 'skills' as const,
+            label: '导出技能数据为 JSON',
+            stats: `${skills.length} 技能`
+        },
+        {
+            type: 'charms' as const,
+            label: '导出护石数据为 JSON',
+            stats: `${charms.length} 护石`
+        }
+    ];
+
+    // 导入选项配置
+    const importOptions = [
+        {
+            type: 'all' as const,
+            label: '导入全部数据'
+        },
+        {
+            type: 'skills' as const,
+            label: '导入技能数据'
+        },
+        {
+            type: 'charms' as const,
+            label: '导入护石数据'
+        }
+    ];
+
     // 计算最佳护石
     const bestKeySkillCharm: Charm | undefined = charms.length > 0 ? sortCharms(charms, 'keySkillValue', 'desc')[0] : undefined;
     const bestWeaponSlot1Charm: Charm | undefined = charms.length > 0 ? sortCharms(charms, 'weaponSlot1', 'desc')[0] : undefined;
@@ -27,26 +62,17 @@ export function DataManagement() {
     const bestArmorSlot2Charm: Charm | undefined = charms.length > 0 ? sortCharms(charms, 'armorSlot2', 'desc')[0] : undefined;
     const bestArmorSlot1Charm: Charm | undefined = charms.length > 0 ? sortCharms(charms, 'armorSlot1', 'desc')[0] : undefined;
 
-    // 导出JSON
-    const handleExportJSON = () => {
+    // 统一导出处理函数
+    const handleExport = (dataType: 'all' | 'skills' | 'charms') => {
         try {
-            exportToJSON(skills, charms);
-        } catch (error) {
-            alert('导出失败：' + (error as Error).message);
-        }
-    };
-
-    // 导出CSV
-    const handleExportCSV = () => {
-        try {
-            exportCharmsToCSV(charms, skills);
+            exportDataToJSON(dataType, skills, charms);
         } catch (error) {
             alert('导出失败：' + (error as Error).message);
         }
     };
 
     // 导入JSON
-    const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImport = async (e: React.ChangeEvent<HTMLInputElement>, expectedType: 'all' | 'skills' | 'charms') => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -60,14 +86,45 @@ export function DataManagement() {
                 return;
             }
 
-            if (
-                confirm(
-                    `确定要导入数据吗？\n\n将导入 ${data.skills.length} 个技能和 ${data.charms.length} 个护石\n\n注意：这将覆盖当前所有数据！`
-                )
-            ) {
-                // 导入数据
-                importSkills(data.skills);
-                importCharms(data.charms);
+            // 验证数据类型是否匹配期望类型
+            if (data.dataType !== expectedType) {
+                alert(`导入失败：文件数据类型 (${data.dataType}) 与期望类型 (${expectedType}) 不匹配`);
+                return;
+            }
+
+            // 根据数据类型生成确认信息和导入逻辑
+            let confirmMessage = '';
+            let shouldProceed = false;
+
+            switch (data.dataType) {
+                case 'all':
+                    confirmMessage = `确定要导入全部数据吗？\n\n将导入 ${data.skills!.length} 个技能和 ${data.charms!.length} 个护石\n\n注意：这将覆盖当前所有数据！`;
+                    shouldProceed = confirm(confirmMessage);
+                    if (shouldProceed) {
+                        importSkills(data.skills!);
+                        importCharms(data.charms!);
+                    }
+                    break;
+                case 'skills':
+                    confirmMessage = `确定要导入技能数据吗？\n\n将导入 ${data.skills!.length} 个技能\n\n注意：这将覆盖当前的技能数据！`;
+                    shouldProceed = confirm(confirmMessage);
+                    if (shouldProceed) {
+                        importSkills(data.skills!);
+                    }
+                    break;
+                case 'charms':
+                    confirmMessage = `确定要导入护石数据吗？\n\n将导入 ${data.charms!.length} 个护石\n\n注意：这将覆盖当前的护石数据！`;
+                    shouldProceed = confirm(confirmMessage);
+                    if (shouldProceed) {
+                        importCharms(data.charms!);
+                    }
+                    break;
+                default:
+                    alert('导入失败：未知的数据类型');
+                    return;
+            }
+
+            if (shouldProceed) {
                 alert('导入成功！');
             }
         } catch (error) {
@@ -112,26 +169,19 @@ export function DataManagement() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                        <div
-                            onClick={handleExportJSON}
-                            className="inline-flex items-center justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full cursor-pointer"
-                        >
-                            <FileJson className="h-4 w-4 mr-2" />
-                            导出全部数据为 JSON
-                            <span className="ml-auto text-xs text-muted-foreground">
-                                {skills.length} 技能 · {charms.length} 护石
-                            </span>
-                        </div>
-                        <div
-                            onClick={handleExportCSV}
-                            className="inline-flex items-center justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full cursor-pointer"
-                        >
-                            <FileSpreadsheet className="h-4 w-4 mr-2" />
-                            导出护石为 CSV
-                            <span className="ml-auto text-xs text-muted-foreground">
-                                {charms.length} 护石
-                            </span>
-                        </div>
+                        {exportOptions.map((option) => (
+                            <div
+                                key={option.type}
+                                onClick={() => handleExport(option.type)}
+                                className="inline-flex items-center justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full cursor-pointer"
+                            >
+                                <FileJson className="h-4 w-4 mr-2" />
+                                {option.label}
+                                <span className="ml-auto text-xs text-muted-foreground">
+                                    {option.stats}
+                                </span>
+                            </div>
+                        ))}
                     </CardContent>
                 </Card>
 
@@ -146,26 +196,27 @@ export function DataManagement() {
                             从之前导出的 JSON 文件恢复数据
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <input
-                            type="file"
-                            accept=".json"
-                            onChange={handleImport}
-                            disabled={importing}
-                            className="hidden"
-                            id="import-file-input"
-                        />
-                        <label htmlFor="import-file-input" className="block">
-                            <div
-                                className={`inline-flex items-center justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full cursor-pointer ${importing ? 'opacity-50 pointer-events-none' : ''}`}
-                            >
-                                <Upload className="h-4 w-4 mr-2" />
-                                {importing ? '导入中...' : '选择 JSON 文件'}
+                    <CardContent className="space-y-3">
+                        {importOptions.map((option) => (
+                            <div key={option.type}>
+                                <input
+                                    type="file"
+                                    accept=".json"
+                                    onChange={(e) => handleImport(e, option.type)}
+                                    disabled={importing}
+                                    className="hidden"
+                                    id={`import-${option.type}-input`}
+                                />
+                                <label htmlFor={`import-${option.type}-input`} className="block">
+                                    <div
+                                        className={`inline-flex items-center justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full cursor-pointer ${importing ? 'opacity-50 pointer-events-none' : ''}`}
+                                    >
+                                        <Upload className="h-4 w-4 mr-2" />
+                                        {importing ? '导入中...' : option.label}
+                                    </div>
+                                </label>
                             </div>
-                        </label>
-                        <p className="mt-2 text-xs text-muted-foreground">
-                            仅支持本应用导出的 JSON 文件
-                        </p>
+                        ))}
                     </CardContent>
                 </Card>
 

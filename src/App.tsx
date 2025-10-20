@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { CharmManagement } from '@/components/charms';
-import { DataManagement } from '@/components/data';
+import { DataManagement } from '@/components/dm';
 import { Footer, Header, Navigation } from '@/components/layout';
 import { SkillManagement } from '@/components/skills';
 import { AppProvider } from '@/contexts';
