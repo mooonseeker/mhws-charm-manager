@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
-import { SKILL_TYPE_LABELS } from '@/types/constants';
+import { SKILL_TYPE_LABELS, SLOT_LEVEL_LABELS } from '@/types/constants';
 
 import type { Skill, SkillType, SlotLevel } from '@/types';
 
@@ -52,14 +52,6 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
         setLocalError(null);
     }, [skill, open]);
 
-    // 当类型改变时，自动设置装饰品等级
-    useEffect(() => {
-        if (type === 'special') {
-            setDecorationLevel(-1);
-        } else if (decorationLevel === -1) {
-            setDecorationLevel(2);
-        }
-    }, [type, decorationLevel]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -85,7 +77,7 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
             name: trimmedName,
             type,
             maxLevel,
-            decorationLevel: type === 'special' ? -1 : decorationLevel,
+            decorationLevel,
             isKey,
         });
         onClose();
@@ -130,7 +122,6 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
                             <SelectContent>
                                 <SelectItem value="weapon">{SKILL_TYPE_LABELS.weapon}</SelectItem>
                                 <SelectItem value="armor">{SKILL_TYPE_LABELS.armor}</SelectItem>
-                                <SelectItem value="special">{SKILL_TYPE_LABELS.special}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -149,24 +140,23 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
                             />
                         </div>
 
-                        {type !== 'special' && (
-                            <div className="space-y-3">
-                                <Label htmlFor="decorationLevel">装饰品等级</Label>
-                                <Select
-                                    value={decorationLevel.toString()}
-                                    onValueChange={(v) => setDecorationLevel(parseInt(v) as SlotLevel)}
-                                >
-                                    <SelectTrigger id="decorationLevel">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="1">一级</SelectItem>
-                                        <SelectItem value="2">二级</SelectItem>
-                                        <SelectItem value="3">三级</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
+                        <div className="space-y-3">
+                            <Label htmlFor="decorationLevel">装饰品等级</Label>
+                            <Select
+                                value={decorationLevel.toString()}
+                                onValueChange={(v) => setDecorationLevel(parseInt(v) as SlotLevel)}
+                            >
+                                <SelectTrigger id="decorationLevel">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="-1">{SLOT_LEVEL_LABELS[-1]}</SelectItem>
+                                    <SelectItem value="1">{SLOT_LEVEL_LABELS[1]}</SelectItem>
+                                    <SelectItem value="2">{SLOT_LEVEL_LABELS[2]}</SelectItem>
+                                    <SelectItem value="3">{SLOT_LEVEL_LABELS[3]}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     <div className="flex items-center space-x-2">

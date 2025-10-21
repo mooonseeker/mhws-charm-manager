@@ -14,7 +14,6 @@ import type { Skill, SkillWithLevel, Slot, EquivalentSlots } from '@/types';
  * 规则：
  * - 武器技能：level个对应装饰品等级的武器孔位
  * - 防具技能：level个对应装饰品等级的防具孔位
- * - 特殊技能：无对应孔位（返回全0）
  * 
  * @param skill - 技能定义
  * @param level - 技能等级
@@ -49,10 +48,6 @@ export function calculateSkillEquivalentSlots(
         return equivalentSlots;
     }
 
-    // 特殊技能无对应孔位
-    if (skill.type === 'special') {
-        return equivalentSlots;
-    }
 
     // 检查装饰品等级是否有效
     if (skill.decorationLevel <= 0) {

@@ -7,10 +7,9 @@
 /**
  * 技能类型枚举
  * - weapon: 武器技能
- * - armor: 防具技能  
- * - special: 特殊技能
+ * - armor: 防具技能
  */
-export type SkillType = 'weapon' | 'armor' | 'special';
+export type SkillType = 'weapon' | 'armor';
 
 /**
  * 孔位类型

@@ -75,21 +75,11 @@ MHWS护石管理器是一个用于管理《怪物猎人：荒野》(Monster Hunt
 ```bash
 mhws-charm-manager/
 ├── public/                          # 静态资源
-│   ├── armor-slot-1.png             # 防具孔位1级图标
-│   ├── armor-slot-2.png             # 防具孔位2级图标
-│   ├── armor-slot-3.png             # 防具孔位3级图标
-│   ├── armor.png                    # 防具类型图标
-│   ├── charm.png                    # 护石图标
-│   ├── special.png                  # 特殊技能图标
-│   ├── weapon-slot-1.png            # 武器孔位1级图标
-│   ├── weapon-slot-2.png            # 武器孔位2级图标
-│   ├── weapon-slot-3.png            # 武器孔位3级图标
-│   └── weapon.png                   # 武器技能图标
 ├── src/
 │   ├── components/                  # React组件
 │   │   ├── charms/                  # 护石管理组件
 │   │   ├── common/                  # 通用组件
-│   │   ├── data/                    # 数据管理组件
+│   │   ├── dm/                    # 数据管理组件
 │   │   ├── layout/                  # 布局组件
 │   │   ├── skills/                  # 技能管理组件
 │   │   └── ui/                      # UI库组件（shadcn/ui）
@@ -123,7 +113,6 @@ mhws-charm-manager/
 
 - `weapon`: 武器技能
 - `armor`: 防具技能
-- `special`: 特殊技能
 
 #### 4.1.2 孔位类型和等级 (SlotType, SlotLevel)
 
@@ -209,7 +198,7 @@ function calculateCharmEquivalentSlots(skills, slots, skillsData):
   // 2. 累加技能的等效孔位
   for each skill_instance in skills:
     skill_def = skillsData.get(skill_instance.id)
-    if skill_def is valid and not 'special':
+    if skill_def is valid:
       // 技能的每个等级都算作一个对应装饰品等级的孔位
       slot_key = skill_def.type + "Slot" + skill_def.decorationLevel
       totalEquivalentSlots[slot_key] += skill_instance.level
