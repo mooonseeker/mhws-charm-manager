@@ -58,7 +58,12 @@ export function validateIdFormat(id: string): boolean {
         return false;
     }
 
-    // 检查技能ID格式: skill-{数字}
+    // 检查官方技能ID格式: HunterSkill_XXX 或 NONE 等
+    if (id.startsWith('HunterSkill_') || id === 'NONE' || /^[A-Z][a-zA-Z]*_\d+$/.test(id)) {
+        return true;
+    }
+
+    // 检查用户自定义技能ID格式: skill-{数字}
     if (id.startsWith('skill-')) {
         const hashPart = id.substring(6); // 移除 'skill-'
         return /^\d+$/.test(hashPart);

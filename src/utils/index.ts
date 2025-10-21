@@ -52,6 +52,11 @@ export {
     validateImportData,
 } from './import-export';
 
+// 数据迁移工具
+export {
+    runDataMigration,
+} from './migration';
+
 // 导入导出类型
 export type {
     ExportData,

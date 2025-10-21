@@ -42,6 +42,8 @@ export const CHARM_SLOTS_MAX = 3;
 export const SKILL_TYPE_LABELS: Record<SkillType, string> = {
     weapon: '武器技能',
     armor: '防具技能',
+    series: '套装技能',
+    group: '组合技能',
 };
 
 /**

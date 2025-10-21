@@ -79,6 +79,9 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
             maxLevel,
             decorationLevel,
             isKey,
+            description: '', // 用户自定义技能默认无描述
+            skillIconType: '', // 用户自定义技能默认无图标类型
+            sortId: 9999, // 用户自定义技能默认排在最后
         });
         onClose();
     };

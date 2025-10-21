@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ErrorMessage, Loading } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { useSkills } from '@/contexts';
+import { generateSkillId } from '@/utils';
 
 import { SkillForm } from './SkillForm';
 import { SkillList } from './SkillList';
@@ -45,7 +46,12 @@ export function SkillManagement() {
             }
         } else {
             try {
-                addSkill(skillData);
+                // 为新技能生成ID
+                const newSkill: Skill = {
+                    ...skillData,
+                    id: generateSkillId(skillData.name),
+                };
+                addSkill(newSkill);
                 setFormOpen(false); // 成功后关闭
             } catch (error) {
                 if (error instanceof Error) {

@@ -7,8 +7,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useReducer } from 'react';
 
-import { initialSkills } from '@/data/initial-skills';
-import { generateSkillId, loadSkills, saveSkills } from '@/utils';
+import { loadSkills, saveSkills } from '@/utils';
 
 import type { Skill } from '@/types';
 
@@ -41,7 +40,7 @@ type SkillAction =
  */
 interface SkillContextType extends SkillState {
     /** 添加技能 */
-    addSkill: (skill: Omit<Skill, 'id'>) => void;
+    addSkill: (skill: Skill) => void;
     /** 更新技能 */
     updateSkill: (skill: Skill) => void;
     /** 删除技能 */
@@ -108,24 +107,17 @@ export function SkillProvider({ children }: { children: ReactNode }) {
         error: null,
     });
 
-    // 初始化：从LocalStorage加载或使用初始数据
+    // 初始化：从LocalStorage加载
     useEffect(() => {
         try {
             const savedSkills = loadSkills();
-            if (savedSkills && savedSkills.length > 0) {
-                dispatch({ type: 'SET_SKILLS', payload: savedSkills });
-            } else {
-                // 为初始数据生成确定性ID
-                const initialSkillsWithIds = initialSkills.map(skill => ({
-                    ...skill,
-                    id: generateSkillId(skill.name),
-                }));
-                dispatch({ type: 'SET_SKILLS', payload: initialSkillsWithIds });
-                saveSkills(initialSkillsWithIds);
-            }
+            // 如果本地有存储，则加载，否则设置为空数组
+            dispatch({ type: 'SET_SKILLS', payload: savedSkills ?? [] });
         } catch (error) {
+            console.error('加载技能数据失败:', error);
             dispatch({ type: 'SET_ERROR', payload: '加载技能数据失败' });
-            dispatch({ type: 'SET_SKILLS', payload: initialSkills });
+            // 出错时也设置为空数组
+            dispatch({ type: 'SET_SKILLS', payload: [] });
         }
     }, []);
 
@@ -146,18 +138,17 @@ export function SkillProvider({ children }: { children: ReactNode }) {
      * @param skill - 技能数据（不包含ID）
      * @throws {Error} 如果技能名称已存在
      */
-    const addSkill = (skill: Omit<Skill, 'id'>) => {
+    const addSkill = (skill: Skill) => {
         // 检查名称是否重复（忽略大小写和前后空格）
         if (state.skills.some(s => s.name.trim().toLowerCase() === skill.name.trim().toLowerCase())) {
             throw new Error(`技能 "${skill.name}" 已存在。`);
         }
+        // 检查ID是否重复
+        if (state.skills.some(s => s.id === skill.id)) {
+            throw new Error(`技能ID "${skill.id}" 已存在。`);
+        }
 
-        // 使用确定性ID生成函数
-        const newSkill: Skill = {
-            ...skill,
-            id: generateSkillId(skill.name),
-        };
-        dispatch({ type: 'ADD_SKILL', payload: newSkill });
+        dispatch({ type: 'ADD_SKILL', payload: skill });
     };
 
     /**
@@ -201,7 +192,7 @@ export function SkillProvider({ children }: { children: ReactNode }) {
      * 重置技能为初始数据
      */
     const resetSkills = () => {
-        dispatch({ type: 'SET_SKILLS', payload: initialSkills });
+        dispatch({ type: 'SET_SKILLS', payload: [] });
     };
 
     const value: SkillContextType = {

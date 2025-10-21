@@ -5,6 +5,7 @@
  */
 
 import type { Skill, Charm } from '@/types';
+import { CURRENT_VERSION } from './storage';
 
 /**
  * 数据导出格式
@@ -64,7 +65,7 @@ export function exportDataToJSON(
     charms: Charm[]
 ): void {
     const data: ExportData = {
-        version: '1.0.0',
+        version: CURRENT_VERSION,
         exportedAt: new Date().toISOString(),
         dataType,
     };
@@ -160,7 +161,7 @@ export function importFromJSON(file: File): Promise<ExportData> {
                 }
 
                 resolve(data);
-            } catch (parseError) {
+            } catch {
                 reject(new Error('导入失败：文件格式不正确'));
             }
         };

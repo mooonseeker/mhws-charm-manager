@@ -18,7 +18,7 @@ const STORAGE_KEYS = {
 /**
  * 当前数据版本号
  */
-const CURRENT_VERSION = '1.0.0';
+export const CURRENT_VERSION = '1.03.0';
 
 /**
  * 保存技能列表到LocalStorage

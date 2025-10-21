@@ -9,7 +9,7 @@
  * - weapon: 武器技能
  * - armor: 防具技能
  */
-export type SkillType = 'weapon' | 'armor';
+export type SkillType = 'weapon' | 'armor' | 'series' | 'group';
 
 /**
  * 孔位类型
@@ -40,6 +40,9 @@ export interface Skill {
     maxLevel: number;
     decorationLevel: SlotLevel;
     isKey: boolean;
+    description: string;
+    skillIconType: string;
+    sortId: number;
 }
 
 /**

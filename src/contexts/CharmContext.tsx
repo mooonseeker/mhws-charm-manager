@@ -6,7 +6,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useReducer } from 'react';
 
-import { initialCharms } from '@/data/initial-charms';
 import { loadCharms, saveCharms } from '@/utils';
 
 import type { Charm } from '@/types';
@@ -116,22 +115,17 @@ export function CharmProvider({ children }: { children: ReactNode }) {
         error: null,
     });
 
-    // 初始化：从LocalStorage加载或使用初始数据
+    // 初始化：从LocalStorage加载
     useEffect(() => {
         try {
             const savedCharms = loadCharms();
-            if (savedCharms && savedCharms.length > 0) {
-                dispatch({ type: 'SET_CHARMS', payload: savedCharms });
-            } else {
-                dispatch({ type: 'SET_CHARMS', payload: initialCharms });
-                // 初始数据为空时不需要保存
-                if (initialCharms.length > 0) {
-                    saveCharms(initialCharms);
-                }
-            }
+            // 如果本地有存储，则加载，否则设置为空数组
+            dispatch({ type: 'SET_CHARMS', payload: savedCharms ?? [] });
         } catch (error) {
+            console.error('加载护石数据失败:', error);
             dispatch({ type: 'SET_ERROR', payload: '加载护石数据失败' });
-            dispatch({ type: 'SET_CHARMS', payload: initialCharms });
+            // 出错时也设置为空数组
+            dispatch({ type: 'SET_CHARMS', payload: [] });
         }
     }, []);
 
@@ -205,7 +199,7 @@ export function CharmProvider({ children }: { children: ReactNode }) {
      * 重置护石为初始数据
      */
     const resetCharms = () => {
-        dispatch({ type: 'SET_CHARMS', payload: initialCharms });
+        dispatch({ type: 'SET_CHARMS', payload: [] });
     };
 
     const value: CharmContextType = {
