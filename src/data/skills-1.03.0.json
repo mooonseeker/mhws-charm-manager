@@ -136,17 +136,6 @@
       "sortId": 54
     },
     {
-      "id": "HunterSkill_066",
-      "name": "SkillCommon_m111868368",
-      "type": "armor",
-      "maxLevel": 10,
-      "decorationLevel": -1,
-      "isKey": false,
-      "description": "SkillCommon_EXPm111868368",
-      "skillIconType": "SKILL_0000",
-      "sortId": 55
-    },
-    {
       "id": "HunterSkill_005",
       "name": "火属性攻击强化",
       "type": "weapon",

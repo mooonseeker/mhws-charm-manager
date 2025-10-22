@@ -75,11 +75,13 @@ MHWS护石管理器是一个用于管理《怪物猎人：荒野》(Monster Hunt
 ```bash
 mhws-charm-manager/
 ├── public/                          # 静态资源
+├── scripts/                         # 构建和数据生成脚本
+│   └── generate-skills-json.ts      # 官方技能数据生成脚本
 ├── src/
 │   ├── components/                  # React组件
 │   │   ├── charms/                  # 护石管理组件
 │   │   ├── common/                  # 通用组件
-│   │   ├── dm/                    # 数据管理组件
+│   │   ├── dm/                      # 数据管理组件
 │   │   ├── layout/                  # 布局组件
 │   │   ├── skills/                  # 技能管理组件
 │   │   └── ui/                      # UI库组件（shadcn/ui）
@@ -113,6 +115,8 @@ mhws-charm-manager/
 
 - `weapon`: 武器技能
 - `armor`: 防具技能
+- `series`: 套装技能
+- `group`: 组合技能
 
 #### 4.1.2 孔位类型和等级 (SlotType, SlotLevel)
 
@@ -125,7 +129,16 @@ mhws-charm-manager/
 
 #### 4.1.4 技能 (Skill & SkillWithLevel)
 
-- **Skill**: 定义了一个技能的基础属性，包括`id`, `name`, `type` (`SkillType`), `maxLevel` (最高等级), `decorationLevel` (`SlotLevel`, 镶嵌所需孔位等级, -1表示无法镶嵌), 和 `isKey` (是否为核心技能)。
+- **Skill**: 定义了一个技能的基础属性，包括：
+  - `id`: 技能唯一标识符
+  - `name`: 技能名称
+  - `type`: 技能类型 (`SkillType`)
+  - `maxLevel`: 最高等级
+  - `decorationLevel`: 镶嵌所需孔位等级 (`SlotLevel`, -1表示无法镶嵌)
+  - `isKey`: 是否为核心技能
+  - `description`: 技能描述
+  - `skillIconType`: 技能图标类型
+  - `sortId`: 排序ID
 - **SkillWithLevel**: 表示护石上带有的一个具体技能实例，包含 `skillId` (关联到`Skill`定义) 和 `level` (当前等级)。
 
 #### 4.1.5 等效孔位 (EquivalentSlots)
@@ -141,7 +154,15 @@ mhws-charm-manager/
 
 #### 4.1.6 护石 (Charm)
 
-定义了护石的核心数据结构，包含 `id`, `rarity` (稀有度, 1-12), `skills` (技能列表), `slots` (孔位列表), `equivalentSlots` (等效孔位), `keySkillValue` (核心技能价值), 和 `createdAt` (创建时间, ISO 8601格式)。
+定义了护石的核心数据结构，包含：
+
+- `id`: 护石唯一标识符
+- `rarity`: 稀有度 (1-12)
+- `skills`: 技能列表
+- `slots`: 孔位列表
+- `equivalentSlots`: 等效孔位
+- `keySkillValue`: 核心技能价值
+- `createdAt`: 创建时间 (ISO 8601格式)
 
 ### 4.2 应用状态类型
 
@@ -403,7 +424,7 @@ sequenceDiagram
 - `mhws-charm-manager-charms`: 存储护石列表的JSON字符串
 - `mhws-charm-manager-version`: 存储数据版本号
 
-我们封装了`saveSkills`、`loadSkills`、`saveCharms`、`loadCharms`、`clearStorage`等原子操作函数。加载时会进行基本的JSON解析错误处理，以确保数据安全。
+我们封装了`saveSkills`、`loadSkills`、`saveCharms`、`loadCharms`、`clearStorage`、`getStorageVersion`等原子操作函数。加载时会进行基本的JSON解析错误处理，以确保数据安全。
 
 ### 8.2 JSON文件格式
 
@@ -423,9 +444,9 @@ sequenceDiagram
 
 ### 8.3 初始化数据
 
-当应用首次启动且`LocalStorage`中没有数据时，系统会自动创建初始数据：
+当应用首次启动且`LocalStorage`中没有数据时，系统会自动加载官方技能数据，初始护石数据为空列表：
 
-- **技能数据**: 预设一个示例技能"精神抖擞"（武器技能，1级装饰品，最高等级3级），为用户提供技能管理的起点。
+- **技能数据**: 自动加载官方技能库（176个技能），包含完整的技能信息、类型映射和排序规则。
 - **护石数据**: 初始为空列表，用户需要自行添加护石。
 
 ---
@@ -440,9 +461,9 @@ sequenceDiagram
 - **多语言支持 (尚未实现)**：预留了加载不同语言包、切换应用语言的接口。
 - **云端同步 (尚未实现)**：预留了与云服务同步数据的接口（如登录后将数据备份到云端）。
 
-### 9.2 数据迁移策略 (尚未实现)
+### 9.2 数据迁移策略 (已实现)
 
-- **数据迁移管理器 (尚未实现)**：文档中设计了一个数据迁移管理器(`DataMigrationManager`)，用于在未来数据结构发生不兼容变更时，自动执行版本间的迁移脚本。**此管理器目前仅为设计，代码中尚未实现。**
+- **数据迁移管理器 (已实现)**：实现了一个数据迁移系统（[`migration.ts`](src/utils/migration.ts)），在应用启动时自动检测数据版本并执行必要的迁移。当前支持从旧技能系统迁移到官方技能数据，使用技能名称映射确保数据连续性。
 
 ---
 
@@ -491,3 +512,4 @@ sequenceDiagram
 
 - **v0.0.0 (2025-10-12)**：初始架构设计文档
 - **v0.6.2 (2025-10-20)**: 根据 v0.6.2 的代码实现，对整个架构文档进行了全面的审查和更新。
+- **v0.7.0 (2025-10-22)**: 升级数据版本，使用官方技能数据。实现数据迁移逻辑，更新技能数据模型和初始化流程。
