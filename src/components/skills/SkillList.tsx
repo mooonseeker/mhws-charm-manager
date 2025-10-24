@@ -37,8 +37,10 @@ export function SkillList({ onEdit }: SkillListProps) {
                 return `/weapon-slot-${decorationLevel}.png`;
             case 'armor':
                 return `/armor-slot-${decorationLevel}.png`;
+            case 'series':
+            case 'group':
             default:
-                return `/armor-slot-${decorationLevel}.png`;
+                return `/special.png`;
         }
     };
 
@@ -107,6 +109,22 @@ export function SkillList({ onEdit }: SkillListProps) {
                             className="text-xs sm:text-sm"
                         >
                             防具
+                        </Button>
+                        <Button
+                            variant={typeFilter === 'series' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setTypeFilter('series')}
+                            className="text-xs sm:text-sm"
+                        >
+                            套装
+                        </Button>
+                        <Button
+                            variant={typeFilter === 'group' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setTypeFilter('group')}
+                            className="text-xs sm:text-sm"
+                        >
+                            组合
                         </Button>
                         <div className="w-2"></div>
                         <div className="flex items-center gap-2">
@@ -179,11 +197,15 @@ export function SkillList({ onEdit }: SkillListProps) {
                                     </TableCell>
                                     <TableCell className="text-center text-sm">
                                         <div className="flex items-center justify-center gap-4">
-                                            <img
-                                                src={getDecorationIcon(skill.type, skill.decorationLevel)}
-                                                alt={`${SKILL_TYPE_LABELS[skill.type]}装饰品等级${skill.decorationLevel}`}
-                                                style={{ width: '2rem', height: '2rem' }}
-                                            />
+                                            {skill.decorationLevel !== -1 ? (
+                                                <img
+                                                    src={getDecorationIcon(skill.type, skill.decorationLevel)}
+                                                    alt={`${SKILL_TYPE_LABELS[skill.type]}装饰品等级${skill.decorationLevel}`}
+                                                    style={{ width: '2rem', height: '2rem' }}
+                                                />
+                                            ) : (
+                                                <span className="text-muted-foreground">—</span>
+                                            )}
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-center">{skill.maxLevel}</TableCell>

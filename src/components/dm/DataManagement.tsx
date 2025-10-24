@@ -1,4 +1,4 @@
-import { Download, FileJson, Trash2, Upload } from 'lucide-react';
+import { Download, FileJson, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 import { CharmCard } from '@/components/charms/CharmCard';
@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCharms, useSkills } from '@/contexts';
 import {
-    clearStorage, exportDataToJSON, importFromJSON, sortCharms, validateImportData
+    clearStorage, exportDataToJSON, importFromJSON, sortCharms, validateImportData,
+    validateSkillsDatabase
 } from '@/utils';
 
 import type { Charm } from '@/types';
@@ -135,6 +136,22 @@ export function DataManagement() {
         }
     };
 
+    // 数据库验证
+    const handleValidateDatabase = () => {
+        try {
+            const validation = validateSkillsDatabase(skills);
+
+            if (validation.isValid) {
+                alert('技能数据库验证通过！\n\n数据完全一致，技能数据库完整且正确。');
+            } else {
+                const errorMessage = `技能数据库验证失败：\n\n${validation.errors.join('\n')}`;
+                alert(errorMessage);
+            }
+        } catch (error) {
+            alert('验证过程中发生错误：' + (error as Error).message);
+        }
+    };
+
     // 重置数据
     const handleReset = () => {
         if (
@@ -186,7 +203,7 @@ export function DataManagement() {
                 </Card>
 
                 {/* 导入数据 */}
-                <Card className="md:col-span-2">
+                <Card className="md:col-span-1">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Upload className="h-5 w-5" />
@@ -217,6 +234,28 @@ export function DataManagement() {
                                 </label>
                             </div>
                         ))}
+                    </CardContent>
+                </Card>
+
+                {/* 数据库验证 */}
+                <Card className="md:col-span-1">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <ShieldCheck className="h-5 w-5" />
+                            数据库验证
+                        </CardTitle>
+                        <CardDescription>
+                            验证当前技能数据与初始数据库的一致性
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button
+                            onClick={handleValidateDatabase}
+                            variant="outline"
+                            className="w-full"
+                        >
+                            技能
+                        </Button>
                     </CardContent>
                 </Card>
 

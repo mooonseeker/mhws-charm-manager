@@ -57,6 +57,11 @@ export {
     runDataMigration,
 } from './migration';
 
+// 数据库验证工具
+export {
+    validateSkillsDatabase,
+} from './database-validator';
+
 // 导入导出类型
 export type {
     ExportData,
