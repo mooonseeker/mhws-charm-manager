@@ -187,17 +187,18 @@ export function DataManagement() {
                     </CardHeader>
                     <CardContent className="space-y-3">
                         {exportOptions.map((option) => (
-                            <div
+                            <Button
                                 key={option.type}
                                 onClick={() => handleExport(option.type)}
-                                className="inline-flex items-center justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full cursor-pointer"
+                                variant="outline"
+                                className="w-full justify-start"
                             >
                                 <FileJson className="h-4 w-4 mr-2" />
                                 {option.label}
                                 <span className="ml-auto text-xs text-muted-foreground">
                                     {option.stats}
                                 </span>
-                            </div>
+                            </Button>
                         ))}
                     </CardContent>
                 </Card>
@@ -224,14 +225,17 @@ export function DataManagement() {
                                     className="hidden"
                                     id={`import-${option.type}-input`}
                                 />
-                                <label htmlFor={`import-${option.type}-input`} className="block">
-                                    <div
-                                        className={`inline-flex items-center justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full cursor-pointer ${importing ? 'opacity-50 pointer-events-none' : ''}`}
-                                    >
+                                <Button
+                                    asChild
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                    disabled={importing}
+                                >
+                                    <label htmlFor={`import-${option.type}-input`}>
                                         <Upload className="h-4 w-4 mr-2" />
                                         {importing ? '导入中...' : option.label}
-                                    </div>
-                                </label>
+                                    </label>
+                                </Button>
                             </div>
                         ))}
                     </CardContent>
@@ -245,7 +249,7 @@ export function DataManagement() {
                             数据库验证
                         </CardTitle>
                         <CardDescription>
-                            验证当前技能数据与初始数据库的一致性
+                            验证当前数据库与初始数据库的一致性
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
