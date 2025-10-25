@@ -209,7 +209,7 @@ export function validateImportData(data: ExportData): ValidationResult {
         } else {
             // 验证技能数据
             data.skills.forEach((skill, index) => {
-                if (!skill.id || !skill.name || !skill.type) {
+                if (!skill.id || !skill.name || !skill.category) {
                     errors.push(`技能 ${index + 1} 缺少必需字段`);
                 }
             });

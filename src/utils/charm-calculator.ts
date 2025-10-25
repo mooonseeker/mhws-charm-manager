@@ -9,7 +9,7 @@ import type { Skill, SkillWithLevel, Slot, EquivalentSlots } from '@/types';
 /**
  * 计算单个技能的等效孔位
  * 
- * 根据技能的类型、装饰品等级和技能等级，计算该技能等效的孔位数量
+ * 根据技能分类、装饰品等级和技能等级，计算该技能等效的孔位数量
  * 
  * 规则：
  * - 武器技能：level个对应装饰品等级的武器孔位
@@ -54,10 +54,10 @@ export function calculateSkillEquivalentSlots(
         return equivalentSlots;
     }
 
-    // 根据技能类型和装饰品等级，累加对应的孔位
+    // 根据技能分类和装饰品等级，累加对应的孔位
     const decorationLevel = skill.decorationLevel;
 
-    if (skill.type === 'weapon') {
+    if (skill.category === 'weapon') {
         // 武器技能对应武器孔位
         if (decorationLevel === 1) {
             equivalentSlots.weaponSlot1 = level;
@@ -66,7 +66,7 @@ export function calculateSkillEquivalentSlots(
         } else if (decorationLevel === 3) {
             equivalentSlots.weaponSlot3 = level;
         }
-    } else if (skill.type === 'armor') {
+    } else if (skill.category === 'armor') {
         // 防具技能对应防具孔位
         if (decorationLevel === 1) {
             equivalentSlots.armorSlot1 = level;

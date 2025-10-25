@@ -97,7 +97,7 @@ export function CharmForm({
                                     {skill.isKey && ' ⭐'}
                                 </span>
                                 <Badge variant="outline">
-                                    {skill.type === 'weapon' ? '武器' : skill.type === 'armor' ? '防具' : '特殊'}
+                                    {skill.category === 'weapon' ? '武器' : skill.category === 'armor' ? '防具' : '特殊'}
                                 </Badge>
                                 <Button
                                     variant="ghost"

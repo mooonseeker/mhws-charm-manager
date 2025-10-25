@@ -10,9 +10,9 @@ import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
 import { useSkills } from '@/contexts';
-import { SKILL_TYPE_LABELS, SKILLS_PER_PAGE } from '@/types/constants';
+import { SKILL_CATEGORY_LABELS, SKILLS_PER_PAGE } from '@/types/constants';
 
-import type { Skill, SkillType, SlotLevel } from '@/types';
+import type { Skill, SkillCategory, SlotLevel } from '@/types';
 
 interface SkillListProps {
     onEdit: (skill: Skill) => void;
@@ -25,14 +25,14 @@ interface SkillListProps {
 
 export function SkillList({ onEdit }: SkillListProps) {
     const { skills, deleteSkill } = useSkills();
-    const [typeFilter, setTypeFilter] = useState<SkillType | 'all'>('all');
+    const [categoryFilter, setCategoryFilter] = useState<SkillCategory | 'all'>('all');
     const [keyOnlyFilter, setKeyOnlyFilter] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
     // 获取装饰品等级图标
-    const getDecorationIcon = (skillType: SkillType, decorationLevel: SlotLevel) => {
-        switch (skillType) {
+    const getDecorationIcon = (skillCategory: SkillCategory, decorationLevel: SlotLevel) => {
+        switch (skillCategory) {
             case 'weapon':
                 return `/weapon-slot-${decorationLevel}.png`;
             case 'armor':
@@ -46,7 +46,7 @@ export function SkillList({ onEdit }: SkillListProps) {
 
     // 筛选技能
     const filteredSkills = skills.filter((skill) => {
-        if (typeFilter !== 'all' && skill.type !== typeFilter) return false;
+        if (categoryFilter !== 'all' && skill.category !== categoryFilter) return false;
         if (keyOnlyFilter && !skill.isKey) return false;
         if (searchQuery) {
             // 检查是否为精确匹配（以等号开头）
@@ -72,7 +72,7 @@ export function SkillList({ onEdit }: SkillListProps) {
     // 当筛选条件变化时，重置到第一页
     useEffect(() => {
         setCurrentPage(1);
-    }, [typeFilter, keyOnlyFilter, searchQuery]);
+    }, [categoryFilter, keyOnlyFilter, searchQuery]);
 
     const handleDelete = (skill: Skill) => {
         if (confirm(`确定要删除技能"${skill.name}"吗？`)) {
@@ -87,41 +87,41 @@ export function SkillList({ onEdit }: SkillListProps) {
                 <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Button
-                            variant={typeFilter === 'all' ? 'default' : 'outline'}
+                            variant={categoryFilter === 'all' ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => setTypeFilter('all')}
+                            onClick={() => setCategoryFilter('all')}
                             className="text-xs sm:text-sm"
                         >
                             全部
                         </Button>
                         <Button
-                            variant={typeFilter === 'weapon' ? 'default' : 'outline'}
+                            variant={categoryFilter === 'weapon' ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => setTypeFilter('weapon')}
+                            onClick={() => setCategoryFilter('weapon')}
                             className="text-xs sm:text-sm"
                         >
                             武器
                         </Button>
                         <Button
-                            variant={typeFilter === 'armor' ? 'default' : 'outline'}
+                            variant={categoryFilter === 'armor' ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => setTypeFilter('armor')}
+                            onClick={() => setCategoryFilter('armor')}
                             className="text-xs sm:text-sm"
                         >
                             防具
                         </Button>
                         <Button
-                            variant={typeFilter === 'series' ? 'default' : 'outline'}
+                            variant={categoryFilter === 'series' ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => setTypeFilter('series')}
+                            onClick={() => setCategoryFilter('series')}
                             className="text-xs sm:text-sm"
                         >
                             套装
                         </Button>
                         <Button
-                            variant={typeFilter === 'group' ? 'default' : 'outline'}
+                            variant={categoryFilter === 'group' ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => setTypeFilter('group')}
+                            onClick={() => setCategoryFilter('group')}
                             className="text-xs sm:text-sm"
                         >
                             组合
@@ -166,7 +166,7 @@ export function SkillList({ onEdit }: SkillListProps) {
                         <TableRow>
                             <TableHead className="text-center min-w-[50px] bg-primary text-primary-foreground">核心</TableHead>
                             <TableHead className="text-center min-w-[120px] bg-primary text-primary-foreground">技能名称</TableHead>
-                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">类型</TableHead>
+                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">分类</TableHead>
                             <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">装饰品等级</TableHead>
                             <TableHead className="text-center min-w-[60px] bg-primary text-primary-foreground">最大等级</TableHead>
                             <TableHead className="text-right min-w-[80px] bg-primary text-primary-foreground">操作</TableHead>
@@ -192,15 +192,15 @@ export function SkillList({ onEdit }: SkillListProps) {
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Badge variant="outline" className="text-center text-xs">
-                                            {SKILL_TYPE_LABELS[skill.type]}
+                                            {SKILL_CATEGORY_LABELS[skill.category]}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-center text-sm">
                                         <div className="flex items-center justify-center gap-4">
                                             {skill.decorationLevel !== -1 ? (
                                                 <img
-                                                    src={getDecorationIcon(skill.type, skill.decorationLevel)}
-                                                    alt={`${SKILL_TYPE_LABELS[skill.type]}装饰品等级${skill.decorationLevel}`}
+                                                    src={getDecorationIcon(skill.category, skill.decorationLevel)}
+                                                    alt={`${SKILL_CATEGORY_LABELS[skill.category]}装饰品等级${skill.decorationLevel}`}
                                                     style={{ width: '2rem', height: '2rem' }}
                                                 />
                                             ) : (

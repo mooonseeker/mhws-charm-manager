@@ -109,7 +109,7 @@ mhws-charm-manager/
 
 ### 4.1 核心数据类型
 
-#### 4.1.1 技能类型 (SkillType)
+#### 4.1.1 技能分类 (SkillCategory)
 
 技能的分类，是一个字符串枚举，包含：
 
@@ -132,12 +132,12 @@ mhws-charm-manager/
 - **Skill**: 定义了一个技能的基础属性，包括：
   - `id`: 技能唯一标识符
   - `name`: 技能名称
-  - `type`: 技能类型 (`SkillType`)
+  - `category`: 技能分类 (`SkillCategory`)
   - `maxLevel`: 最高等级
-  - `decorationLevel`: 镶嵌所需孔位等级 (`SlotLevel`, -1表示无法镶嵌)
+  - `decorationLevel`: 镶嵌所需孔位等级 (`SlotLevel`, -1表示无对应的装饰品)
   - `isKey`: 是否为核心技能
   - `description`: 技能描述
-  - `skillIconType`: 技能图标类型
+  - `type`: 技能类型
   - `sortId`: 排序ID
 - **SkillWithLevel**: 表示护石上带有的一个具体技能实例，包含 `skillId` (关联到`Skill`定义) 和 `level` (当前等级)。
 
@@ -344,7 +344,7 @@ graph TD
 - **CharmForm**: 添加/编辑护石的表单组件，包含技能选择器和孔位配置，是应用中最复杂的表单。
 - **CharmValidation**: 根据智能判定算法的结果，以弹出窗口形式显示验证状态、警告信息和确认选项。
 - **SkillSelector**: 一个可复用的组件，允许用户通过搜索从技能列表中选择技能，并设置其等级。
-- **SkillForm**: 添加/编辑技能的表单组件，支持技能名称、类型、最大等级等属性配置。
+- **SkillForm**: 添加/编辑技能的表单组件，支持技能名称、分类、最大等级等属性配置。
 
 ---
 

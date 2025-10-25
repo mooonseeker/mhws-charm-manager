@@ -10,9 +10,9 @@ import { Label } from '@/components/ui/label';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
-import { SKILL_TYPE_LABELS, SLOT_LEVEL_LABELS } from '@/types/constants';
+import { SKILL_CATEGORY_LABELS, SLOT_LEVEL_LABELS } from '@/types/constants';
 
-import type { Skill, SkillType, SlotLevel } from '@/types';
+import type { Skill, SkillCategory, SlotLevel } from '@/types';
 
 interface SkillFormProps {
     skill?: Skill;
@@ -29,7 +29,7 @@ interface SkillFormProps {
  */
 export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: SkillFormProps) {
     const [name, setName] = useState('');
-    const [type, setType] = useState<SkillType>('armor');
+    const [category, setCategory] = useState<SkillCategory>('armor');
     const [maxLevel, setMaxLevel] = useState(3);
     const [decorationLevel, setDecorationLevel] = useState<SlotLevel>(-1);
     const [isKey, setIsKey] = useState(false);
@@ -38,13 +38,13 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
     useEffect(() => {
         if (skill) {
             setName(skill.name);
-            setType(skill.type);
+            setCategory(skill.category);
             setMaxLevel(skill.maxLevel);
             setDecorationLevel(skill.decorationLevel);
             setIsKey(skill.isKey);
         } else {
             setName('');
-            setType('armor');
+            setCategory('armor');
             setMaxLevel(3);
             setDecorationLevel(2);
             setIsKey(false);
@@ -75,12 +75,12 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
 
         onSubmit({
             name: trimmedName,
-            type,
+            category,
             maxLevel,
             decorationLevel,
             isKey,
             description: '', // 用户自定义技能默认无描述
-            skillIconType: '', // 用户自定义技能默认无图标类型
+            type: '', // 用户自定义技能默认无类型
             sortId: 9999, // 用户自定义技能默认排在最后
         });
         onClose();
@@ -117,14 +117,14 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
                     </div>
 
                     <div className="space-y-3">
-                        <Label htmlFor="type">技能类型</Label>
-                        <Select value={type} onValueChange={(v) => setType(v as SkillType)}>
-                            <SelectTrigger id="type">
+                        <Label htmlFor="category">技能分类</Label>
+                        <Select value={category} onValueChange={(v) => setCategory(v as SkillCategory)}>
+                            <SelectTrigger id="category">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="weapon">{SKILL_TYPE_LABELS.weapon}</SelectItem>
-                                <SelectItem value="armor">{SKILL_TYPE_LABELS.armor}</SelectItem>
+                                <SelectItem value="weapon">{SKILL_CATEGORY_LABELS.weapon}</SelectItem>
+                                <SelectItem value="armor">{SKILL_CATEGORY_LABELS.armor}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

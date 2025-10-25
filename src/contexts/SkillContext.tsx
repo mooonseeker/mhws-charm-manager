@@ -7,6 +7,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useReducer } from 'react';
 
+import initialSkillsData from '@/data/skills-1.03.0.json';
 import { loadSkills, saveSkills } from '@/utils';
 
 import type { Skill } from '@/types';
@@ -192,7 +193,7 @@ export function SkillProvider({ children }: { children: ReactNode }) {
      * 重置技能为初始数据
      */
     const resetSkills = () => {
-        dispatch({ type: 'SET_SKILLS', payload: [] });
+        dispatch({ type: 'SET_SKILLS', payload: initialSkillsData.skills as Skill[] });
     };
 
     const value: SkillContextType = {

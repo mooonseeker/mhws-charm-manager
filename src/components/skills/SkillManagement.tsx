@@ -75,7 +75,7 @@ export function SkillManagement() {
                 <div className="flex items-baseline">
                     <h1 className="font-bold tracking-tight">技能管理</h1>
                     <p className="text-foreground">
-                        管理技能数据，设置技能类型和装饰品等级
+                        管理技能数据库
                     </p>
                 </div>
                 <Button size="lg" onClick={handleAdd}>

@@ -4,7 +4,7 @@
  * 包含应用中使用的所有常量
  */
 
-import type { SkillType, SlotLevel } from './index';
+import type { SkillCategory, SlotLevel } from './index';
 
 /**
  * 稀有度最小值
@@ -37,9 +37,9 @@ export const CHARM_SLOTS_MIN = 0;
 export const CHARM_SLOTS_MAX = 3;
 
 /**
- * 技能类型标签映射
+ * 技能分类标签映射
  */
-export const SKILL_TYPE_LABELS: Record<SkillType, string> = {
+export const SKILL_CATEGORY_LABELS: Record<SkillCategory, string> = {
     weapon: '武器技能',
     armor: '防具技能',
     series: '套装技能',

@@ -5,11 +5,13 @@
  */
 
 /**
- * 技能类型枚举
+ * 技能分类枚举
  * - weapon: 武器技能
  * - armor: 防具技能
+ * - series: 套装技能
+ * - group: 组合技能
  */
-export type SkillType = 'weapon' | 'armor' | 'series' | 'group';
+export type SkillCategory = 'weapon' | 'armor' | 'series' | 'group';
 
 /**
  * 孔位类型
@@ -25,23 +27,26 @@ export type SlotLevel = -1 | 1 | 2 | 3;
 
 /**
  * 技能完整定义
- * 
+ *
  * @property id - 技能唯一ID
  * @property name - 技能名称
- * @property type - 技能类型（武器/防具/特殊）
+ * @property category - 技能分类
  * @property maxLevel - 技能最大等级（1-7不等）
  * @property decorationLevel - 装饰品等级（1-3）
  * @property isKey - 是否为核心技能
+ * @property description - 技能描述
+ * @property type - 技能类型（影响技能图标）
+ * @property sortId - 排序ID
  */
 export interface Skill {
     id: string;
     name: string;
-    type: SkillType;
+    category: SkillCategory;
     maxLevel: number;
     decorationLevel: SlotLevel;
     isKey: boolean;
     description: string;
-    skillIconType: string;
+    type: string;
     sortId: number;
 }
 
