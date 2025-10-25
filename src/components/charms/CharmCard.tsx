@@ -33,7 +33,7 @@ export function CharmCard({ charm, className }: CharmCardProps) {
     };
 
     // 获取装饰品图标路径
-    const getDecorationIcon = (slotType: 'weapon' | 'armor', level: number) => {
+    const getAccessoryIcon = (slotType: 'weapon' | 'armor', level: number) => {
         return `/${slotType}-slot-${level}.png`;
     };
 
@@ -75,7 +75,7 @@ export function CharmCard({ charm, className }: CharmCardProps) {
                     return slot ? (
                         <img
                             key={index}
-                            src={getDecorationIcon(slot.type, slot.level)}
+                            src={getAccessoryIcon(slot.type, slot.level)}
                             alt={`${slot.type === 'weapon' ? 'WeaponSlot' : 'ArmorSlot'} ${slot.level}级`}
                             className="slot-icon w-6 h-6"
                         />

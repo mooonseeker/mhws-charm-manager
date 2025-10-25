@@ -134,7 +134,7 @@ mhws-charm-manager/
   - `name`: 技能名称
   - `category`: 技能分类 (`SkillCategory`)
   - `maxLevel`: 最高等级
-  - `decorationLevel`: 镶嵌所需孔位等级 (`SlotLevel`, -1表示无对应的装饰品)
+  - `accessoryLevel`: 镶嵌所需孔位等级 (`SlotLevel`, -1表示无对应的装饰品)
   - `isKey`: 是否为核心技能
   - `description`: 技能描述
   - `type`: 技能类型
@@ -221,7 +221,7 @@ function calculateCharmEquivalentSlots(skills, slots, skillsData):
     skill_def = skillsData.get(skill_instance.id)
     if skill_def is valid:
       // 技能的每个等级都算作一个对应装饰品等级的孔位
-      slot_key = skill_def.type + "Slot" + skill_def.decorationLevel
+      slot_key = skill_def.type + "Slot" + skill_def.accessoryLevel
       totalEquivalentSlots[slot_key] += skill_instance.level
 
   // 3. 累加护石自身的孔位
@@ -503,7 +503,7 @@ sequenceDiagram
 - **护石（Charm）**：游戏中的装备道具，提供技能和孔位
 - **技能（Skill）**：护石或装备提供的能力
 - **孔位（Slot）**：可以镶嵌装饰品的位置
-- **装饰品（Decoration）**：镶嵌在孔位中，提供技能
+- **装饰品（Accessory）**：镶嵌在孔位中，提供技能
 - **等效孔位（Equivalent Slots）**：将技能换算为孔位数量的结果
 - **核心技能（Core Skill）**：最有价值的技能
 - **等效核心技能价值（Core Skill Value）**：基于孔位计算的核心价值

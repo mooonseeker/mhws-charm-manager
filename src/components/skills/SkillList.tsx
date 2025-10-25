@@ -31,12 +31,12 @@ export function SkillList({ onEdit }: SkillListProps) {
     const [currentPage, setCurrentPage] = useState(1);
 
     // 获取装饰品等级图标
-    const getDecorationIcon = (skillCategory: SkillCategory, decorationLevel: SlotLevel) => {
+    const getAccessoryIcon = (skillCategory: SkillCategory, accessoryLevel: SlotLevel) => {
         switch (skillCategory) {
             case 'weapon':
-                return `/weapon-slot-${decorationLevel}.png`;
+                return `/weapon-slot-${accessoryLevel}.png`;
             case 'armor':
-                return `/armor-slot-${decorationLevel}.png`;
+                return `/armor-slot-${accessoryLevel}.png`;
             case 'series':
             case 'group':
             default:
@@ -197,10 +197,10 @@ export function SkillList({ onEdit }: SkillListProps) {
                                     </TableCell>
                                     <TableCell className="text-center text-sm">
                                         <div className="flex items-center justify-center gap-4">
-                                            {skill.decorationLevel !== -1 ? (
+                                            {skill.accessoryLevel !== -1 ? (
                                                 <img
-                                                    src={getDecorationIcon(skill.category, skill.decorationLevel)}
-                                                    alt={`${SKILL_CATEGORY_LABELS[skill.category]}装饰品等级${skill.decorationLevel}`}
+                                                    src={getAccessoryIcon(skill.category, skill.accessoryLevel)}
+                                                    alt={`${SKILL_CATEGORY_LABELS[skill.category]}装饰品等级${skill.accessoryLevel}`}
                                                     style={{ width: '2rem', height: '2rem' }}
                                                 />
                                             ) : (

@@ -31,7 +31,7 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
     const [name, setName] = useState('');
     const [category, setCategory] = useState<SkillCategory>('armor');
     const [maxLevel, setMaxLevel] = useState(3);
-    const [decorationLevel, setDecorationLevel] = useState<SlotLevel>(-1);
+    const [accessoryLevel, setAccessoryLevel] = useState<SlotLevel>(-1);
     const [isKey, setIsKey] = useState(false);
     const [localError, setLocalError] = useState<string | null>(null);
 
@@ -40,13 +40,13 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
             setName(skill.name);
             setCategory(skill.category);
             setMaxLevel(skill.maxLevel);
-            setDecorationLevel(skill.decorationLevel);
+            setAccessoryLevel(skill.accessoryLevel);
             setIsKey(skill.isKey);
         } else {
             setName('');
             setCategory('armor');
             setMaxLevel(3);
-            setDecorationLevel(2);
+            setAccessoryLevel(2);
             setIsKey(false);
         }
         setLocalError(null);
@@ -77,7 +77,7 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
             name: trimmedName,
             category,
             maxLevel,
-            decorationLevel,
+            accessoryLevel,
             isKey,
             description: '', // 用户自定义技能默认无描述
             type: '', // 用户自定义技能默认无类型
@@ -144,12 +144,12 @@ export function SkillForm({ skill, open, onClose, onSubmit, error, skills }: Ski
                         </div>
 
                         <div className="space-y-3">
-                            <Label htmlFor="decorationLevel">装饰品等级</Label>
+                            <Label htmlFor="accessoryLevel">装饰品等级</Label>
                             <Select
-                                value={decorationLevel.toString()}
-                                onValueChange={(v) => setDecorationLevel(parseInt(v) as SlotLevel)}
+                                value={accessoryLevel.toString()}
+                                onValueChange={(v) => setAccessoryLevel(parseInt(v) as SlotLevel)}
                             >
-                                <SelectTrigger id="decorationLevel">
+                                <SelectTrigger id="accessoryLevel">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>

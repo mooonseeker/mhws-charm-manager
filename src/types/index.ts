@@ -32,7 +32,7 @@ export type SlotLevel = -1 | 1 | 2 | 3;
  * @property name - 技能名称
  * @property category - 技能分类
  * @property maxLevel - 技能最大等级（1-7不等）
- * @property decorationLevel - 装饰品等级（1-3）
+ * @property accessoryLevel - 装饰品等级（1-3）
  * @property isKey - 是否为核心技能
  * @property description - 技能描述
  * @property type - 技能类型（影响技能图标）
@@ -43,7 +43,7 @@ export interface Skill {
     name: string;
     category: SkillCategory;
     maxLevel: number;
-    decorationLevel: SlotLevel;
+    accessoryLevel: SlotLevel;
     isKey: boolean;
     description: string;
     type: string;

@@ -50,29 +50,29 @@ export function calculateSkillEquivalentSlots(
 
 
     // 检查装饰品等级是否有效
-    if (skill.decorationLevel <= 0) {
+    if (skill.accessoryLevel <= 0) {
         return equivalentSlots;
     }
 
     // 根据技能分类和装饰品等级，累加对应的孔位
-    const decorationLevel = skill.decorationLevel;
+    const accessoryLevel = skill.accessoryLevel;
 
     if (skill.category === 'weapon') {
         // 武器技能对应武器孔位
-        if (decorationLevel === 1) {
+        if (accessoryLevel === 1) {
             equivalentSlots.weaponSlot1 = level;
-        } else if (decorationLevel === 2) {
+        } else if (accessoryLevel === 2) {
             equivalentSlots.weaponSlot2 = level;
-        } else if (decorationLevel === 3) {
+        } else if (accessoryLevel === 3) {
             equivalentSlots.weaponSlot3 = level;
         }
     } else if (skill.category === 'armor') {
         // 防具技能对应防具孔位
-        if (decorationLevel === 1) {
+        if (accessoryLevel === 1) {
             equivalentSlots.armorSlot1 = level;
-        } else if (decorationLevel === 2) {
+        } else if (accessoryLevel === 2) {
             equivalentSlots.armorSlot2 = level;
-        } else if (decorationLevel === 3) {
+        } else if (accessoryLevel === 3) {
             equivalentSlots.armorSlot3 = level;
         }
     }
