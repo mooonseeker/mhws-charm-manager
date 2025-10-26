@@ -115,6 +115,31 @@ export interface Charm {
 }
 
 /**
+ * 装饰品完整定义
+ *
+ * @property id - 装饰品唯一ID
+ * @property name - 装饰品名称
+ * @property type - 装饰品类型（weapon/armor）
+ * @property description - 装饰品描述
+ * @property sortID - 排序ID
+ * @property skills - 技能列表
+ * @property rarity - 稀有度
+ * @property slotLevel - 镶嵌所需孔位等级
+ * @property color - 图标颜色
+ */
+export interface Accessory {
+    id: string;
+    name: string;
+    type: 'weapon' | 'armor';
+    description: string;
+    sortID: number;
+    skills: SkillWithLevel[];
+    rarity: number;
+    slotLevel: number;
+    color: string;
+}
+
+/**
  * 护石验证状态
  *
  * - `ACCEPTED_AS_FIRST`: 数据库为空，直接接受

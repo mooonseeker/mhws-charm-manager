@@ -2,7 +2,11 @@
     "version": "1.03.0",
     "dataType": "meta",
     "skillsData": "./skills.csv",
-    "accessoriesData": "",
+    "skillsLastModified": "2025-10-26T16:07:33.506Z",
+    "accessoriesData": "./accessories.csv",
+    "accessoriesLastModified": "2025-10-26T16:57:00.000Z",
     "armorData": "",
-    "weaponData": ""
+    "armorLastModified": "",
+    "weaponsData": "",
+    "weaponsLastModified": ""
 }
