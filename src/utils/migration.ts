@@ -1,4 +1,4 @@
-import v2skillsData from '@/data/skills-1.03.0.json';
+import v2skillsData from '@/data/initial-skills.json';
 
 import { loadCharms, loadSkills, saveCharms, saveSkills } from './storage';
 

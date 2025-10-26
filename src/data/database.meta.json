@@ -1,0 +1,8 @@
+{
+    "version": "1.03.0",
+    "dataType": "meta",
+    "skillsData": "./skills.csv",
+    "accessoriesData": "",
+    "armorData": "",
+    "weaponData": ""
+}

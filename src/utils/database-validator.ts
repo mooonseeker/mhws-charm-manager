@@ -4,7 +4,7 @@
  * 用于验证当前存储的技能数据是否与初始数据库完全一致
  */
 
-import initialSkillsData from '../data/skills-1.03.0.json';
+import initialSkillsData from '../data/initial-skills.json';
 
 import type { Skill } from '../types';
 

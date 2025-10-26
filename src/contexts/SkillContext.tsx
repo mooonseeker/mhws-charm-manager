@@ -7,7 +7,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useReducer } from 'react';
 
-import initialSkillsData from '@/data/skills-1.03.0.json';
+import initialSkillsData from '@/data/initial-skills.json';
 import { loadSkills, saveSkills } from '@/utils';
 
 import type { Skill } from '@/types';
