@@ -15,6 +15,7 @@ import type { Accessory } from '@/types';
 
 interface AccessoryListProps {
     onEdit: (accessory: Accessory) => void;
+    isLocked?: boolean;
 }
 
 /**
@@ -22,7 +23,7 @@ interface AccessoryListProps {
  * 显示所有装饰品并支持筛选、排序、编辑和删除
  */
 
-export function AccessoryList({ onEdit }: AccessoryListProps) {
+export function AccessoryList({ onEdit, isLocked }: AccessoryListProps) {
     const { accessories, deleteAccessory } = useAccessories();
     const { skills } = useSkills();
     const [typeFilter, setTypeFilter] = useState<'all' | 'weapon' | 'armor'>('all');
@@ -171,6 +172,7 @@ export function AccessoryList({ onEdit }: AccessoryListProps) {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => onEdit(accessory)}
+                                                disabled={isLocked}
                                                 className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
                                             >
                                                 <Pencil className="h-4 w-4" />

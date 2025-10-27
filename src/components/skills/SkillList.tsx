@@ -16,6 +16,7 @@ import type { Skill, SkillCategory, SlotLevel } from '@/types';
 
 interface SkillListProps {
     onEdit: (skill: Skill) => void;
+    isLocked?: boolean;
 }
 
 /**
@@ -23,7 +24,7 @@ interface SkillListProps {
  * 显示所有技能并支持筛选、排序、编辑和删除
  */
 
-export function SkillList({ onEdit }: SkillListProps) {
+export function SkillList({ onEdit, isLocked }: SkillListProps) {
     const { skills, deleteSkill } = useSkills();
     const [categoryFilter, setCategoryFilter] = useState<SkillCategory | 'all'>('all');
     const [keyOnlyFilter, setKeyOnlyFilter] = useState(false);
@@ -215,6 +216,7 @@ export function SkillList({ onEdit }: SkillListProps) {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => onEdit(skill)}
+                                                disabled={isLocked}
                                                 className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
                                             >
                                                 <Pencil className="h-4 w-4" />

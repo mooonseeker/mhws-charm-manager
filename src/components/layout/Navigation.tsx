@@ -2,7 +2,7 @@ import { Database, List, Sparkles } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
-export type NavigationTab = 'skills' | 'charms' | 'data';
+export type NavigationTab = 'database' | 'charms' | 'data';
 
 interface NavigationProps {
     currentTab: NavigationTab;
@@ -15,7 +15,7 @@ interface NavigationProps {
  */
 export function Navigation({ currentTab, onTabChange }: NavigationProps) {
     const tabs = [
-        { id: 'skills' as const, label: '技能管理', icon: Sparkles },
+        { id: 'database' as const, label: '数据库管理', icon: Sparkles },
         { id: 'charms' as const, label: '护石管理', icon: List },
         { id: 'data' as const, label: '数据管理', icon: Database },
     ];

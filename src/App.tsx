@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
 import { CharmManagement } from '@/components/charms';
+import { DatabaseManager } from '@/components/database';
 import { DataManagement } from '@/components/dm';
 import { Footer, Header, Navigation } from '@/components/layout';
-import { SkillManagement } from '@/components/skills';
 import { AppProvider } from '@/contexts';
 
 import type { NavigationTab } from '@/components/layout';
 
 function App() {
-  const [currentTab, setCurrentTab] = useState<NavigationTab>('charms');
+  const [currentTab, setCurrentTab] = useState<NavigationTab>('database');
 
   return (
     <AppProvider>
@@ -19,7 +19,7 @@ function App() {
         <Navigation currentTab={currentTab} onTabChange={setCurrentTab} />
 
         <main className="mx-auto w-[80%] px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-8 md:py-10 landscape:py-4 mobile-landscape:py-3 flex-1">
-          {currentTab === 'skills' && <SkillManagement />}
+          {currentTab === 'database' && <DatabaseManager />}
           {currentTab === 'charms' && <CharmManagement />}
           {currentTab === 'data' && <DataManagement />}
         </main>
