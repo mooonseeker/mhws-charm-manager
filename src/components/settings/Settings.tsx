@@ -13,10 +13,10 @@ import {
 import type { Charm } from '@/types';
 
 /**
- * 数据管理组件
+ * 设置组件
  * 提供导入、导出和重置功能
  */
-export function DataManagement() {
+export function Settings() {
     const { skills, resetSkills, importSkills } = useSkills();
     const { charms, resetCharms, importCharms } = useCharms();
     const [importing, setImporting] = useState(false);
@@ -169,8 +169,8 @@ export function DataManagement() {
     return (
         <div className="space-y-6">
             <div className="flex items-baseline">
-                <h1 className="font-bold tracking-tight">数据管理</h1>
-                <p className="text-foreground">管理您的技能和护石数据</p>
+                <h1 className="font-bold tracking-tight">设置</h1>
+                <p className="text-foreground">管理系统设置和数据</p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-5">

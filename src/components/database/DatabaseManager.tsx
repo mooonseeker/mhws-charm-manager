@@ -1,8 +1,9 @@
-import { Plus } from 'lucide-react';
+import { Gem, Lock, Plus, Shield, Sparkles, Swords, Unlock } from 'lucide-react';
 import { useState } from 'react';
 
 import { ErrorMessage, Loading } from '@/components/common';
 import { Button } from '@/components/ui/button';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useAccessories, useSkills } from '@/contexts';
 import { generateSkillId } from '@/utils';
 
@@ -33,7 +34,7 @@ export function DatabaseManager() {
         accessories
     } = useAccessories();
 
-    const [currentDb, setCurrentDb] = useState<'skills' | 'accessories'>('skills');
+    const [currentDb, setCurrentDb] = useState<'skills' | 'accessories' | 'armor' | 'weapons'>('skills');
     const [isLocked, setIsLocked] = useState<boolean>(false);
     const [formOpen, setFormOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<{ type: 'skill' | 'accessory'; data: Skill | Accessory } | undefined>();
@@ -118,47 +119,52 @@ export function DatabaseManager() {
         return <ErrorMessage message={error} />;
     }
 
-    const currentItems = currentDb === 'skills' ? skills : accessories;
-    const addButtonText = currentDb === 'skills' ? '添加技能' : '添加装饰品';
+    const addButtonText = currentDb === 'skills' ? '添加技能' : currentDb === 'accessories' ? '添加装饰品' : '添加';
 
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-4">
                     <h1 className="font-bold tracking-tight">数据库管理</h1>
-                    <label className="flex items-center space-x-2">
-                        <input
-                            type="checkbox"
-                            checked={isLocked}
-                            onChange={(e) => setIsLocked(e.target.checked)}
-                        />
-                        <span>锁定编辑</span>
-                    </label>
+                    <ToggleGroup
+                        type="single"
+                        value={currentDb}
+                        onValueChange={(value) => value && setCurrentDb(value as 'skills' | 'accessories' | 'armor' | 'weapons')}
+                        size="sm"
+                        className="border border-border rounded-md p-1"
+                    >
+                        <ToggleGroupItem value="skills" aria-label="技能">
+                            <Sparkles className="h-4 w-4" />
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="accessories" aria-label="装饰品">
+                            <Gem className="h-4 w-4" />
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="armor" aria-label="防具">
+                            <Shield className="h-4 w-4" />
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="weapons" aria-label="武器">
+                            <Swords className="h-4 w-4" />
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+                    <ToggleGroup
+                        type="single"
+                        value={isLocked ? 'locked' : 'unlocked'}
+                        onValueChange={(value) => setIsLocked(value === 'locked')}
+                        size="sm"
+                        className="border border-border rounded-md p-1"
+                    >
+                        <ToggleGroupItem value="unlocked" aria-label="解锁编辑">
+                            <Unlock className="h-4 w-4" />
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="locked" aria-label="锁定编辑">
+                            <Lock className="h-4 w-4" />
+                        </ToggleGroupItem>
+                    </ToggleGroup>
                 </div>
                 <Button size="lg" onClick={handleAdd} disabled={isLocked}>
                     <Plus className="h-5 w-5 mr-2" />
                     {addButtonText}
                 </Button>
-            </div>
-
-            <div className="flex justify-between items-center">
-                <div className="flex space-x-2">
-                    <Button
-                        variant={currentDb === 'skills' ? 'default' : 'outline'}
-                        onClick={() => setCurrentDb('skills')}
-                    >
-                        技能
-                    </Button>
-                    <Button
-                        variant={currentDb === 'accessories' ? 'default' : 'outline'}
-                        onClick={() => setCurrentDb('accessories')}
-                    >
-                        装饰品
-                    </Button>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                    总条目: {currentItems.length}
-                </div>
             </div>
 
             {currentDb === 'skills' && (
@@ -172,6 +178,12 @@ export function DatabaseManager() {
                     onEdit={(accessory) => handleEdit(accessory, 'accessory')}
                     isLocked={isLocked}
                 />
+            )}
+            {currentDb === 'armor' && (
+                <div>ArmorList placeholder</div>
+            )}
+            {currentDb === 'weapons' && (
+                <div>WeaponList placeholder</div>
             )}
 
             {editingItem?.type === 'skill' && (
