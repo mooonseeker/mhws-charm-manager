@@ -44,8 +44,39 @@ export function DatabaseManager() {
     const error = skillsError || accessoriesError;
 
     const handleAdd = () => {
-        setEditingItem(undefined);
         setFormError(null); // 打开表单时清除旧错误
+        if (currentDb === 'skills') {
+            setEditingItem({
+                type: 'skill',
+                data: {
+                    id: '',
+                    name: '',
+                    category: 'armor',
+                    maxLevel: 1,
+                    accessoryLevel: -1,
+                    isKey: false,
+                    description: '',
+                    type: 'SKILL_0000',
+                    sortId: 999,
+                },
+            });
+        } else if (currentDb === 'accessories') {
+            setEditingItem({
+                type: 'accessory',
+                data: {
+                    id: '',
+                    name: '',
+                    type: 'armor',
+                    description: '',
+                    sortID: 999,
+                    skills: [],
+                    rarity: 1,
+                    slotLevel: 1,
+                    color: 'default',
+                },
+            });
+        }
+        // TODO: 为防具和武器添加类似的处理
         setFormOpen(true);
     };
 

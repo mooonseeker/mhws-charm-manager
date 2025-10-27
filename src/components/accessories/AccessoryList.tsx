@@ -181,6 +181,7 @@ export function AccessoryList({ onEdit, isLocked }: AccessoryListProps) {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleDelete(accessory)}
+                                                disabled={isLocked}
                                                 className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
                                             >
                                                 <Trash2 className="h-4 w-4 text-destructive" />

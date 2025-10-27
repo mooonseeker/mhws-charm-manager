@@ -225,6 +225,7 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleDelete(skill)}
+                                                disabled={isLocked}
                                                 className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
                                             >
                                                 <Trash2 className="h-4 w-4 text-destructive" />
