@@ -7,6 +7,9 @@
 // 技能Context
 export { SkillProvider, useSkills } from './SkillContext';
 
+// 装饰品Context
+export { AccessoryProvider, useAccessories } from './AccessoryContext';
+
 // 护石Context
 export { CharmProvider, useCharms } from './CharmContext';
 
