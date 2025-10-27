@@ -35,9 +35,9 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
     const getAccessoryIcon = (skillCategory: SkillCategory, accessoryLevel: SlotLevel) => {
         switch (skillCategory) {
             case 'weapon':
-                return `/weapon-slot-${accessoryLevel}.png`;
+                return `/slot/weapon-slot-${accessoryLevel}.png`;
             case 'armor':
-                return `/armor-slot-${accessoryLevel}.png`;
+                return `/slot/armor-slot-${accessoryLevel}.png`;
             case 'series':
             case 'group':
             default:
@@ -188,8 +188,18 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
                                             <Star className="h-4 w-4 fill-warning text-warning-foreground inline" />
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-center font-medium">
-                                        {skill.name}
+                                    <TableCell className="text-left font-medium">
+                                        <div className="flex items-center gap-2">
+                                            <img
+                                                src={`/skill-type/${skill.type}.png`}
+                                                alt={`${skill.type} icon`}
+                                                style={{ width: '1.5rem', height: '1.5rem' }}
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                            {skill.name}
+                                        </div>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Badge variant="outline" className="text-center text-xs">
@@ -202,7 +212,7 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
                                                 <img
                                                     src={getAccessoryIcon(skill.category, skill.accessoryLevel)}
                                                     alt={`${SKILL_CATEGORY_LABELS[skill.category]}装饰品等级${skill.accessoryLevel}`}
-                                                    style={{ width: '2rem', height: '2rem' }}
+                                                    style={{ width: '1.5rem', height: '1.5rem' }}
                                                 />
                                             ) : (
                                                 <span className="text-muted-foreground">—</span>

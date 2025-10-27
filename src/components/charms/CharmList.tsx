@@ -159,7 +159,7 @@ export function CharmList({ onEdit }: CharmListProps) {
 
     // 获取装饰品等级图标
     const getAccessoryIcon = (slotType: 'weapon' | 'armor', level: number) => {
-        return `/${slotType}-slot-${level}.png`;
+        return `/slot/${slotType}-slot-${level}.png`;
     };
 
     // 渲染排序图标
@@ -366,10 +366,10 @@ export function CharmList({ onEdit }: CharmListProps) {
                                                         key={index}
                                                         src={getAccessoryIcon(slot.type, slot.level)}
                                                         alt={`${slot.type === 'weapon' ? 'WeaponSlot' : 'ArmorSlot'} ${slot.level}级`}
-                                                        style={{ width: '2rem', height: '2rem' }}
+                                                        style={{ width: '1.5rem', height: '1.5rem' }}
                                                     />
                                                 ) : (
-                                                    <span key={index} className="text-muted-foreground text-sm" style={{ width: '2rem', height: '2rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <span key={index} className="text-muted-foreground text-sm" style={{ width: '1.5rem', height: '1.5rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                                                         —
                                                     </span>
                                                 );

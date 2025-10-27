@@ -34,7 +34,7 @@ export function CharmCard({ charm, className }: CharmCardProps) {
 
     // 获取装饰品图标路径
     const getAccessoryIcon = (slotType: 'weapon' | 'armor', level: number) => {
-        return `/${slotType}-slot-${level}.png`;
+        return `/slot/${slotType}-slot-${level}.png`;
     };
 
     return (
