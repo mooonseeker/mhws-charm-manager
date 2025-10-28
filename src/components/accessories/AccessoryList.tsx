@@ -32,10 +32,17 @@ export function AccessoryList({ onEdit, isLocked }: AccessoryListProps) {
 
     const ACCESSORIES_PER_PAGE = 10;
 
-    // 获取技能名称
-    const getSkillName = (skillId: string) => {
-        const skill = skills.find(s => s.id === skillId);
-        return skill ? skill.name : skillId;
+    // 获取技能对象
+    const getSkill = (skillId: string) => {
+        return skills.find(s => s.id === skillId);
+    };
+
+    // 获取孔位等级图标
+    const getSlotIcon = (type: 'weapon' | 'armor', level: number) => {
+        if (level >= 1 && level <= 3) {
+            return `/slot/${type}-slot-${level}.png`;
+        }
+        return '';
     };
 
     // 筛选装饰品
@@ -45,7 +52,10 @@ export function AccessoryList({ onEdit, isLocked }: AccessoryListProps) {
             const keyword = searchQuery.toLowerCase();
             return accessory.name.toLowerCase().includes(keyword) ||
                 accessory.description.toLowerCase().includes(keyword) ||
-                accessory.skills.some(skill => getSkillName(skill.skillId).toLowerCase().includes(keyword));
+                accessory.skills.some(skill => {
+                    const foundSkill = getSkill(skill.skillId);
+                    return foundSkill ? foundSkill.name.toLowerCase().includes(keyword) : false;
+                });
         }
         return true;
     });
@@ -102,7 +112,7 @@ export function AccessoryList({ onEdit, isLocked }: AccessoryListProps) {
 
                     <div className="flex items-center gap-4 justify-end">
                         <div className="text-muted-foreground text-sm">
-                            共 {filteredAccessories.length} 个装饰品
+                            共 {filteredAccessories.length} 种装饰品
                         </div>
                         <Input
                             type="text"
@@ -125,46 +135,68 @@ export function AccessoryList({ onEdit, isLocked }: AccessoryListProps) {
                 <Table>
                     <TableHeader>
                         <TableRow>
+                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">孔位</TableHead>
                             <TableHead className="text-center min-w-[150px] bg-primary text-primary-foreground">装饰品名称</TableHead>
-                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">类型</TableHead>
-                            <TableHead className="text-center min-w-[60px] bg-primary text-primary-foreground">稀有度</TableHead>
-                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">孔位等级</TableHead>
                             <TableHead className="text-center min-w-[200px] bg-primary text-primary-foreground">技能</TableHead>
+                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">类型</TableHead>
                             <TableHead className="text-right min-w-[80px] bg-primary text-primary-foreground">操作</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredAccessories.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                                     暂无装饰品数据
                                 </TableCell>
                             </TableRow>
                         ) : (
                             paginatedAccessories.map((accessory) => (
                                 <TableRow key={accessory.id}>
+                                    <TableCell className="text-center">
+                                        <div className="flex items-center justify-center">
+                                            <img
+                                                src={getSlotIcon(accessory.type, accessory.slotLevel)}
+                                                alt={`${accessory.type === 'weapon' ? '武器' : '防具'}孔位等级${accessory.slotLevel}`}
+                                                style={{ width: '1.5rem', height: '1.5rem' }}
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                        </div>
+                                    </TableCell>
                                     <TableCell className="text-center font-medium">
                                         {accessory.name}
+                                    </TableCell>
+                                    <TableCell className="text-center text-sm">
+                                        <div className={`flex ${accessory.skills.length === 2 ? 'flex-row justify-center gap-4 items-center' : 'flex-col gap-1 items-center'}`}>
+                                            {accessory.skills && accessory.skills.length > 0 ? (
+                                                accessory.skills.map((skill, index) => {
+                                                    const foundSkill = getSkill(skill.skillId);
+                                                    return (
+                                                        <div key={index} className="flex items-center gap-1 text-xs">
+                                                            {foundSkill && (
+                                                                <img
+                                                                    src={`/skill-type/${foundSkill.type}.png`}
+                                                                    alt={`${foundSkill.type} icon`}
+                                                                    style={{ width: '1.5rem', height: '1.5rem' }}
+                                                                    onError={(e) => {
+                                                                        e.currentTarget.style.display = 'none';
+                                                                    }}
+                                                                />
+                                                            )}
+                                                            {foundSkill ? foundSkill.name : skill.skillId} Lv.{skill.level}
+                                                        </div>
+                                                    );
+                                                })
+                                            ) : (
+                                                <span className="text-muted-foreground">—</span>
+                                            )}
+                                        </div>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         <Badge variant="outline" className="text-center text-xs">
                                             {accessory.type === 'weapon' ? '武器' : '防具'}
                                         </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        ★{accessory.rarity}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        {accessory.slotLevel}
-                                    </TableCell>
-                                    <TableCell className="text-center text-sm">
-                                        <div className="flex flex-col gap-1">
-                                            {accessory.skills.map((skill, index) => (
-                                                <div key={index} className="text-xs">
-                                                    {getSkillName(skill.skillId)} Lv.{skill.level}
-                                                </div>
-                                            ))}
-                                        </div>
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-1 sm:gap-2">

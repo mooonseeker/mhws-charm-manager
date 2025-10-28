@@ -98,13 +98,13 @@ export function AccessoryProvider({ children }: { children: ReactNode }) {
         error: null,
     });
 
-    // 初始化：从CSV加载
+    // 初始化：从JSON加载
     useEffect(() => {
         try {
-            // 从CSV加载装饰品数据
-            import('@/data/accessories.csv?raw').then((module) => {
-                const csvText = module.default;
-                const accessories = parseAccessoriesCSV(csvText);
+            // 从JSON加载装饰品数据
+            import('@/data/initial-accessories.json').then((module) => {
+                const jsonData = module.default;
+                const accessories = (jsonData.accessories || []) as Accessory[];
                 dispatch({ type: 'SET_ACCESSORIES', payload: accessories });
             }).catch((error) => {
                 console.error('加载装饰品数据失败:', error);
@@ -118,56 +118,6 @@ export function AccessoryProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
-    /**
-     * 解析CSV数据为Accessory数组
-     */
-    function parseAccessoriesCSV(csvText: string): Accessory[] {
-        const lines = csvText.trim().split('\n');
-        const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
-
-        return lines.slice(1).map(line => {
-            const values = line.split(',').map(v => v.replace(/"/g, ''));
-            const obj: Record<string, string> = {};
-
-            headers.forEach((header, index) => {
-                obj[header] = values[index];
-            });
-
-            // 解析skills字段（格式如：[HunterSkill_000,1,NONE,0]）
-            const skillsStr = obj.skills;
-            let skills: { skillId: string; level: number }[] = [];
-            if (skillsStr && skillsStr !== '[]') {
-                const skillMatches = skillsStr.match(/\[([^\]]+)\]/);
-                if (skillMatches) {
-                    const skillParts = skillMatches[1].split(',');
-                    skills = [{
-                        skillId: skillParts[0],
-                        level: parseInt(skillParts[1])
-                    }];
-
-                    // 检查是否有第二个技能
-                    if (skillParts.length > 2 && skillParts[2] !== 'NONE') {
-                        skills.push({
-                            skillId: skillParts[2],
-                            level: parseInt(skillParts[3])
-                        });
-                    }
-                }
-            }
-
-            return {
-                id: obj.id,
-                name: obj.name,
-                type: obj.type,
-                description: obj.description,
-                sortID: parseInt(obj.sortID),
-                skills,
-                rarity: parseInt(obj.rarity),
-                slotLevel: parseInt(obj.slotLevel),
-                color: obj.color
-            } as Accessory;
-        });
-    }
 
     /**
      * 添加装饰品
