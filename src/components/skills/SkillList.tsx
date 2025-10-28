@@ -122,7 +122,7 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
                             onClick={() => setCategoryFilter('series')}
                             className="text-xs sm:text-sm"
                         >
-                            套装
+                            系列
                         </Button>
                         <Button
                             variant={categoryFilter === 'group' ? 'default' : 'outline'}

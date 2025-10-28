@@ -115,7 +115,7 @@ mhws-charm-manager/
 
 - `weapon`: 武器技能
 - `armor`: 防具技能
-- `series`: 套装技能
+- `series`: 系列技能
 - `group`: 组合技能
 
 #### 4.1.2 孔位类型和等级 (SlotType, SlotLevel)

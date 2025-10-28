@@ -8,7 +8,7 @@
  * 技能分类枚举
  * - weapon: 武器技能
  * - armor: 防具技能
- * - series: 套装技能
+ * - series: 系列技能
  * - group: 组合技能
  */
 export type SkillCategory = 'weapon' | 'armor' | 'series' | 'group';
