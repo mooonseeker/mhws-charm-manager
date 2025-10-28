@@ -45,6 +45,11 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
         }
     };
 
+    // 获取技能分类图标
+    const getCategoryIcon = (skillCategory: SkillCategory) => {
+        return `/skill-category/${skillCategory}.png`;
+    };
+
     // 筛选技能
     const filteredSkills = skills.filter((skill) => {
         if (categoryFilter !== 'all' && skill.category !== categoryFilter) return false;
@@ -162,21 +167,22 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
 
             {/* 技能表格 */}
             <div className="bg-card rounded-lg border shadow-sm overflow-auto">
-                <Table>
+                <Table className="w-full table-fixed">
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="text-center min-w-[50px] bg-primary text-primary-foreground">核心</TableHead>
-                            <TableHead className="text-center min-w-[120px] bg-primary text-primary-foreground">技能名称</TableHead>
-                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">分类</TableHead>
-                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">装饰品等级</TableHead>
-                            <TableHead className="text-center min-w-[60px] bg-primary text-primary-foreground">最大等级</TableHead>
-                            <TableHead className="text-right min-w-[80px] bg-primary text-primary-foreground">操作</TableHead>
+                            <TableHead className="text-center w-[5%] bg-primary text-primary-foreground">核心</TableHead>
+                            <TableHead className="text-center w-[23%] bg-primary text-primary-foreground">技能名称</TableHead>
+                            <TableHead className="text-center w-[32%] bg-primary text-primary-foreground hidden lg:table-cell">技能描述</TableHead>
+                            <TableHead className="text-center w-[12%] bg-primary text-primary-foreground hidden md:table-cell">分类</TableHead>
+                            <TableHead className="text-center w-[8%] bg-primary text-primary-foreground">装饰品</TableHead>
+                            <TableHead className="text-center w-[8%] bg-primary text-primary-foreground">最大等级</TableHead>
+                            <TableHead className="text-right w-[12%] bg-primary text-primary-foreground">操作</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredSkills.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                                     暂无技能数据
                                 </TableCell>
                             </TableRow>
@@ -184,11 +190,9 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
                             paginatedSkills.map((skill) => (
                                 <TableRow key={skill.id}>
                                     <TableCell className="text-center">
-                                        {skill.isKey && (
-                                            <Star className="h-4 w-4 fill-warning text-warning-foreground inline" />
-                                        )}
+                                        <Star className={`h-4 w-4 ${skill.isKey ? 'fill-warning text-warning-foreground' : 'text-muted-foreground'} inline`} />
                                     </TableCell>
-                                    <TableCell className="text-left font-medium">
+                                    <TableCell className="text-left font-medium md:pl-4 lg:pl-8">
                                         <div className="flex items-center gap-2">
                                             <img
                                                 src={`/skill-type/${skill.type}.png`}
@@ -201,10 +205,23 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
                                             {skill.name}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-center">
-                                        <Badge variant="outline" className="text-center text-xs">
-                                            {SKILL_CATEGORY_LABELS[skill.category]}
-                                        </Badge>
+                                    <TableCell className="text-left text-sm text-muted-foreground truncate hidden lg:table-cell">
+                                        {skill.description || '—'}
+                                    </TableCell>
+                                    <TableCell className="text-center hidden md:table-cell">
+                                        <div className="flex items-center justify-center gap-1">
+                                            <img
+                                                src={getCategoryIcon(skill.category)}
+                                                alt={`${SKILL_CATEGORY_LABELS[skill.category]} icon`}
+                                                style={{ width: '1.5rem', height: '1.5rem' }}
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                            <Badge variant="outline" className="hidden lg:flex text-center text-xs">
+                                                {SKILL_CATEGORY_LABELS[skill.category]}
+                                            </Badge>
+                                        </div>
                                     </TableCell>
                                     <TableCell className="text-center text-sm">
                                         <div className="flex items-center justify-center gap-4">
