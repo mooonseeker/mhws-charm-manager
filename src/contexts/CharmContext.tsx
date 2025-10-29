@@ -4,9 +4,9 @@
  * 使用Context API + useReducer管理护石的全局状态
  */
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 
-import { loadCharms, saveCharms } from '@/utils';
+import { DataStorage } from '@/services/DataStorage';
 
 import type { Charm } from '@/types';
 
@@ -99,13 +99,13 @@ const CharmContext = createContext<CharmContextType | undefined>(undefined);
 
 /**
  * 护石Provider组件
- * 
+ *
  * 提供护石全局状态管理，包括：
- * - 从LocalStorage加载初始数据
- * - 自动保存数据到LocalStorage
+ * - 从DataStorage加载初始数据
+ * - 自动保存数据到DataStorage
  * - 提供增删改查操作
  * - 支持批量删除
- * 
+ *
  * @param children - 子组件
  */
 export function CharmProvider({ children }: { children: ReactNode }) {
@@ -115,12 +115,14 @@ export function CharmProvider({ children }: { children: ReactNode }) {
         error: null,
     });
 
-    // 初始化：从LocalStorage加载
+    // 使用 ref 跟踪是否是首次渲染，避免初始化时触发保存
+    const isFirstRender = useRef(true);
+
+    // 初始化：从DataStorage加载
     useEffect(() => {
         try {
-            const savedCharms = loadCharms();
-            // 如果本地有存储，则加载，否则设置为空数组
-            dispatch({ type: 'SET_CHARMS', payload: savedCharms ?? [] });
+            const savedCharms = DataStorage.loadData<Charm>('charms');
+            dispatch({ type: 'SET_CHARMS', payload: savedCharms });
         } catch (error) {
             console.error('加载护石数据失败:', error);
             dispatch({ type: 'SET_ERROR', payload: '加载护石数据失败' });
@@ -129,16 +131,19 @@ export function CharmProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
-    // 自动保存到LocalStorage（避免初始化时的不必要保存）
+    // 自动保存到DataStorage（避免初始化时的不必要保存）
     useEffect(() => {
-        if (!state.loading) {
-            try {
-                saveCharms(state.charms);
-            } catch (error) {
-                console.error('Failed to save charms:', error);
-            }
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
         }
-    }, [state.charms, state.loading]);
+
+        try {
+            DataStorage.saveData('charms', state.charms);
+        } catch (error) {
+            console.error('保存护石数据失败:', error);
+        }
+    }, [state.charms]);
 
     /**
      * 添加护石

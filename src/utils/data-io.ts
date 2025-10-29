@@ -3,9 +3,8 @@
  *
  * 提供与具体数据类型无关的、统一的数据导入、导出和验证功能。
  */
-import type { DataId, DataItem } from '@/hooks/useDataIO';
-
-import { CURRENT_VERSION } from './storage';
+import type { DataId, DataItem } from '@/types';
+import { CURRENT_VERSION, DataStorage } from '@/services/DataStorage';
 
 /**
  * 统一的导出数据结构
@@ -28,14 +27,14 @@ export interface ValidationResult {
 /**
  * 将任何类型的数据导出为JSON文件
  *
- * @param dataType - 要导出的数据ID（或 'all'）
- * @param data - 要导出的数据数组
+ * @param id - 要导出的数据ID
  */
-export function exportData(dataType: DataId | 'all', data: DataItem[]): void {
+export function exportData(id: DataId): void {
+    const data = DataStorage.loadData(id);
     const payload: ExportPayload = {
         version: CURRENT_VERSION,
         exportedAt: new Date().toISOString(),
-        dataType,
+        dataType: id,
         data,
     };
 
@@ -49,7 +48,7 @@ export function exportData(dataType: DataId | 'all', data: DataItem[]): void {
 
     // 根据数据类型生成文件名
     const dateStr = new Date().toISOString().split('T')[0];
-    const fileName = `mhws-charms-${dataType}-${dateStr}.json`;
+    const fileName = `mhws-charms-${id}-${dateStr}.json`;
 
     link.download = fileName;
     document.body.appendChild(link);
@@ -62,10 +61,9 @@ export function exportData(dataType: DataId | 'all', data: DataItem[]): void {
  * 从JSON文件导入数据，并进行基础验证
  *
  * @param file - 要导入的JSON文件
- * @returns 返回一个包含数据类型和内容的Promise
  * @throws 当文件读取失败或格式不正确时抛出错误
  */
-export function importData(file: File): Promise<{ dataType: DataId | 'all'; data: DataItem[] }> {
+export async function importData(file: File): Promise<void> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
@@ -79,7 +77,9 @@ export function importData(file: File): Promise<{ dataType: DataId | 'all'; data
                     throw new Error('无效的数据结构: 缺少 version, dataType 或 data 字段');
                 }
 
-                resolve({ dataType: payload.dataType, data: payload.data });
+                // 将数据保存到 DataStorage
+                DataStorage.saveData(payload.dataType as DataId, payload.data);
+                resolve();
             } catch (error) {
                 reject(new Error(`导入失败：文件格式不正确或内容无效。(${error instanceof Error ? error.message : String(error)})`));
             }

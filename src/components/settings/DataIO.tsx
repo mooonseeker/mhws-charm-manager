@@ -6,19 +6,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
-import { useDataIO } from '@/hooks/useDataIO';
+import { DataStorage } from '@/services/DataStorage';
 import { exportData, importData, validateData } from '@/utils/data-io';
 
-import type { DataId } from '@/hooks/useDataIO';
+import type { DataId } from '@/types';
 /**
  * 数据库 IO 管理表格组件
  * 显示数据库验证、重置、导出和导入功能的统一界面
  */
 export function DataIO() {
-    const { getData, resetData, importData: importDataToContext, getInitialData } = useDataIO();
     const [processing, setProcessing] = useState<{ id: string, action: string } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [importTarget, setImportTarget] = useState<DataId | 'all' | null>(null);
+    const [importTarget, setImportTarget] = useState<DataId | null>(null);
 
     // 定义数据库类别
     const databaseItems: { id: DataId, name: string }[] = [
@@ -43,28 +42,27 @@ export function DataIO() {
         try {
             switch (actionId) {
                 case 'validate': {
-                    const currentItems = getData(itemId);
-                    const initialData = await getInitialData(itemId);
-                    const key = itemId as keyof typeof initialData;
-                    const initialItems = initialData[key] || [];
+                    const currentItems = DataStorage.loadData(itemId);
+                    const initialData = await import(`../../data/initial-${itemId}.json`);
+                    const initialItems = (initialData.default[itemId] || []) as typeof currentItems;
                     const result = validateData(currentItems, initialItems);
                     if (result.isValid) {
-                        alert(`“${databaseItems.find(i => i.id === itemId)?.name}”数据库验证通过！数据完整且一致。`);
+                        alert(`"${databaseItems.find(i => i.id === itemId)?.name}"数据库验证通过！数据完整且一致。`);
                     } else {
-                        alert(`“${databaseItems.find(i => i.id === itemId)?.name}”数据库验证失败：\n\n${result.errors.join('\n')}`);
+                        alert(`"${databaseItems.find(i => i.id === itemId)?.name}"数据库验证失败：\n\n${result.errors.join('\n')}`);
                     }
                     break;
                 }
                 case 'reset': {
-                    if (confirm(`确定要重置“${databaseItems.find(i => i.id === itemId)?.name}”数据吗？\n\n此操作将恢复到初始状态，且不可撤销！`)) {
-                        resetData(itemId);
-                        alert(`“${databaseItems.find(i => i.id === itemId)?.name}”数据已重置。`);
+                    if (confirm(`确定要重置"${databaseItems.find(i => i.id === itemId)?.name}"数据吗？\n\n此操作将恢复到初始状态，且不可撤销！`)) {
+                        await DataStorage.resetData(itemId);
+                        alert(`"${databaseItems.find(i => i.id === itemId)?.name}"数据已重置。`);
+                        window.location.reload();
                     }
                     break;
                 }
                 case 'export': {
-                    const items = getData(itemId);
-                    exportData(itemId, items);
+                    exportData(itemId);
                     break;
                 }
                 case 'import': {
@@ -86,22 +84,20 @@ export function DataIO() {
         const file = e.target.files?.[0];
         if (!file || !importTarget) return;
 
-        setProcessing({ id: importTarget, action: 'import' });
-        try {
-            const { dataType, data } = await importData(file);
-
-            if (dataType !== importTarget) {
-                throw new Error(`文件类型 (${dataType}) 与期望的导入类型 (${importTarget}) 不匹配。`);
-            }
-
-            if (importTarget !== 'all' && confirm(`确定要导入“${databaseItems.find(i => i.id === importTarget)?.name}”数据吗？\n\n将导入 ${data.length} 条记录。\n注意：这将覆盖当前数据！`)) {
-                importDataToContext(importTarget, data);
+        if (confirm(`确定要导入"${databaseItems.find(i => i.id === importTarget)?.name}"数据吗？\n\n这将覆盖当前数据！`)) {
+            setProcessing({ id: importTarget, action: 'import' });
+            try {
+                await importData(file);
                 alert('导入成功！');
+                window.location.reload();
+            } catch (error) {
+                alert(`导入失败：${error instanceof Error ? error.message : String(error)}`);
+            } finally {
+                setProcessing(null);
+                setImportTarget(null);
+                e.target.value = ''; // 重置文件输入
             }
-        } catch (error) {
-            alert(`导入失败：${error instanceof Error ? error.message : String(error)}`);
-        } finally {
-            setProcessing(null);
+        } else {
             setImportTarget(null);
             e.target.value = ''; // 重置文件输入
         }
@@ -111,7 +107,7 @@ export function DataIO() {
     return (
         <Card className="md:col-span-5">
             <CardHeader>
-                <CardTitle>数据库管理</CardTitle>
+                <CardTitle>数据管理</CardTitle>
                 <CardDescription>
                     统一管理所有数据库的验证、重置、导出和导入功能
                 </CardDescription>

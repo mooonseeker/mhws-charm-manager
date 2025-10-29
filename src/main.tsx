@@ -3,31 +3,38 @@ import './index.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { runDataMigration } from '@/utils/migration';
-import { getStorageVersion } from '@/utils/storage';
+import { DataStorage } from '@/services/DataStorage';
 
 import App from './App.tsx';
 
-// Run data migration check on startup
-(() => {
-  const LATEST_VERSION = '1.03.0';
-  const storedVersion = getStorageVersion();
+async function main() {
+  try {
+    // Initialize DataStorage before rendering the app
+    await DataStorage.initialize();
 
-  if (storedVersion !== LATEST_VERSION) {
-    console.log(
-      `Version mismatch: stored is "${storedVersion}", expected "${LATEST_VERSION}". Starting migration.`
+    // Render the React application
+    createRoot(document.getElementById('root')!).render(
+      <StrictMode>
+        <App />
+      </StrictMode>,
     );
-    try {
-      runDataMigration();
-      console.log('Data migration completed successfully.');
-    } catch (error) {
-      console.error('Data migration failed:', error);
+  } catch (error) {
+    // Display error message if initialization fails
+    console.error('Application initialization failed:', error);
+    const rootEl = document.getElementById('root');
+    if (rootEl) {
+      rootEl.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: system-ui, -apple-system, sans-serif;">
+          <div style="text-align: center; padding: 2rem; max-width: 500px;">
+            <h1 style="color: #dc2626; margin-bottom: 1rem;">初始化失败</h1>
+            <p style="color: #6b7280; margin-bottom: 1rem;">应用程序在启动时遇到错误。请尝试刷新页面或清除浏览器数据后重试。</p>
+            <p style="color: #9ca3af; font-size: 0.875rem;">错误详情: ${error instanceof Error ? error.message : String(error)}</p>
+          </div>
+        </div>
+      `;
     }
   }
-})();
+}
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+// Start the application
+main();

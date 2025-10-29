@@ -5,7 +5,9 @@
  */
 
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
+
+import { DataStorage } from '@/services/DataStorage';
 
 import type { Accessory } from '@/types';
 
@@ -92,8 +94,8 @@ const AccessoryContext = createContext<AccessoryContextType | undefined>(undefin
  * 装饰品Provider组件
  *
  * 提供装饰品全局状态管理，包括：
- * - 从CSV文件加载初始数据
- * - 管理装饰品的状态
+ * - 从 DataStorage 加载初始数据
+ * - 自动保存数据到 DataStorage
  * - 提供增删改查操作
  *
  * @param children - 子组件
@@ -105,25 +107,37 @@ export function AccessoryProvider({ children }: { children: ReactNode }) {
         error: null,
     });
 
-    // 初始化：从JSON加载
+    // 用于跟踪是否是首次渲染
+    const isFirstRender = useRef(true);
+
+    // 初始化：从 DataStorage 加载
     useEffect(() => {
         try {
-            // 从JSON加载装饰品数据
-            import('@/data/initial-accessories.json').then((module) => {
-                const jsonData = module.default;
-                const accessories = (jsonData.accessories || []) as Accessory[];
-                dispatch({ type: 'SET_ACCESSORIES', payload: accessories });
-            }).catch((error) => {
-                console.error('加载装饰品数据失败:', error);
-                dispatch({ type: 'SET_ERROR', payload: '加载装饰品数据失败' });
-                dispatch({ type: 'SET_ACCESSORIES', payload: [] });
-            });
+            const accessories = DataStorage.loadData<Accessory>('accessories');
+            dispatch({ type: 'SET_ACCESSORIES', payload: accessories });
         } catch (error) {
             console.error('加载装饰品数据失败:', error);
             dispatch({ type: 'SET_ERROR', payload: '加载装饰品数据失败' });
             dispatch({ type: 'SET_ACCESSORIES', payload: [] });
         }
     }, []);
+
+    // 自动保存到 DataStorage（避免初始化时的不必要保存）
+    useEffect(() => {
+        // 跳过首次渲染
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
+        if (!state.loading) {
+            try {
+                DataStorage.saveData('accessories', state.accessories);
+            } catch (error) {
+                console.error('保存装饰品数据失败:', error);
+            }
+        }
+    }, [state.accessories, state.loading]);
 
 
     /**
@@ -178,16 +192,12 @@ export function AccessoryProvider({ children }: { children: ReactNode }) {
     /**
      * 重置装饰品为初始数据
      */
-    const resetAccessories = () => {
+    const resetAccessories = async () => {
         try {
-            import('@/data/initial-accessories.json').then((module) => {
-                const jsonData = module.default;
-                const accessories = (jsonData.accessories || []) as Accessory[];
-                dispatch({ type: 'SET_ACCESSORIES', payload: accessories });
-            }).catch((error) => {
-                console.error('重置装饰品数据失败:', error);
-                dispatch({ type: 'SET_ERROR', payload: '重置装饰品数据失败' });
-            });
+            // 动态导入初始数据
+            const initialData = await import('@/data/initial-accessories.json');
+            const initialAccessories = initialData.default.accessories as Accessory[];
+            dispatch({ type: 'SET_ACCESSORIES', payload: initialAccessories });
         } catch (error) {
             console.error('重置装饰品数据失败:', error);
             dispatch({ type: 'SET_ERROR', payload: '重置装饰品数据失败' });

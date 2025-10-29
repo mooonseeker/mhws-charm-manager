@@ -1,14 +1,13 @@
 /**
  * MHWS护石管理器 - 技能Context
- * 
+ *
  * 使用Context API + useReducer管理技能的全局状态
  */
 
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
 
-import initialSkillsData from '@/data/initial-skills.json';
-import { loadSkills, saveSkills } from '@/utils';
+import { DataStorage } from '@/services/DataStorage';
 
 import type { Skill } from '@/types';
 
@@ -93,12 +92,12 @@ const SkillContext = createContext<SkillContextType | undefined>(undefined);
 
 /**
  * 技能Provider组件
- * 
+ *
  * 提供技能全局状态管理，包括：
- * - 从LocalStorage加载初始数据
- * - 自动保存数据到LocalStorage
+ * - 从 DataStorage 加载初始数据
+ * - 自动保存数据到 DataStorage
  * - 提供增删改查操作
- * 
+ *
  * @param children - 子组件
  */
 export function SkillProvider({ children }: { children: ReactNode }) {
@@ -108,27 +107,28 @@ export function SkillProvider({ children }: { children: ReactNode }) {
         error: null,
     });
 
-    // 初始化：从LocalStorage加载
+    // 用于跟踪是否是首次渲染
+    const isFirstRender = useRef(true);
+
+    // 初始化：从 DataStorage 加载
     useEffect(() => {
-        try {
-            const savedSkills = loadSkills();
-            // 如果本地有存储，则加载，否则设置为空数组
-            dispatch({ type: 'SET_SKILLS', payload: savedSkills ?? [] });
-        } catch (error) {
-            console.error('加载技能数据失败:', error);
-            dispatch({ type: 'SET_ERROR', payload: '加载技能数据失败' });
-            // 出错时也设置为空数组
-            dispatch({ type: 'SET_SKILLS', payload: [] });
-        }
+        const skills = DataStorage.loadData<Skill>('skills');
+        dispatch({ type: 'SET_SKILLS', payload: skills });
     }, []);
 
-    // 自动保存到LocalStorage（避免初始化时的不必要保存）
+    // 自动保存到 DataStorage（避免初始化时的不必要保存）
     useEffect(() => {
-        if (!state.loading && state.skills.length > 0) {
+        // 跳过首次渲染
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
+        if (!state.loading) {
             try {
-                saveSkills(state.skills);
+                DataStorage.saveData('skills', state.skills);
             } catch (error) {
-                console.error('Failed to save skills:', error);
+                console.error('保存技能数据失败:', error);
             }
         }
     }, [state.skills, state.loading]);
@@ -192,8 +192,16 @@ export function SkillProvider({ children }: { children: ReactNode }) {
     /**
      * 重置技能为初始数据
      */
-    const resetSkills = () => {
-        dispatch({ type: 'SET_SKILLS', payload: initialSkillsData.skills as Skill[] });
+    const resetSkills = async () => {
+        try {
+            // 动态导入初始数据
+            const initialData = await import('@/data/initial-skills.json');
+            const initialSkills = initialData.default.skills as Skill[];
+            dispatch({ type: 'SET_SKILLS', payload: initialSkills });
+        } catch (error) {
+            console.error('重置技能数据失败:', error);
+            dispatch({ type: 'SET_ERROR', payload: '重置技能数据失败' });
+        }
     };
 
     const value: SkillContextType = {

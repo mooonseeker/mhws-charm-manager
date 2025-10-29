@@ -200,3 +200,13 @@ export type CharmSortField =
  * - desc: 降序
  */
 export type SortDirection = 'asc' | 'desc';
+
+/**
+ * 支持的数据库ID类型
+ */
+export type DataId = 'skills' | 'accessories' | 'armor' | 'weapons' | 'charms';
+
+/**
+ * 各种数据类型的联合类型
+ */
+export type DataItem = Skill | Accessory | Charm;

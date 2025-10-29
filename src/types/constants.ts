@@ -1,10 +1,15 @@
 /**
  * MHWS护石管理器 - 常量定义
- * 
+ *
  * 包含应用中使用的所有常量
  */
 
 import type { SkillCategory, SlotLevel } from './index';
+
+/**
+ * 应用名称
+ */
+export const APP_NAME = 'mhws-charm-manager';
 
 /**
  * 稀有度最小值
@@ -72,3 +77,19 @@ export const SKILLS_PER_PAGE = 16;
  * 护石列表每页显示数量
  */
 export const CHARMS_PER_PAGE = 16;
+
+/**
+ * 数据存储的键名映射
+ */
+export const STORAGE_KEYS: Record<import('./index').DataId, string> = {
+    skills: `${APP_NAME}-skills`,
+    accessories: `${APP_NAME}-accessories`,
+    armor: `${APP_NAME}-armor`,
+    weapons: `${APP_NAME}-weapons`,
+    charms: `${APP_NAME}-charms`,
+} as const;
+
+/**
+ * 版本号存储键
+ */
+export const VERSION_KEY = `${APP_NAME}-version`;

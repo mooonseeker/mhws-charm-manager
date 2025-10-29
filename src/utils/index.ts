@@ -33,28 +33,12 @@ export {
     filterAndSortBySkill,
 } from './charm-sorter';
 
-// LocalStorage持久化工具
-export {
-    saveSkills,
-    loadSkills,
-    saveCharms,
-    loadCharms,
-    clearStorage,
-    getStorageVersion,
-    hasStoredData,
-} from './storage';
-
 // 通用数据IO工具
 export {
     exportData,
     importData,
     validateData,
 } from './data-io';
-
-// 数据迁移工具
-export {
-    runDataMigration,
-} from './migration';
 
 // 通用数据IO类型
 export type {

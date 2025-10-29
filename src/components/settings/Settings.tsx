@@ -4,16 +4,17 @@ import { CharmShowcase } from '@/components/charms';
 import { DataIO } from '@/components/settings';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useCharms, useSkills } from '@/contexts';
-import { clearStorage } from '@/utils';
+import { DataStorage } from '@/services/DataStorage';
+
+import type { Charm, Skill } from '@/types';
 
 /**
  * 设置组件
  * 提供导入、导出和重置功能
  */
 export function Settings() {
-    const { skills, resetSkills } = useSkills();
-    const { charms, resetCharms } = useCharms();
+    const skills = DataStorage.loadData<Skill>('skills');
+    const charms = DataStorage.loadData<Charm>('charms');
 
     // 重置数据
     const handleReset = () => {
@@ -22,10 +23,9 @@ export function Settings() {
                 '确定要重置所有数据吗？\n\n这将清除所有技能和护石数据，并恢复到初始状态。\n\n此操作不可撤销！'
             )
         ) {
-            clearStorage();
-            resetSkills();
-            resetCharms();
-            alert('数据已重置');
+            DataStorage.clearAll();
+            alert('数据已重置，页面将刷新。');
+            window.location.reload();
         }
     };
 
