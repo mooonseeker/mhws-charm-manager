@@ -26,6 +26,16 @@ export type SlotType = 'weapon' | 'armor';
 export type SlotLevel = -1 | 1 | 2 | 3;
 
 /**
+ * 防具类型
+ * - helm: 头部防具
+ * - body: 身体防具
+ * - arm: 手部防具
+ * - waist: 腰部防具
+ * - leg: 腿部防具
+ */
+export type ArmorType = 'helm' | 'body' | 'arm' | 'waist' | 'leg';
+
+/**
  * 技能完整定义
  *
  * @property id - 技能唯一ID
@@ -137,6 +147,33 @@ export interface Accessory {
     rarity: number;
     slotLevel: number;
     color: string;
+}
+
+/**
+ * 防具完整定义
+ *
+ * @property id - 防具唯一ID
+ * @property name - 防具名称
+ * @property type - 防具类型（）
+ * @property description - 防具描述
+ * @property skills - 技能列表
+ * @property slots - 孔位列表
+ * @property rarity - 稀有度
+ * @property defense - 防御
+ * @property resistance - 属性耐性（五种属性耐性）
+ * @property series - 防具系列
+ */
+export interface Armor {
+    id: string;
+    name: string;
+    type: ArmorType;
+    description: string;
+    skills: SkillWithLevel[];
+    slots: Slot[];
+    rarity: number;
+    defense: number;
+    resistance: number[];
+    series: string;
 }
 
 /**
