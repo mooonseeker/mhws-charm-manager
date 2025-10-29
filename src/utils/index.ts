@@ -44,26 +44,20 @@ export {
     hasStoredData,
 } from './storage';
 
-// 数据导入导出工具
+// 通用数据IO工具
 export {
-    exportToJSON,
-    exportDataToJSON,
-    importFromJSON,
-    validateImportData,
-} from './import-export';
+    exportData,
+    importData,
+    validateData,
+} from './data-io';
 
 // 数据迁移工具
 export {
     runDataMigration,
 } from './migration';
 
-// 数据库验证工具
-export {
-    validateSkillsDatabase,
-} from './database-validator';
-
-// 导入导出类型
+// 通用数据IO类型
 export type {
-    ExportData,
+    ExportPayload,
     ValidationResult,
-} from './import-export';
+} from './data-io';

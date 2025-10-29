@@ -29,6 +29,7 @@ type AccessoryAction =
     | { type: 'ADD_ACCESSORY'; payload: Accessory }
     | { type: 'UPDATE_ACCESSORY'; payload: Accessory }
     | { type: 'DELETE_ACCESSORY'; payload: string }
+    | { type: 'IMPORT_ACCESSORIES'; payload: Accessory[] }
     | { type: 'SET_LOADING'; payload: boolean }
     | { type: 'SET_ERROR'; payload: string | null };
 
@@ -44,6 +45,10 @@ interface AccessoryContextType extends AccessoryState {
     deleteAccessory: (id: string) => void;
     /** 根据ID获取装饰品 */
     getAccessoryById: (id: string) => Accessory | undefined;
+    /** 批量导入装饰品 */
+    importAccessories: (accessories: Accessory[]) => void;
+    /** 重置装饰品为初始数据 */
+    resetAccessories: () => void;
 }
 
 /**
@@ -67,6 +72,8 @@ function accessoryReducer(state: AccessoryState, action: AccessoryAction): Acces
                 ...state,
                 accessories: state.accessories.filter(a => a.id !== action.payload),
             };
+        case 'IMPORT_ACCESSORIES':
+            return { ...state, accessories: action.payload, loading: false };
         case 'SET_LOADING':
             return { ...state, loading: action.payload };
         case 'SET_ERROR':
@@ -160,12 +167,41 @@ export function AccessoryProvider({ children }: { children: ReactNode }) {
         return state.accessories.find(a => a.id === id);
     };
 
+    /**
+     * 批量导入装饰品
+     * @param accessories 要导入的装饰品列表
+     */
+    const importAccessories = (accessories: Accessory[]) => {
+        dispatch({ type: 'IMPORT_ACCESSORIES', payload: accessories });
+    };
+
+    /**
+     * 重置装饰品为初始数据
+     */
+    const resetAccessories = () => {
+        try {
+            import('@/data/initial-accessories.json').then((module) => {
+                const jsonData = module.default;
+                const accessories = (jsonData.accessories || []) as Accessory[];
+                dispatch({ type: 'SET_ACCESSORIES', payload: accessories });
+            }).catch((error) => {
+                console.error('重置装饰品数据失败:', error);
+                dispatch({ type: 'SET_ERROR', payload: '重置装饰品数据失败' });
+            });
+        } catch (error) {
+            console.error('重置装饰品数据失败:', error);
+            dispatch({ type: 'SET_ERROR', payload: '重置装饰品数据失败' });
+        }
+    };
+
     const value: AccessoryContextType = {
         ...state,
         addAccessory,
         updateAccessory,
         deleteAccessory,
         getAccessoryById,
+        importAccessories,
+        resetAccessories,
     };
 
     return <AccessoryContext.Provider value={value}>{children}</AccessoryContext.Provider>;
