@@ -11,15 +11,12 @@ const __dirname = path.dirname(__filename);
 const metaFilePath = path.resolve(__dirname, '../src/data/database.meta.json');
 const outputFilePath = path.resolve(__dirname, '../src/data/initial-skills.json');
 
-console.log('Starting skills data generation...');
-
 // 1. 读取元数据
 const metadata = JSON.parse(fs.readFileSync(metaFilePath, 'utf-8'));
 const skills: Skill[] = [];
 
 // 2. 根据元数据找到CSV文件路径
 const csvFilePath = path.resolve(__dirname, '../src/data/', metadata.skillsData);
-console.log(`Reading CSV file from: ${csvFilePath}`);
 
 // 3. 读取并解析CSV
 fs.createReadStream(csvFilePath)
@@ -51,7 +48,6 @@ fs.createReadStream(csvFilePath)
 
         // 6. 写入文件
         fs.writeFileSync(outputFilePath, JSON.stringify(finalJson, null, 2));
-        console.log(`Successfully generated skills data at: ${outputFilePath}`);
         console.log(`Generated ${skills.length} skills`);
     })
     .on('error', (error) => {
