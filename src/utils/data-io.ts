@@ -4,7 +4,8 @@
  * 提供与具体数据类型无关的、统一的数据导入、导出和验证功能。
  */
 import type { DataId, DataItem } from '@/types';
-import { CURRENT_VERSION, DataStorage } from '@/services/DataStorage';
+import { DataStorage } from '@/services/DataStorage';
+import { DATABASE_VERSION } from '@/types/constants';
 
 /**
  * 统一的导出数据结构
@@ -32,7 +33,7 @@ export interface ValidationResult {
 export function exportData(id: DataId): void {
     const data = DataStorage.loadData(id);
     const payload: ExportPayload = {
-        version: CURRENT_VERSION,
+        version: DATABASE_VERSION,
         exportedAt: new Date().toISOString(),
         dataType: id,
         data,

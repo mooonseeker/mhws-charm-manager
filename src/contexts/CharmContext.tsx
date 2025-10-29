@@ -4,7 +4,7 @@
  * 使用Context API + useReducer管理护石的全局状态
  */
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
+import { createContext, useContext, useEffect, useReducer } from 'react';
 
 import { DataStorage } from '@/services/DataStorage';
 
@@ -115,9 +115,6 @@ export function CharmProvider({ children }: { children: ReactNode }) {
         error: null,
     });
 
-    // 使用 ref 跟踪是否是首次渲染，避免初始化时触发保存
-    const isFirstRender = useRef(true);
-
     // 初始化：从DataStorage加载
     useEffect(() => {
         try {
@@ -131,10 +128,10 @@ export function CharmProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
-    // 自动保存到DataStorage（避免初始化时的不必要保存）
+    // 自动保存到DataStorage
+    // 仅当数据加载完成后才执行保存操作，避免保存初始的空状态
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
+        if (state.loading) {
             return;
         }
 
@@ -143,7 +140,7 @@ export function CharmProvider({ children }: { children: ReactNode }) {
         } catch (error) {
             console.error('保存护石数据失败:', error);
         }
-    }, [state.charms]);
+    }, [state.charms, state.loading]);
 
     /**
      * 添加护石

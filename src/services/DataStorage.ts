@@ -10,13 +10,7 @@
  */
 
 import type { Accessory, Charm, Skill, DataId, DataItem } from '@/types';
-import { STORAGE_KEYS, VERSION_KEY } from '@/types/constants';
-
-/**
- * 当前应用数据版本号
- */
-export const CURRENT_VERSION = '1.03.0';
-
+import { DATABASE_VERSION, DATABASE_VERSION_KEY, STORAGE_KEYS } from '@/types/constants';
 
 /**
  * DataStorage 类
@@ -58,7 +52,7 @@ class DataStorageService {
 
             const storedVersion = this.getStoredVersion();
 
-            if (storedVersion === CURRENT_VERSION) {
+            if (storedVersion === DATABASE_VERSION) {
                 // 版本匹配，直接加载现有数据
                 console.log('[DataStorage] 版本匹配，加载现有数据');
                 await this.loadExistingData();
@@ -68,12 +62,12 @@ class DataStorageService {
                 await this.loadInitialData();
             } else {
                 // 版本不匹配，执行迁移
-                console.log(`[DataStorage] 版本升级: ${storedVersion} -> ${CURRENT_VERSION}`);
+                console.log(`[DataStorage] 版本升级: ${storedVersion} -> ${DATABASE_VERSION}`);
                 await this.migrateData(storedVersion);
             }
 
             // 更新版本号
-            this.setStoredVersion(CURRENT_VERSION);
+            this.setStoredVersion(DATABASE_VERSION);
 
             this.initialized = true;
             console.log('[DataStorage] 初始化完成');
@@ -154,7 +148,7 @@ class DataStorageService {
         Object.values(STORAGE_KEYS).forEach(key => {
             localStorage.removeItem(key);
         });
-        localStorage.removeItem(VERSION_KEY);
+        localStorage.removeItem(DATABASE_VERSION_KEY);
 
         // 清除内存缓存
         this.dataCache.clear();
@@ -203,6 +197,15 @@ class DataStorageService {
      * 加载指定类型的初始数据
      */
     private async loadInitialDataForType(id: DataId): Promise<void> {
+        // 特殊的处理：护石数据初始为空，不需要初始数据文件
+        if (id === 'charms') {
+            this.dataCache.set(id, []);
+            const key = STORAGE_KEYS[id];
+            localStorage.setItem(key, JSON.stringify([]));
+            console.log(`[DataStorage] 已初始化空 ${id} 数据`);
+            return;
+        }
+
         try {
             // 使用相对路径进行动态导入
             const module = await import(`../data/initial-${id}.json`);
@@ -232,7 +235,7 @@ class DataStorageService {
      * @param oldVersion - 旧版本号
      */
     private async migrateData(oldVersion: string): Promise<void> {
-        console.log(`[DataStorage] 执行数据迁移: ${oldVersion} -> ${CURRENT_VERSION}`);
+        console.log(`[DataStorage] 执行数据迁移: ${oldVersion} -> ${DATABASE_VERSION}`);
 
         try {
             // 从 localStorage 加载旧数据
@@ -244,8 +247,8 @@ class DataStorageService {
             const oldSkillsData = localStorage.getItem(oldSkillsKey);
 
             // 加载新版本的技能数据
-            const v2SkillsModule = await import('../data/initial-skills.json');
-            const v2skills = v2SkillsModule.default.skills as Skill[];
+            const newSkillsModule = await import('../data/initial-skills.json');
+            const newskills = newSkillsModule.default.skills as Skill[];
 
             // 如果没有旧数据，直接加载初始数据
             if (!oldCharmsData || !oldSkillsData) {
@@ -260,7 +263,7 @@ class DataStorageService {
 
             // 基于技能名称创建 ID 映射表
             const idMap = new Map<string, string>(); // <旧ID, 新ID>
-            const v2SkillMap = new Map(v2skills.map(s => [s.name, s]));
+            const v2SkillMap = new Map(newskills.map(s => [s.name, s]));
 
             oldSkills.forEach(oldSkill => {
                 const newSkill = v2SkillMap.get(oldSkill.name);
@@ -279,11 +282,11 @@ class DataStorageService {
             }));
 
             // 保存迁移后的数据到缓存和 localStorage
-            this.dataCache.set('skills', v2skills);
+            this.dataCache.set('skills', newskills);
             this.dataCache.set('charms', migratedCharms);
 
             // 保存到 localStorage（不使用 saveData 以避免重复写入缓存）
-            localStorage.setItem(oldSkillsKey, JSON.stringify(v2skills));
+            localStorage.setItem(oldSkillsKey, JSON.stringify(newskills));
             localStorage.setItem(oldCharmsKey, JSON.stringify(migratedCharms));
 
             // 加载饰品数据（如果存在则保留，否则加载初始数据）
@@ -301,7 +304,7 @@ class DataStorageService {
             }
 
             console.log('[DataStorage] 数据迁移完成');
-            console.log(`  - 技能: ${v2skills.length} 条`);
+            console.log(`  - 技能: ${newskills.length} 条`);
             console.log(`  - 护石: ${migratedCharms.length} 条`);
         } catch (error) {
             console.error('[DataStorage] 数据迁移失败:', error);
@@ -315,14 +318,14 @@ class DataStorageService {
      * 获取存储的版本号
      */
     private getStoredVersion(): string | null {
-        return localStorage.getItem(VERSION_KEY);
+        return localStorage.getItem(DATABASE_VERSION_KEY);
     }
 
     /**
      * 设置存储的版本号
      */
     private setStoredVersion(version: string): void {
-        localStorage.setItem(VERSION_KEY, version);
+        localStorage.setItem(DATABASE_VERSION_KEY, version);
     }
 }
 
