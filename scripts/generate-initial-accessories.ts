@@ -22,11 +22,12 @@ const csvFilePath = path.resolve(__dirname, '../src/data/', metadata.accessories
 fs.createReadStream(csvFilePath)
     .pipe(csv())
     .on('data', (row) => {
-        // 4. 数据类型转换 (CSV字段顺序: id,name,type,description,sortID,skills,rarity,slotLevel,color)
+        // 4. 数据类型转换
+        // CSV字段顺序: id,name,type,description,sortID,skills,rarity,slotLevel,color
 
-        // 解析skills字符串: "[HunterSkill_028, 3, HunterSkill_005, 1]" -> [{skillId: 'HunterSkill_028', level: 3}, {skillId: 'HunterSkill_005', level: 1}]
-        const skillsString = row.skills.replace(/^\[|\]$/g, ''); // 移除方括号
-        const skillPairs: string[] = skillsString ? skillsString.split(',').map((s: string) => s.trim()) : [];
+        // 解析skills字符串: "HunterSkill_028, 3, HunterSkill_005, 1" 
+        // -> [{skillId: 'HunterSkill_028', level: 3}, {skillId: 'HunterSkill_005', level: 1}]
+        const skillPairs: string[] = row.skills ? row.skills.split(',').map((s: string) => s.trim()) : [];
         const skills: { skillId: string; level: number }[] = [];
 
         for (let i = 0; i < skillPairs.length; i += 2) {
@@ -54,9 +55,9 @@ fs.createReadStream(csvFilePath)
         accessories.push(accessory);
     })
     .on('end', () => {
-        // 5. 生成与原始 accessories.json 相同格式的JSON对象
+        // 5. 生成 accessories.json
         const finalJson = {
-            version: "1.03.0",
+            version: metadata.version,
             exportedAt: new Date().toISOString(),
             dataType: "accessories",
             accessories: accessories.sort((a, b) => a.sortID - b.sortID), // 确保排序

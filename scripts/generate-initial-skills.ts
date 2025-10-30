@@ -22,7 +22,8 @@ const csvFilePath = path.resolve(__dirname, '../src/data/', metadata.skillsData)
 fs.createReadStream(csvFilePath)
     .pipe(csv())
     .on('data', (row) => {
-        // 4. 数据类型转换 (CSV字段顺序: id,name,type,description,sortId,category,maxLevel,accessoryLevel,isKey)
+        // 4. 数据类型转换
+        // CSV字段顺序: id,name,type,description,sortId,category,maxLevel,accessoryLevel,isKey
         const accessoryLevelNum = parseInt(row.accessoryLevel, 10);
         const skill: Skill = {
             id: row.id,
@@ -32,15 +33,15 @@ fs.createReadStream(csvFilePath)
             sortId: parseInt(row.sortId, 10),
             category: row.category as Skill['category'],
             maxLevel: parseInt(row.maxLevel, 10),
-            accessoryLevel: accessoryLevelNum as Skill['accessoryLevel'], // 类型断言为SlotLevel
+            accessoryLevel: accessoryLevelNum as Skill['accessoryLevel'],
             isKey: row.isKey.toLowerCase() === 'true',
         };
         skills.push(skill);
     })
     .on('end', () => {
-        // 5. 生成与原始 skills-1.03.0.json 相同格式的JSON对象
+        // 5. 生成 skills.json
         const finalJson = {
-            version: "1.03.0",
+            version: metadata.version,
             exportedAt: new Date().toISOString(),
             dataType: "skills",
             skills: skills.sort((a, b) => a.sortId - b.sortId), // 确保排序

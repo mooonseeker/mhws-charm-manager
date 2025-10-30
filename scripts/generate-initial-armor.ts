@@ -22,9 +22,11 @@ const csvFilePath = path.resolve(__dirname, '../src/data/', metadata.armorData);
 fs.createReadStream(csvFilePath, { encoding: 'utf8' })
     .pipe(csv())
     .on('data', (row) => {
-        // 数据类型转换 (CSV字段顺序: id,name,type,description,rarity,defense,resistance,series,skills,slots)
+        // 数据类型转换
+        // CSV字段顺序: id,name,type,description,rarity,defense,resistance,series,skills,slots
 
-        // 解析skills字符串: "HunterSkill_086,1,HunterSkill_137,1" -> [{skillId: 'HunterSkill_086', level: 1}, {skillId: 'HunterSkill_137', level: 1}]
+        // 解析skills字符串: "HunterSkill_086,1,HunterSkill_137,1" 
+        // -> [{skillId: 'HunterSkill_086', level: 1}, {skillId: 'HunterSkill_137', level: 1}]
         const skillsString = row.skills.trim();
         const skillPairs: string[] = skillsString ? skillsString.split(',').map((s: string) => s.trim()) : [];
         const skills: { skillId: string; level: number }[] = [];
@@ -40,7 +42,8 @@ fs.createReadStream(csvFilePath, { encoding: 'utf8' })
             }
         }
 
-        // 解析slots字符串: "1,2,0" -> [{type: 'armor', level: 1}, {type: 'armor', level: 2}]
+        // 解析slots字符串: "1,2,0" 
+        // -> [{type: 'armor', level: 1}, {type: 'armor', level: 2}]
         const slotsString = row.slots.trim();
         const slotLevels: number[] = slotsString ? slotsString.split(',').map((s: string) => parseInt(s.trim(), 10)) : [];
         const slots: { type: 'weapon' | 'armor'; level: 1 | 2 | 3 }[] = [];
@@ -76,9 +79,9 @@ fs.createReadStream(csvFilePath, { encoding: 'utf8' })
         // 由于armor数据中没有sortId字段，按id排序
         armors.sort((a, b) => a.id.localeCompare(b.id));
 
-        // 生成与原始armor.json相同格式的JSON对象
+        // 生成 armor.json
         const finalJson = {
-            version: "1.03.0",
+            version: metadata.version,
             exportedAt: new Date().toISOString(),
             dataType: "armor",
             armor: armors
