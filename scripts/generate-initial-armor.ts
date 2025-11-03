@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import type { Armor } from '../src/types';
+import type { Armor, Resistance } from '../src/types';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,7 +58,7 @@ fs.createReadStream(csvFilePath, { encoding: 'utf8' })
         });
 
         // 解析resistance字符串: "[1,0,1,0,0]" -> [1,0,1,0,0]
-        const resistance: number[] = JSON.parse(row.resistance);
+        const resistance = JSON.parse(row.resistance) as Resistance;
 
         const armor: Armor = {
             id: row.id,
@@ -89,7 +89,7 @@ fs.createReadStream(csvFilePath, { encoding: 'utf8' })
 
         // 写入文件
         fs.writeFileSync(outputFilePath, JSON.stringify(finalJson, null, 2));
-        console.log(`Generated ${armors.length} armors`);
+        console.log(`Generated ${armors.length} armor`);
     })
     .on('error', (error) => {
         console.error('Error during CSV processing:', error);

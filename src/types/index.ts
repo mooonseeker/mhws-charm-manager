@@ -4,6 +4,7 @@
  * 本文件包含应用的所有核心TypeScript类型和接口定义
  */
 
+/* 技能相关 */
 /**
  * 技能分类枚举
  * - weapon: 武器技能
@@ -12,28 +13,6 @@
  * - group: 组合技能
  */
 export type SkillCategory = 'weapon' | 'armor' | 'series' | 'group';
-
-/**
- * 孔位类型
- * - weapon: 武器孔位
- * - armor: 防具孔位
- */
-export type SlotType = 'weapon' | 'armor';
-
-/**
- * 孔位等级（1-3级，-1表示特殊技能无装饰品）
- */
-export type SlotLevel = -1 | 1 | 2 | 3;
-
-/**
- * 防具类型
- * - helm: 头部防具
- * - body: 身体防具
- * - arm: 手部防具
- * - waist: 腰部防具
- * - leg: 腿部防具
- */
-export type ArmorType = 'helm' | 'body' | 'arm' | 'waist' | 'leg';
 
 /**
  * 技能完整定义
@@ -71,6 +50,19 @@ export interface SkillWithLevel {
     level: number;
 }
 
+/* 孔位&装饰品相关 */
+/**
+ * 孔位类型
+ * - weapon: 武器孔位
+ * - armor: 防具孔位
+ */
+export type SlotType = 'weapon' | 'armor';
+
+/**
+ * 孔位等级（1-3级，-1表示特殊技能无装饰品）
+ */
+export type SlotLevel = -1 | 1 | 2 | 3;
+
 /**
  * 孔位定义
  * 
@@ -80,48 +72,6 @@ export interface SkillWithLevel {
 export interface Slot {
     type: SlotType;
     level: SlotLevel;
-}
-
-/**
- * 等效孔位统计
- * 
- * 用于统计护石技能和孔位转换后的等效孔位数量
- * 
- * @property weaponSlot1 - 1级武器孔位数量
- * @property weaponSlot2 - 2级武器孔位数量
- * @property weaponSlot3 - 3级武器孔位数量
- * @property armorSlot1 - 1级防具孔位数量
- * @property armorSlot2 - 2级防具孔位数量
- * @property armorSlot3 - 3级防具孔位数量
- */
-export interface EquivalentSlots {
-    weaponSlot1: number;
-    weaponSlot2: number;
-    weaponSlot3: number;
-    armorSlot1: number;
-    armorSlot2: number;
-    armorSlot3: number;
-}
-
-/**
- * 护石完整定义
- * 
- * @property id - 护石唯一ID
- * @property rarity - 稀有度（1-12）
- * @property skills - 技能列表（1-3个）
- * @property slots - 孔位列表（0-3个）
- * @property equivalentSlots - 等效孔位（根据技能和孔位计算得出）
- * @property keySkillValue - 核心技能价值（根据等效孔位计算得出）
- * @property createdAt - 创建时间（ISO 8601格式）
- */
-export interface Charm {
-    id: string;
-    rarity: number;
-    skills: SkillWithLevel[];
-    slots: Slot[];
-    equivalentSlots: EquivalentSlots;
-    keySkillValue: number;
-    createdAt: string;
 }
 
 /**
@@ -140,14 +90,31 @@ export interface Charm {
 export interface Accessory {
     id: string;
     name: string;
-    type: 'weapon' | 'armor';
+    type: SlotType;
     description: string;
     sortID: number;
     skills: SkillWithLevel[];
     rarity: number;
-    slotLevel: number;
+    slotLevel: SlotLevel;
     color: string;
 }
+
+/* 防具相关 */
+/**
+ * 防具类型
+ * - helm: 头部防具
+ * - body: 身体防具
+ * - arm: 手部防具
+ * - waist: 腰部防具
+ * - leg: 腿部防具
+ */
+export type ArmorType = 'helm' | 'body' | 'arm' | 'waist' | 'leg';
+
+/**
+ * 属性耐性
+ * 五种属性耐性依次为：火、水、冰、雷、龙
+ */
+export type Resistance = [number, number, number, number, number];
 
 /**
  * 防具完整定义
@@ -172,8 +139,51 @@ export interface Armor {
     slots: Slot[];
     rarity: number;
     defense: number;
-    resistance: number[];
+    resistance: Resistance;
     series: string;
+}
+
+/* 护石相关 */
+/**
+ * 护石完整定义
+ * 
+ * @property id - 护石唯一ID
+ * @property rarity - 稀有度（1-12）
+ * @property skills - 技能列表（1-3个）
+ * @property slots - 孔位列表（0-3个）
+ * @property equivalentSlots - 等效孔位（根据技能和孔位计算得出）
+ * @property keySkillValue - 核心技能价值（根据等效孔位计算得出）
+ * @property createdAt - 创建时间（ISO 8601格式）
+ */
+export interface Charm {
+    id: string;
+    rarity: number;
+    skills: SkillWithLevel[];
+    slots: Slot[];
+    equivalentSlots: EquivalentSlots;
+    keySkillValue: number;
+    createdAt: string;
+}
+
+/**
+ * 等效孔位统计
+ * 
+ * 用于统计护石技能和孔位转换后的等效孔位数量
+ * 
+ * @property weaponSlot1 - 1级武器孔位数量
+ * @property weaponSlot2 - 2级武器孔位数量
+ * @property weaponSlot3 - 3级武器孔位数量
+ * @property armorSlot1 - 1级防具孔位数量
+ * @property armorSlot2 - 2级防具孔位数量
+ * @property armorSlot3 - 3级防具孔位数量
+ */
+export interface EquivalentSlots {
+    weaponSlot1: number;
+    weaponSlot2: number;
+    weaponSlot3: number;
+    armorSlot1: number;
+    armorSlot2: number;
+    armorSlot3: number;
 }
 
 /**
@@ -231,6 +241,75 @@ export type CharmSortField =
     | 'armorSlot2'
     | 'armorSlot3';
 
+/* 武器相关 */
+/**
+ * 武器类型
+ */
+export type WeaponType =
+    | 'hammer' | 'lance' | 'long-sword' | 'short-sword' | 'tachi' | 'twin-sword'
+    | 'charge-axe' | 'gun-lance' | 'rod' | 'slash-axe' | 'whistle'
+    | 'bow' | 'heavy-bowgun' | 'light-bowgun';
+
+/**
+ * 属性/异常类型
+ */
+export type AttributeType =
+    | 'fire' | 'water' | 'ice' | 'elec' | 'dragon'
+    | 'poison' | 'sleep' | 'blast';
+
+/**
+ * 斩味定义
+ * 斩味数组长度为7，依次代表 红、橙、黄、绿、蓝、白、紫 斩味的长度
+ * 匠数组长度为4，依次代表匠技能(50刀)斩味的分布
+ */
+export type Sharpness = [number, number, number, number, number, number, number];
+export type Takumi = [number, number, number, number];
+
+/**
+ * 武器基础定义
+ * 
+ * 适用武器：大剑、片手、大锤、太刀、长枪、双刀
+ * 其它武器具有独有属性，但此版本先忽略独有属性
+ * 
+ * @property id - 武器id
+ * @property name - 武器名称
+ * @property type - 武器类型
+ * @property description - 武器描述
+ * @property sortId - 排序id
+ * @property skills - 技能列表（1-3个）
+ * @property slots - 孔位列表（0-3个）
+ * @property rarity - 稀有度（1-12）
+ * @property attack - 攻击力
+ * @property critical - 会心率
+ * @property defense - 防御力
+ * @property attribute - 属性类型（可选：无属性武器）
+ * @property attributeValue - 属性值（可选：无属性武器）
+ * @property subattribute - 副属性类型（可选：目前无双属性武器，保留作未来拓展）
+ * @property subattributeValue - 副属性值（可选：目前无双属性武器，保留作未来拓展）
+ * @property sharpness - 斩味（可选：远程武器无此属性）
+ * @property takumi - 匠（可选：远程武器无此属性）
+ */
+export interface Weapon {
+    id: string;
+    name: string;
+    type: WeaponType;
+    description: string;
+    sortId: number;
+    skills: SkillWithLevel[];
+    slots: Slot[];
+    rarity: number;
+    attack: number;
+    critical: number;
+    defense: number;
+    attribute?: AttributeType;
+    attributeValue?: number;
+    subattribute?: AttributeType;
+    subattributeValue?: number;
+    sharpness?: Sharpness;
+    takumi?: Takumi;
+}
+
+/* 其它类型 */
 /**
  * 排序方向
  * - asc: 升序
@@ -241,9 +320,9 @@ export type SortDirection = 'asc' | 'desc';
 /**
  * 支持的数据库ID类型
  */
-export type DataId = 'skills' | 'accessories' | 'armor' | 'weapons' | 'charms';
+export type DataId = 'skills' | 'accessories' | 'armor' | 'charms' | 'weapons';
 
 /**
  * 各种数据类型的联合类型
  */
-export type DataItem = Skill | Accessory | Charm;
+export type DataItem = Skill | Accessory | Armor | Charm | Weapon;
