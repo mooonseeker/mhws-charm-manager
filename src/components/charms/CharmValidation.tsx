@@ -1,7 +1,7 @@
 import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { useMemo } from 'react';
 
-import { CharmCard } from './CharmCard';
+import { EquipmentCard } from '../equipments/EquipmentCard';
 
 import type { LucideIcon } from 'lucide-react';
 import type { CharmValidationResult, CharmValidationStatus } from '@/types';
@@ -131,7 +131,7 @@ export function CharmValidation({ validation }: CharmValidationProps) {
                                 <>
                                     <li className={listClass}>• 存在以下1个上位替代：</li>
                                     <div className="mt-2 mb-4">
-                                        <CharmCard charm={betterCharm} />
+                                        <EquipmentCard item={betterCharm} />
                                     </div>
                                 </>
                             )}
@@ -142,7 +142,7 @@ export function CharmValidation({ validation }: CharmValidationProps) {
                                     <li className={listClass}>• 可上位替代以下{outclassedCharms.length}个护石：</li>
                                     <div className="mt-2 mb-4 space-y-2">
                                         {outclassedCharms.slice(0, 3).map((charm, index) => (
-                                            <CharmCard key={`out-${index}`} charm={charm} />
+                                            <EquipmentCard key={`out-${index}`} item={charm} />
                                         ))}
                                     </div>
                                 </>

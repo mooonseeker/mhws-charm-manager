@@ -326,3 +326,8 @@ export type DataId = 'skills' | 'accessories' | 'armor' | 'charms' | 'weapons';
  * 各种数据类型的联合类型
  */
 export type DataItem = Skill | Accessory | Armor | Charm | Weapon;
+
+/**
+ * 通用装备类型联合类型
+ */
+export type Equipment = Charm | Armor | Weapon;

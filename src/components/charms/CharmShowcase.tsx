@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useCharms } from '@/contexts';
 import { sortCharms } from '@/utils';
 
-import { CharmCard } from './CharmCard';
+import { EquipmentCard } from '../equipments/EquipmentCard';
 
 import type { Charm } from '@/types';
 /**
@@ -34,19 +34,19 @@ export function CharmShowcase() {
                         {bestKeySkillCharm && (
                             <div>
                                 <h4 className="text-sm font-medium mb-3 text-center">核心技能价值最高</h4>
-                                <CharmCard charm={bestKeySkillCharm} />
+                                <EquipmentCard item={bestKeySkillCharm} />
                             </div>
                         )}
                         {bestWeaponSlot1Charm && (
                             <div>
                                 <h4 className="text-sm font-medium mb-3 text-center">等效武器一级孔最多</h4>
-                                <CharmCard charm={bestWeaponSlot1Charm} />
+                                <EquipmentCard item={bestWeaponSlot1Charm} />
                             </div>
                         )}
                         {bestArmorSlot3Charm && (
                             <div>
                                 <h4 className="text-sm font-medium mb-3 text-center">等效防具三级孔最多</h4>
-                                <CharmCard charm={bestArmorSlot3Charm} />
+                                <EquipmentCard item={bestArmorSlot3Charm} />
                             </div>
                         )}
                     </div>
@@ -54,13 +54,13 @@ export function CharmShowcase() {
                         {bestArmorSlot2Charm && (
                             <div>
                                 <h4 className="text-sm font-medium mb-3 text-center">等效防具二级孔最多</h4>
-                                <CharmCard charm={bestArmorSlot2Charm} />
+                                <EquipmentCard item={bestArmorSlot2Charm} />
                             </div>
                         )}
                         {bestArmorSlot1Charm && (
                             <div>
                                 <h4 className="text-sm font-medium mb-3 text-center">等效防具一级孔最多</h4>
-                                <CharmCard charm={bestArmorSlot1Charm} />
+                                <EquipmentCard item={bestArmorSlot1Charm} />
                             </div>
                         )}
                     </div>
