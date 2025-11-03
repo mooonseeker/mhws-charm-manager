@@ -255,7 +255,7 @@ export type WeaponType =
  */
 export type AttributeType =
     | 'fire' | 'water' | 'ice' | 'elec' | 'dragon'
-    | 'poison' | 'sleep' | 'blast';
+    | 'poison' | 'sleep' | 'blast' | 'paralyse';
 
 /**
  * 斩味定义
