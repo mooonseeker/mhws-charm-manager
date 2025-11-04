@@ -1,7 +1,7 @@
 {
   "name": "mhws-charm-manager",
   "private": true,
-  "version": "0.9.2",
+  "version": "0.9.3",
   "type": "module",
   "scripts": {
     "dev": "npm run generate && vite",
@@ -10,6 +10,7 @@
     "generate:skills": "ts-node scripts/generate-initial-skills.ts",
     "generate:acc": "ts-node scripts/generate-initial-accessories.ts",
     "generate:armor": "ts-node scripts/generate-initial-armor.ts",
+    "generate:weapons": "ts-node scripts/generate-initial-weapons.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },

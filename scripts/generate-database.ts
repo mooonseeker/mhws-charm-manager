@@ -12,6 +12,9 @@ try {
     console.log('Generating armor...');
     execSync('ts-node scripts/generate-initial-armor.ts', { stdio: 'inherit' });
 
+    console.log('Generating weapons...');
+    execSync('ts-node scripts/generate-initial-weapons.ts', { stdio: 'inherit' });
+
     console.log('Database generation completed successfully!');
 } catch (error) {
     console.error('Error during database generation:', error);

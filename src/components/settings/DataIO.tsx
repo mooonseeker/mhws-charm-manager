@@ -23,8 +23,8 @@ export function DataIO() {
     const databaseItems: { id: DataId, name: string }[] = [
         { id: 'skills', name: '技能' },
         { id: 'accessories', name: '装饰品' },
+        { id: 'armor', name: '防具' },
         { id: 'charms', name: '护石' },
-        // { id: 'armor', name: '防具' },
         // { id: 'weapons', name: '武器' },
     ];
 
