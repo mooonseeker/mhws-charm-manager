@@ -24,8 +24,8 @@ export function DataIO() {
         { id: 'skills', name: '技能' },
         { id: 'accessories', name: '装饰品' },
         { id: 'armor', name: '防具' },
+        { id: 'weapons', name: '武器' },
         { id: 'charms', name: '护石' },
-        // { id: 'weapons', name: '武器' },
     ];
 
     // 定义每个类别可执行的操作

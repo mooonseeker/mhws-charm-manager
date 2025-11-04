@@ -159,7 +159,7 @@ class DataStorageService {
      * 加载现有数据到缓存
      */
     private async loadExistingData(): Promise<void> {
-        const dataIds: DataId[] = ['skills', 'accessories', 'charms', 'armor'];
+        const dataIds: DataId[] = ['skills', 'accessories', 'armor', 'weapons', 'charms'];
 
         for (const id of dataIds) {
             const key = STORAGE_KEYS[id];
@@ -186,7 +186,7 @@ class DataStorageService {
      * 加载所有初始数据
      */
     private async loadInitialData(): Promise<void> {
-        const dataIds: DataId[] = ['skills', 'accessories', 'charms', 'armor'];
+        const dataIds: DataId[] = ['skills', 'accessories', 'armor', 'weapons', 'charms'];
 
         for (const id of dataIds) {
             await this.loadInitialDataForType(id);
