@@ -37,6 +37,14 @@ export function EquipmentCard({ item, className }: EquipmentCardProps) {
         return `/slot/${slotType}-slot-${level}.png`;
     };
 
+    const ARMOR_RESISTANCE_META = [
+        { key: 'fire', icon: '/attribute-type/fire.png', alt: 'Fire Res' },
+        { key: 'water', icon: '/attribute-type/water.png', alt: 'Water Res' },
+        { key: 'elec', icon: '/attribute-type/elec.png', alt: 'Elec Res' },
+        { key: 'ice', icon: '/attribute-type/ice.png', alt: 'Ice Res' },
+        { key: 'dragon', icon: '/attribute-type/dragon.png', alt: 'Dragon Res' }
+    ];
+
     // 辅助函数：判断装备类型
     const isCharm = (item: Equipment): item is Charm => !('name' in item);
     const isWeapon = (item: Equipment): item is Weapon => 'attack' in item;
@@ -72,20 +80,22 @@ export function EquipmentCard({ item, className }: EquipmentCardProps) {
                 <img
                     src={getEquipmentIcon(item)}
                     alt="Equipment Icon"
-                    className="equipment-icon w-8 h-8"
+                    className="equipment-icon w-6 h-6"
                 />
-                {!isCharm(item) && <h3 className="text-sm font-semibold">{item.name}</h3>}
-                <Badge
-                    variant="outline"
-                    className="text-xs"
-                    style={{
-                        color: item.rarity === 12 ? 'black' : `var(--rarity-${item.rarity})`,
-                        borderColor: item.rarity === 12 ? 'var(--border)' : `var(--rarity-${item.rarity})`,
-                        background: item.rarity === 12 ? `var(--rarity-${item.rarity})` : 'transparent'
-                    }}
-                >
-                    R{item.rarity}
-                </Badge>
+                {!isCharm(item) && <h3 className="text-xs font-semibold flex-1 text-center">{item.name}</h3>}
+                {isCharm(item) && (
+                    <Badge
+                        variant="outline"
+                        className="text-xs"
+                        style={{
+                            color: item.rarity === 12 ? 'black' : `var(--rarity-${item.rarity})`,
+                            borderColor: item.rarity === 12 ? 'var(--border)' : `var(--rarity-${item.rarity})`,
+                            background: item.rarity === 12 ? `var(--rarity-${item.rarity})` : 'transparent'
+                        }}
+                    >
+                        R{item.rarity}
+                    </Badge>
+                )}
             </div>
 
             {/* Stats: 核心属性 */}
@@ -102,21 +112,32 @@ export function EquipmentCard({ item, className }: EquipmentCardProps) {
                 </div>
             )}
             {isArmor(item) && (
-                <div className="card-stats space-y-1 mb-3 text-xs">
-                    <div className="flex justify-between">
-                        <span>防御力</span>
-                        <span>{item.defense}</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span>属性耐性</span>
-                        <div className="flex gap-2">
-                            <span title="火耐性">🔥 {item.resistance[0]}</span>
-                            <span title="水耐性">💧 {item.resistance[1]}</span>
-                            <span title="雷耐性">⚡ {item.resistance[2]}</span>
-                            <span title="冰耐性">❄️ {item.resistance[3]}</span>
-                            <span title="龙耐性">🐲 {item.resistance[4]}</span>
+                <div className="card-stats grid grid-cols-3 lg:grid-cols-6 mb-3 text-xs min-w-0">
+                    {[
+                        {
+                            key: 'defense',
+                            icon: '/skill-type/SKILL_0005.png',
+                            alt: 'Defense',
+                            value: item.defense,
+                            minWidthClass: 'min-w-[1.5rem]'
+                        },
+                        ...ARMOR_RESISTANCE_META.map((meta, index) => ({
+                            ...meta,
+                            value: item.resistance[index],
+                            minWidthClass: 'min-w-[1rem]'
+                        }))
+                    ].map((stat) => (
+                        <div
+                            key={stat.key}
+                            className={cn(
+                                'flex flex-col items-center justify-center p-0.5',
+                                stat.minWidthClass
+                            )}
+                        >
+                            <img src={stat.icon} alt={stat.alt} className="w-4 h-4" />
+                            <span className="text-center">{stat.value}</span>
                         </div>
-                    </div>
+                    ))}
                 </div>
             )}
 
