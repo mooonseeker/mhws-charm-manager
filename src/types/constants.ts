@@ -74,6 +74,11 @@ export const KEY_SKILL_VALUE_THRESHOLD = 2;
 export const SKILLS_PER_PAGE = 16;
 
 /**
+ * 技能列表每页显示数量
+ */
+export const ARMOR_SERIES_PER_PAGE = 32;
+
+/**
  * 护石列表每页显示数量
  */
 export const CHARMS_PER_PAGE = 16;

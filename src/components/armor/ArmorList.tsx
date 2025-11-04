@@ -1,12 +1,17 @@
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ErrorMessage, Loading } from '@/components/common';
 import { EquipmentCard } from '@/components/equipments';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
+import { useSkills } from '@/contexts';
 import { useArmor } from '@/contexts/ArmorContext';
+import { ARMOR_SERIES_PER_PAGE } from '@/types/constants';
 
 import type { Armor, SkillWithLevel } from '@/types';
 
@@ -30,6 +35,15 @@ interface GroupedArmor {
  */
 export function ArmorList() {
     const { armor, loading, error } = useArmor();
+    const { skills } = useSkills();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // 获取技能名称的辅助函数
+    const getSkillName = useCallback((skillId: string) => {
+        const skill = skills.find((s) => s.id === skillId);
+        return skill?.name || '未知技能';
+    }, [skills]);
 
     /**
      * 将防具数组按系列分组，并计算全套技能
@@ -93,6 +107,54 @@ export function ArmorList() {
         return Array.from(groups.values());
     }, [armor]);
 
+    /**
+     * 搜索过滤和分页处理
+     */
+    const filteredAndPaginatedArmor = useMemo(() => {
+        // 搜索过滤
+        let filtered = groupedArmor;
+
+        if (searchQuery) {
+            const keyword = searchQuery.toLowerCase();
+            filtered = groupedArmor.filter(group => {
+                // 检查系列名称
+                if (group.series.toLowerCase().includes(keyword)) return true;
+
+                // 检查装备名称
+                const pieceNames = [
+                    group.helm?.name,
+                    group.body?.name,
+                    group.arm?.name,
+                    group.waist?.name,
+                    group.leg?.name
+                ].filter(Boolean);
+
+                if (pieceNames.some(name => name?.toLowerCase().includes(keyword))) return true;
+
+                // 检查技能名称
+                const skillNames = group.fullSetSkills.map(skill => getSkillName(skill.skillId));
+                return skillNames.some(name => name.toLowerCase().includes(keyword));
+            });
+        }
+
+        // 分页
+        const totalPages = Math.ceil(filtered.length / ARMOR_SERIES_PER_PAGE);
+        const startIndex = (currentPage - 1) * ARMOR_SERIES_PER_PAGE;
+        const endIndex = startIndex + ARMOR_SERIES_PER_PAGE;
+        const paginated = filtered.slice(startIndex, endIndex);
+
+        return {
+            data: paginated,
+            totalCount: filtered.length,
+            totalPages
+        };
+    }, [groupedArmor, searchQuery, currentPage, getSkillName]);
+
+    // 当搜索条件变化时，重置到第一页
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
     if (loading) {
         return <Loading />;
     }
@@ -128,9 +190,9 @@ export function ArmorList() {
             <TableCell>
                 <div className="space-y-1">
                     {skills.map(skill => (
-                        <Badge key={skill.skillId} variant="secondary" className="text-xs">
-                            {skill.skillId} Lv.{skill.level}
-                        </Badge>
+                        <div key={skill.skillId} className="text-xs">
+                            {getSkillName(skill.skillId)} Lv.{skill.level}
+                        </div>
                     ))}
                 </div>
             </TableCell>
@@ -138,35 +200,79 @@ export function ArmorList() {
     };
 
     return (
-        <div className="armor-list">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>防具系列</TableHead>
-                        <TableHead>头盔</TableHead>
-                        <TableHead>胸甲</TableHead>
-                        <TableHead>臂甲</TableHead>
-                        <TableHead>腰甲</TableHead>
-                        <TableHead>腿甲</TableHead>
-                        <TableHead>全套技能</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {groupedArmor.map(group => (
-                        <TableRow key={group.series}>
-                            <TableCell>
-                                <Badge variant="outline">{group.series}</Badge>
-                            </TableCell>
-                            {renderArmorPiece(group.helm)}
-                            {renderArmorPiece(group.body)}
-                            {renderArmorPiece(group.arm)}
-                            {renderArmorPiece(group.waist)}
-                            {renderArmorPiece(group.leg)}
-                            {renderFullSetSkills(group.fullSetSkills)}
+        <div className="space-y-6">
+            {/* 菜单栏 */}
+            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm">
+                <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <Button
+                            variant="default"
+                            size="sm"
+                            className="text-xs sm:text-sm"
+                        >
+                            全部
+                        </Button>
+                    </div>
+
+                    <div className="flex items-center gap-4 justify-end">
+                        <div className="text-muted-foreground text-sm whitespace-nowrap">
+                            共 {filteredAndPaginatedArmor.totalCount} 个防具系列
+                        </div>
+                        <Input
+                            type="text"
+                            placeholder="搜索系列、防具或技能..."
+                            className="h-9 max-w-64"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={filteredAndPaginatedArmor.totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* 防具表格 */}
+            <div className="bg-card rounded-lg border shadow-sm overflow-auto">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[10%] text-center bg-primary text-primary-foreground">防具系列</TableHead>
+                            <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">头盔</TableHead>
+                            <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">胸甲</TableHead>
+                            <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">臂甲</TableHead>
+                            <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">腰甲</TableHead>
+                            <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">腿甲</TableHead>
+                            <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">全套技能</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {filteredAndPaginatedArmor.data.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                    暂无防具数据
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            filteredAndPaginatedArmor.data.map(group => (
+                                <TableRow key={group.series}>
+                                    <TableCell>
+                                        <Badge variant="outline">{group.series}</Badge>
+                                    </TableCell>
+                                    {renderArmorPiece(group.helm)}
+                                    {renderArmorPiece(group.body)}
+                                    {renderArmorPiece(group.arm)}
+                                    {renderArmorPiece(group.waist)}
+                                    {renderArmorPiece(group.leg)}
+                                    {renderFullSetSkills(group.fullSetSkills)}
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     );
 }
