@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { ErrorMessage, Loading } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { useAccessories, useSkills } from '@/contexts';
+import { useAccessories, useArmor, useSkills } from '@/contexts';
 import { generateSkillId } from '@/utils';
 
 import { AccessoryForm } from '../accessories/AccessoryForm';
 import { AccessoryList } from '../accessories/AccessoryList';
+import { ArmorList } from '../armor';
 import { SkillForm } from '../skills/SkillForm';
 import { SkillList } from '../skills/SkillList';
 
@@ -33,15 +34,19 @@ export function DatabaseManager() {
         updateAccessory,
         accessories
     } = useAccessories();
+    const {
+        loading: armorLoading,
+        error: armorError
+    } = useArmor();
 
     const [currentDb, setCurrentDb] = useState<'skills' | 'accessories' | 'armor' | 'weapons'>('skills');
-    const [isLocked, setIsLocked] = useState<boolean>(false);
+    const [isLocked, setIsLocked] = useState<boolean>(true);
     const [formOpen, setFormOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<{ type: 'skill' | 'accessory'; data: Skill | Accessory } | undefined>();
     const [formError, setFormError] = useState<string | null>(null);
 
-    const loading = skillsLoading || accessoriesLoading;
-    const error = skillsError || accessoriesError;
+    const loading = skillsLoading || accessoriesLoading || armorLoading;
+    const error = skillsError || accessoriesError || armorError;
 
     const handleAdd = () => {
         setFormError(null); // 打开表单时清除旧错误
@@ -211,7 +216,7 @@ export function DatabaseManager() {
                 />
             )}
             {currentDb === 'armor' && (
-                <div>ArmorList placeholder</div>
+                <ArmorList />
             )}
             {currentDb === 'weapons' && (
                 <div>WeaponList placeholder</div>

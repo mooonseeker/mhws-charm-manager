@@ -10,7 +10,7 @@ import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
 
-import type { Accessory } from '@/types';
+import type { Accessory, SlotLevel } from '@/types';
 
 interface AccessoryFormProps {
     accessory?: Accessory;
@@ -30,7 +30,7 @@ export function AccessoryForm({ accessory, open, onClose, onSubmit, error, acces
     const [type, setType] = useState<'weapon' | 'armor'>('weapon');
     const [description, setDescription] = useState('');
     const [rarity, setRarity] = useState(1);
-    const [slotLevel, setSlotLevel] = useState(1);
+    const [slotLevel, setSlotLevel] = useState<SlotLevel>(1);
     const [color, setColor] = useState('WHITE');
     const [localError, setLocalError] = useState<string | null>(null);
 
@@ -161,7 +161,7 @@ export function AccessoryForm({ accessory, open, onClose, onSubmit, error, acces
                                 min={1}
                                 max={3}
                                 value={slotLevel}
-                                onChange={(e) => setSlotLevel(parseInt(e.target.value))}
+                                onChange={(e) => setSlotLevel(parseInt(e.target.value) as SlotLevel)}
                                 required
                             />
                         </div>

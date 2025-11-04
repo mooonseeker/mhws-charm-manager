@@ -10,6 +10,9 @@ export { SkillProvider, useSkills } from './SkillContext';
 // 装饰品Context
 export { AccessoryProvider, useAccessories } from './AccessoryContext';
 
+// 防具Context
+export { ArmorProvider, useArmor } from './ArmorContext';
+
 // 护石Context
 export { CharmProvider, useCharms } from './CharmContext';
 

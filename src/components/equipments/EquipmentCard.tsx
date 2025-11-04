@@ -84,7 +84,7 @@ export function EquipmentCard({ item, className }: EquipmentCardProps) {
                         background: item.rarity === 12 ? `var(--rarity-${item.rarity})` : 'transparent'
                     }}
                 >
-                    稀有度 {item.rarity}
+                    R{item.rarity}
                 </Badge>
             </div>
 
