@@ -11,6 +11,7 @@ import { ArmorProvider } from './ArmorContext';
 import { CharmProvider } from './CharmContext';
 import { SkillProvider } from './SkillContext';
 import { ThemeProvider } from './ThemeContext';
+import { WeaponProvider } from './WeaponContext';
 
 /**
  * 应用的根Context Provider
@@ -20,7 +21,8 @@ import { ThemeProvider } from './ThemeContext';
  * 2. SkillProvider - 技能数据（护石依赖技能数据）
  * 3. AccessoryProvider - 装饰品数据
  * 4. ArmorProvider - 防具数据
- * 5. CharmProvider - 护石数据
+ * 5. WeaponProvider - 武器数据
+ * 6. CharmProvider - 护石数据
  *
  * @param children - 应用的根组件
  *
@@ -43,9 +45,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
             <SkillProvider>
                 <AccessoryProvider>
                     <ArmorProvider>
-                        <CharmProvider>
-                            {children}
-                        </CharmProvider>
+                        <WeaponProvider>
+                            <CharmProvider>
+                                {children}
+                            </CharmProvider>
+                        </WeaponProvider>
                     </ArmorProvider>
                 </AccessoryProvider>
             </SkillProvider>

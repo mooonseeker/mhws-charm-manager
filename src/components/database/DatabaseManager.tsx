@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ErrorMessage, Loading } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { useAccessories, useArmor, useSkills, WeaponProvider } from '@/contexts';
+import { useAccessories, useArmor, useSkills } from '@/contexts';
 import { generateSkillId } from '@/utils';
 
 import { AccessoryForm } from '../accessories/AccessoryForm';
@@ -220,9 +220,7 @@ export function DatabaseManager() {
                 <ArmorList />
             )}
             {currentDb === 'weapons' && (
-                <WeaponProvider>
-                    <WeaponList />
-                </WeaponProvider>
+                <WeaponList />
             )}
 
             {editingItem?.type === 'skill' && (
