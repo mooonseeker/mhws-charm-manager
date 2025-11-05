@@ -7,6 +7,9 @@
 // 护石操作Hook
 export { useCharmOperations } from './useCharmOperations';
 
+// 武器Hook
+export { useWeapon } from './useWeapon';
+
 // 响应式Hooks
 export { useOrientation, type OrientationType, type OrientationState } from './useOrientation';
 export { useMediaQuery } from './useMediaQuery';

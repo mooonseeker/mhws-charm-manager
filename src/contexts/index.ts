@@ -13,6 +13,9 @@ export { AccessoryProvider, useAccessories } from './AccessoryContext';
 // 防具Context
 export { ArmorProvider, useArmor } from './ArmorContext';
 
+// 武器Context
+export { WeaponProvider, useWeapon } from './WeaponContext';
+
 // 护石Context
 export { CharmProvider, useCharms } from './CharmContext';
 

@@ -74,7 +74,7 @@ export const KEY_SKILL_VALUE_THRESHOLD = 2;
 export const SKILLS_PER_PAGE = 16;
 
 /**
- * 技能列表每页显示数量
+ * 防具列表每页显示数量（系列数）
  */
 export const ARMOR_SERIES_PER_PAGE = 32;
 
