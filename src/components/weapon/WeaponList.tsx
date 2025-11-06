@@ -4,13 +4,17 @@ import { EquipmentCard } from '@/components/equipments/EquipmentCard';
 import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useWeapon } from '@/hooks';
+import { cn } from '@/lib/utils';
 import { groupWeaponsIntoRows } from '@/utils/weapon-grouper';
 
 import type { Weapon, WeaponType } from '@/types';
+import type { EquipmentSlotType } from '@/types/set-builder';
 
 export interface WeaponListProps {
     mode?: 'display' | 'selector';
     onWeaponSelect?: (weapon: Weapon) => void;
+    selectingFor?: EquipmentSlotType; // 新增
+    currentWeapon?: Weapon | null;    // 新增
 }
 
 /**
@@ -18,7 +22,12 @@ export interface WeaponListProps {
  *
  * 显示武器列表，支持按武器类型筛选和搜索，使用12列网格布局展示武器
  */
-export function WeaponList({ mode = 'display', onWeaponSelect }: WeaponListProps) {
+export function WeaponList({
+    mode = 'display',
+    onWeaponSelect,
+    selectingFor,
+    currentWeapon
+}: WeaponListProps) {
     // 状态管理
     const [selectedWeaponType, setSelectedWeaponType] = useState<WeaponType>('rod');
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -113,19 +122,38 @@ export function WeaponList({ mode = 'display', onWeaponSelect }: WeaponListProps
 
                     {/* 武器卡片 */}
                     {weaponRows.map((row, rowIndex) =>
-                        row.map((weapon: Weapon) => (
-                            <div
-                                key={weapon.id}
-                                style={{
-                                    gridRowStart: rowIndex + 2, // +2 因为表头占用了第1行
-                                    gridColumnStart: weapon.rarity,
-                                }}
-                                className={`weapon-card-container ${mode === 'selector' ? 'cursor-pointer hover:bg-accent/50 transition-colors rounded-lg' : ''}`}
-                                onClick={mode === 'selector' && onWeaponSelect ? () => onWeaponSelect(weapon) : undefined}
-                            >
-                                <EquipmentCard item={weapon} variant={mode === 'selector' ? 'compact' : 'full'} />
-                            </div>
-                        ))
+                        row.map((weapon: Weapon) => {
+                            const isSelector = mode === 'selector';
+                            const isSelected = !!currentWeapon && currentWeapon.id === weapon.id;
+                            const isMatchingSlot = isSelector && selectingFor === 'weapon';
+
+                            return (
+                                <div
+                                    key={weapon.id}
+                                    style={{
+                                        gridRowStart: rowIndex + 2, // +2 因为表头占用了第1行
+                                        gridColumnStart: weapon.rarity,
+                                    }}
+                                    className={cn(
+                                        'weapon-card-container',
+                                        isSelector && 'transition-colors rounded-lg',
+                                        isSelector && isMatchingSlot && 'cursor-pointer hover:bg-accent/50',
+                                        isSelector && !isMatchingSlot && 'cursor-not-allowed opacity-50'
+                                    )}
+                                    onClick={
+                                        isSelector && onWeaponSelect && isMatchingSlot
+                                            ? () => onWeaponSelect(weapon)
+                                            : undefined
+                                    }
+                                >
+                                    <EquipmentCard
+                                        item={weapon}
+                                        variant={mode === 'selector' ? 'compact' : 'full'}
+                                        isSelected={isSelected}
+                                    />
+                                </div>
+                            );
+                        })
                     )}
                 </div>
             </div>

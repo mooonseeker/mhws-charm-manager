@@ -11,9 +11,11 @@ import {
 } from '@/components/ui/table';
 import { useSkills } from '@/contexts';
 import { useArmor } from '@/contexts/ArmorContext';
+import { cn } from '@/lib/utils';
 import { ARMOR_SERIES_PER_PAGE } from '@/types/constants';
 
 import type { Armor, SkillWithLevel } from '@/types';
+import type { EquipmentSlotType } from '@/types/set-builder';
 
 /**
  * 按系列分组的防具数据结构
@@ -36,9 +38,16 @@ interface GroupedArmor {
 export interface ArmorListProps {
     mode?: 'display' | 'selector';
     onPieceSelect?: (piece: Armor) => void;
+    selectingFor?: EquipmentSlotType; // 新增
+    currentPiece?: Armor | null;      // 新增
 }
 
-export function ArmorList({ mode = 'display', onPieceSelect }: ArmorListProps) {
+export function ArmorList({
+    mode = 'display',
+    onPieceSelect,
+    selectingFor,
+    currentPiece
+}: ArmorListProps) {
     const { armor, loading, error } = useArmor();
     const { skills } = useSkills();
     const [searchQuery, setSearchQuery] = useState('');
@@ -177,13 +186,31 @@ export function ArmorList({ mode = 'display', onPieceSelect }: ArmorListProps) {
         }
 
         const isSelector = mode === 'selector';
+        const isSelected = !!currentPiece && currentPiece.id === piece.id;
+        const isMatchingSlot = isSelector && piece.type === selectingFor;
 
         return (
             <TableCell
-                className={isSelector ? 'cursor-pointer hover:bg-accent/50 transition-colors' : ''}
-                onClick={isSelector && onPieceSelect ? () => onPieceSelect(piece) : undefined}
+                className={cn(
+                    isSelector && 'transition-colors',
+                    isSelector && isMatchingSlot && 'cursor-pointer hover:bg-accent/50',
+                    isSelector && !isMatchingSlot && 'cursor-not-allowed opacity-50'
+                )}
+                onClick={
+                    isSelector && onPieceSelect
+                        ? () => {
+                            if (piece.type === selectingFor) {
+                                onPieceSelect(piece);
+                            }
+                        }
+                        : undefined
+                }
             >
-                <EquipmentCard item={piece} variant={isSelector ? 'compact' : 'full'} />
+                <EquipmentCard
+                    item={piece}
+                    variant={isSelector ? 'compact' : 'full'}
+                    isSelected={isSelected}
+                />
             </TableCell>
         );
     };

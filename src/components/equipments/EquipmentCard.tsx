@@ -20,6 +20,10 @@ export interface EquipmentCardProps {
      * 卡片变体，默认为 'full'
      */
     variant?: 'full' | 'compact';
+    /**
+     * 是否选中状态
+     */
+    isSelected?: boolean;
 }
 
 /**
@@ -27,7 +31,7 @@ export interface EquipmentCardProps {
  *
  * 显示单个装备的卡片视图，包含图标、稀有度徽章、孔位和技能列表
  */
-export function EquipmentCard({ item, className, variant = 'full' }: EquipmentCardProps) {
+export function EquipmentCard({ item, className, variant = 'full', isSelected }: EquipmentCardProps) {
     const { skills } = useSkills();
 
     // 获取技能名称的辅助函数
@@ -71,7 +75,8 @@ export function EquipmentCard({ item, className, variant = 'full' }: EquipmentCa
     return (
         <div
             className={cn(
-                "charm-card border rounded-lg p-4 shadow-sm bg-card",
+                "charm-card border rounded-lg p-4 shadow-sm bg-card transition-all",
+                { "ring-2 ring-primary ring-offset-2 ring-offset-background": isSelected },
                 className
             )}
             style={{

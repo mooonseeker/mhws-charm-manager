@@ -14,24 +14,23 @@ const slotTypes: EquipmentSlotType[] = ['weapon', 'helm', 'body', 'arm', 'waist'
 export function SetBuilder() {
     const [mode, setMode] = useState<'manual' | 'auto'>('manual');
     const [equipmentSet, setEquipmentSet] = useState<EquipmentSet>({});
-    const [isEqSelectorOpen, setIsEqSelectorOpen] = useState(false);
     const [isAccSelectorOpen, setIsAccSelectorOpen] = useState(false);
     const [selectingEqFor, setSelectingEqFor] = useState<EquipmentSlotType | null>(null);
     const [selectingAccFor, setSelectingAccFor] = useState<{ slotType: EquipmentSlotType; slotIndex: number; slot: Slot } | null>(null);
 
     const handleEqSlotClick = (type: EquipmentSlotType) => {
-        setSelectingEqFor(type);
-        setIsEqSelectorOpen(true);
+        if (selectingEqFor === type) {
+            setSelectingEqFor(null);
+        } else {
+            setSelectingEqFor(type);
+        }
     };
 
     const handleEqSelect = (item: Armor | Weapon | Charm) => {
         if (!selectingEqFor) return;
         const newSlottedEq = { equipment: item, accessories: Array(item.slots.length).fill(null) };
         setEquipmentSet(prev => ({ ...prev, [selectingEqFor]: newSlottedEq }));
-        // 选择防具后不关闭弹窗，方便连续选择
-        if (selectingEqFor === 'weapon' || selectingEqFor === 'charm') {
-            setIsEqSelectorOpen(false);
-        }
+        setSelectingEqFor(null);
     };
 
     const handleSlotClick = (slotType: EquipmentSlotType, slotIndex: number, slot: Slot) => {
@@ -54,13 +53,6 @@ export function SetBuilder() {
             return newSet;
         });
         setIsAccSelectorOpen(false);
-    };
-
-    const getInitialTab = () => {
-        if (!selectingEqFor) return 'armor';
-        if (selectingEqFor === 'weapon') return 'weapon';
-        if (selectingEqFor === 'charm') return 'charm';
-        return 'armor';
     };
 
     return (
@@ -87,16 +79,18 @@ export function SetBuilder() {
                 </div>
 
                 <div className="lg:col-span-2">
-                    <SetSummary equipmentSet={equipmentSet} />
+                    {selectingEqFor ? (
+                        <EquipmentSelector
+                            selectingFor={selectingEqFor!}
+                            currentEquipment={equipmentSet[selectingEqFor as keyof EquipmentSet]?.equipment}
+                            onSelect={handleEqSelect}
+                            onClose={() => setSelectingEqFor(null)}
+                        />
+                    ) : (
+                        <SetSummary equipmentSet={equipmentSet} />
+                    )}
                 </div>
             </div>
-
-            <EquipmentSelector
-                open={isEqSelectorOpen}
-                onOpenChange={setIsEqSelectorOpen}
-                onSelect={handleEqSelect}
-                initialTab={getInitialTab()}
-            />
 
             <AccessorySelector
                 open={isAccSelectorOpen}

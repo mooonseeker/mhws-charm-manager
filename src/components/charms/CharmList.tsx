@@ -14,15 +14,19 @@ import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
 import { useCharms, useSkills } from '@/contexts';
+import { cn } from '@/lib/utils';
 import { CHARMS_PER_PAGE } from '@/types/constants';
 import { sortCharms } from '@/utils';
 
 import type { Charm, CharmSortField, SortDirection } from '@/types';
+import type { EquipmentSlotType } from '@/types/set-builder';
 
 interface CharmListProps {
     onEdit?: (charm: Charm) => void;
     mode?: 'display' | 'selector';
     onCharmSelect?: (charm: Charm) => void;
+    selectingFor?: EquipmentSlotType; // 新增
+    currentCharm?: Charm | null;      // 新增
 }
 
 /**
@@ -34,7 +38,13 @@ interface CharmListProps {
  * - 排序字段切换
  * - 编辑和删除操作
  */
-export function CharmList({ onEdit, mode = 'display', onCharmSelect }: CharmListProps) {
+export function CharmList({
+    onEdit,
+    mode = 'display',
+    onCharmSelect,
+    selectingFor,
+    currentCharm
+}: CharmListProps) {
     const { charms, deleteCharm } = useCharms();
     const { skills } = useSkills();
 
@@ -331,107 +341,122 @@ export function CharmList({ onEdit, mode = 'display', onCharmSelect }: CharmList
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            paginatedCharms.map((charm) => (
-                                <TableRow
-                                    key={charm.id}
-                                    className={mode === 'selector' ? 'cursor-pointer hover:bg-accent/50 transition-colors' : ''}
-                                    onClick={mode === 'selector' && onCharmSelect ? () => onCharmSelect(charm) : undefined}
-                                >
-                                    <TableCell className="text-center">
-                                        <Badge variant="outline" className="text-xs" style={{
-                                            color: charm.rarity === 12 ? 'black' : `var(--rarity-${charm.rarity})`,
-                                            borderColor: charm.rarity === 12 ? 'var(--border)' : `var(--rarity-${charm.rarity})`,
-                                            background: charm.rarity === 12 ? `var(--rarity-${charm.rarity})` : 'transparent'
-                                        }}>
-                                            R{charm.rarity}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        <div className="space-y-1 sm:space-y-2">
-                                            {charm.skills.map((skillWithLevel) => (
-                                                <div key={skillWithLevel.skillId} className="text-xs sm:text-sm">
-                                                    {getSkillName(skillWithLevel.skillId)} Lv.{skillWithLevel.level}
-                                                    {isKeySkill(skillWithLevel.skillId) && ' ⭐'}
-                                                </div>
-                                            ))}
-                                            {/* 小屏幕显示孔位信息 */}
-                                            {charm.slots.length > 0 && (
-                                                <div className="text-xs text-muted-foreground md:hidden mt-1">
-                                                    孔位: {charm.slots.map((slot, index) => (
-                                                        <span key={index}>
-                                                            {slot.type === 'weapon' ? '武' : '防'}{slot.level}
-                                                            {index < charm.slots.length - 1 && ', '}
+                            paginatedCharms.map((charm) => {
+                                const isSelector = mode === 'selector';
+                                const isSelected = !!currentCharm && currentCharm.id === charm.id;
+                                const isMatchingSlot = isSelector && selectingFor === 'charm';
+
+                                return (
+                                    <TableRow
+                                        key={charm.id}
+                                        className={cn(
+                                            isSelector && 'transition-colors',
+                                            isSelected && 'bg-accent/30',
+                                            isSelector && isMatchingSlot && 'cursor-pointer hover:bg-accent/50',
+                                            isSelector && !isMatchingSlot && 'cursor-not-allowed opacity-50'
+                                        )}
+                                        onClick={
+                                            isSelector && onCharmSelect && isMatchingSlot
+                                                ? () => onCharmSelect(charm)
+                                                : undefined
+                                        }
+                                    >
+                                        <TableCell className="text-center">
+                                            <Badge variant="outline" className="text-xs" style={{
+                                                color: charm.rarity === 12 ? 'black' : `var(--rarity-${charm.rarity})`,
+                                                borderColor: charm.rarity === 12 ? 'var(--border)' : `var(--rarity-${charm.rarity})`,
+                                                background: charm.rarity === 12 ? `var(--rarity-${charm.rarity})` : 'transparent'
+                                            }}>
+                                                R{charm.rarity}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            <div className="space-y-1 sm:space-y-2">
+                                                {charm.skills.map((skillWithLevel) => (
+                                                    <div key={skillWithLevel.skillId} className="text-xs sm:text-sm">
+                                                        {getSkillName(skillWithLevel.skillId)} Lv.{skillWithLevel.level}
+                                                        {isKeySkill(skillWithLevel.skillId) && ' ⭐'}
+                                                    </div>
+                                                ))}
+                                                {/* 小屏幕显示孔位信息 */}
+                                                {charm.slots.length > 0 && (
+                                                    <div className="text-xs text-muted-foreground md:hidden mt-1">
+                                                        孔位: {charm.slots.map((slot, index) => (
+                                                            <span key={index}>
+                                                                {slot.type === 'weapon' ? '武' : '防'}{slot.level}
+                                                                {index < charm.slots.length - 1 && ', '}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="hidden md:table-cell text-center">
+                                            <div className="flex justify-center gap-2">
+                                                {Array.from({ length: 3 }, (_, index) => {
+                                                    const slot = charm.slots[index];
+                                                    return slot ? (
+                                                        <img
+                                                            key={index}
+                                                            src={getAccessoryIcon(slot.type, slot.level)}
+                                                            alt={`${slot.type === 'weapon' ? 'WeaponSlot' : 'ArmorSlot'} ${slot.level}级`}
+                                                            style={{ width: '1.5rem', height: '1.5rem' }}
+                                                        />
+                                                    ) : (
+                                                        <span key={index} className="text-muted-foreground text-sm" style={{ width: '1.5rem', height: '1.5rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                            —
                                                         </span>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="hidden md:table-cell text-center">
-                                        <div className="flex justify-center gap-2">
-                                            {Array.from({ length: 3 }, (_, index) => {
-                                                const slot = charm.slots[index];
-                                                return slot ? (
-                                                    <img
-                                                        key={index}
-                                                        src={getAccessoryIcon(slot.type, slot.level)}
-                                                        alt={`${slot.type === 'weapon' ? 'WeaponSlot' : 'ArmorSlot'} ${slot.level}级`}
-                                                        style={{ width: '1.5rem', height: '1.5rem' }}
-                                                    />
-                                                ) : (
-                                                    <span key={index} className="text-muted-foreground text-sm" style={{ width: '1.5rem', height: '1.5rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        —
-                                                    </span>
-                                                );
-                                            })}
-                                        </div>
-                                    </TableCell>
-                                    {mode === 'display' && (
-                                        <>
-                                            <TableCell className="text-center">
-                                                <span className="font-medium text-primary text-sm sm:text-base">{charm.keySkillValue}</span>
-                                            </TableCell>
-                                            <TableCell className="hidden lg:table-cell text-center">
-                                                <div className="text-sm flex flex-col md:flex-row gap-2 md:gap-4 justify-center">
-                                                    <div className="flex items-center gap-1">
-                                                        <img src="/weapon.png" alt="WeaponSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
-                                                        {charm.equivalentSlots.weaponSlot3}/{charm.equivalentSlots.weaponSlot2}/{charm.equivalentSlots.weaponSlot1}
+                                                    );
+                                                })}
+                                            </div>
+                                        </TableCell>
+                                        {mode === 'display' && (
+                                            <>
+                                                <TableCell className="text-center">
+                                                    <span className="font-medium text-primary text-sm sm:text-base">{charm.keySkillValue}</span>
+                                                </TableCell>
+                                                <TableCell className="hidden lg:table-cell text-center">
+                                                    <div className="text-sm flex flex-col md:flex-row gap-2 md:gap-4 justify-center">
+                                                        <div className="flex items-center gap-1">
+                                                            <img src="/weapon.png" alt="WeaponSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
+                                                            {charm.equivalentSlots.weaponSlot3}/{charm.equivalentSlots.weaponSlot2}/{charm.equivalentSlots.weaponSlot1}
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <img src="/armor.png" alt="ArmorSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
+                                                            {charm.equivalentSlots.armorSlot3}/{charm.equivalentSlots.armorSlot2}/{charm.equivalentSlots.armorSlot1}
+                                                        </div>
                                                     </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <img src="/armor.png" alt="ArmorSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
-                                                        {charm.equivalentSlots.armorSlot3}/{charm.equivalentSlots.armorSlot2}/{charm.equivalentSlots.armorSlot1}
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="hidden lg:table-cell text-xs text-muted-foreground text-center">
-                                                {new Date(charm.createdAt).toLocaleDateString('zh-CN')}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex gap-1 sm:gap-2 justify-end">
-                                                    {onEdit && (
+                                                </TableCell>
+                                                <TableCell className="hidden lg:table-cell text-xs text-muted-foreground text-center">
+                                                    {new Date(charm.createdAt).toLocaleDateString('zh-CN')}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex gap-1 sm:gap-2 justify-end">
+                                                        {onEdit && (
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => onEdit(charm)}
+                                                                className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
+                                                            >
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Button>
+                                                        )}
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            onClick={() => onEdit(charm)}
+                                                            onClick={() => handleDelete(charm.id)}
                                                             className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
                                                         >
-                                                            <Pencil className="h-4 w-4" />
+                                                            <Trash2 className="h-4 w-4 text-destructive" />
                                                         </Button>
-                                                    )}
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleDelete(charm.id)}
-                                                        className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
-                                                    >
-                                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </>
-                                    )}
-                                </TableRow>
-                            ))
+                                                    </div>
+                                                </TableCell>
+                                            </>
+                                        )}
+                                    </TableRow>
+                                );
+                            })
                         )}
                     </TableBody>
                 </Table>
