@@ -16,6 +16,10 @@ export interface EquipmentCardProps {
      * 可选的自定义 CSS 类名
      */
     className?: string;
+    /**
+     * 卡片变体，默认为 'full'
+     */
+    variant?: 'full' | 'compact';
 }
 
 /**
@@ -23,7 +27,7 @@ export interface EquipmentCardProps {
  *
  * 显示单个装备的卡片视图，包含图标、稀有度徽章、孔位和技能列表
  */
-export function EquipmentCard({ item, className }: EquipmentCardProps) {
+export function EquipmentCard({ item, className, variant = 'full' }: EquipmentCardProps) {
     const { skills } = useSkills();
 
     // 获取技能名称的辅助函数
@@ -83,7 +87,7 @@ export function EquipmentCard({ item, className }: EquipmentCardProps) {
                     className="equipment-icon w-6 h-6"
                 />
                 {!isCharm(item) && <h3 className="text-xs font-semibold flex-1 text-center">{item.name}</h3>}
-                {isCharm(item) && (
+                {isCharm(item) && variant === 'full' && (
                     <Badge
                         variant="outline"
                         className="text-xs"
@@ -99,46 +103,50 @@ export function EquipmentCard({ item, className }: EquipmentCardProps) {
             </div>
 
             {/* Stats: 核心属性 */}
-            {isWeapon(item) && (
-                <div className="card-stats space-y-1 mb-3 text-xs">
-                    <div className="flex justify-between">
-                        <span>攻击力</span>
-                        <span>{item.attack}</span>
-                    </div>
-                    <div className="flex justify-between">
-                        <span>会心率</span>
-                        <span>{item.critical}%</span>
-                    </div>
-                </div>
-            )}
-            {isArmor(item) && (
-                <div className="card-stats grid grid-cols-3 lg:grid-cols-6 mb-3 text-xs min-w-0">
-                    {[
-                        {
-                            key: 'defense',
-                            icon: '/skill-type/SKILL_0005.png',
-                            alt: 'Defense',
-                            value: item.defense,
-                            minWidthClass: 'min-w-[1.5rem]'
-                        },
-                        ...ARMOR_RESISTANCE_META.map((meta, index) => ({
-                            ...meta,
-                            value: item.resistance[index],
-                            minWidthClass: 'min-w-[1rem]'
-                        }))
-                    ].map((stat) => (
-                        <div
-                            key={stat.key}
-                            className={cn(
-                                'flex flex-col items-center justify-center p-0.5',
-                                stat.minWidthClass
-                            )}
-                        >
-                            <img src={stat.icon} alt={stat.alt} className="w-4 h-4" />
-                            <span className="text-center">{stat.value}</span>
+            {variant === 'full' && (
+                <>
+                    {isWeapon(item) && (
+                        <div className="card-stats space-y-1 mb-3 text-xs">
+                            <div className="flex justify-between">
+                                <span>攻击力</span>
+                                <span>{item.attack}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>会心率</span>
+                                <span>{item.critical}%</span>
+                            </div>
                         </div>
-                    ))}
-                </div>
+                    )}
+                    {isArmor(item) && (
+                        <div className="card-stats grid grid-cols-3 lg:grid-cols-6 mb-3 text-xs min-w-0">
+                            {[
+                                {
+                                    key: 'defense',
+                                    icon: '/skill-type/SKILL_0005.png',
+                                    alt: 'Defense',
+                                    value: item.defense,
+                                    minWidthClass: 'min-w-[1.5rem]'
+                                },
+                                ...ARMOR_RESISTANCE_META.map((meta, index) => ({
+                                    ...meta,
+                                    value: item.resistance[index],
+                                    minWidthClass: 'min-w-[1rem]'
+                                }))
+                            ].map((stat) => (
+                                <div
+                                    key={stat.key}
+                                    className={cn(
+                                        'flex flex-col items-center justify-center p-0.5',
+                                        stat.minWidthClass
+                                    )}
+                                >
+                                    <img src={stat.icon} alt={stat.alt} className="w-4 h-4" />
+                                    <span className="text-center">{stat.value}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </>
             )}
 
             {/* Slots: 孔位图标 */}

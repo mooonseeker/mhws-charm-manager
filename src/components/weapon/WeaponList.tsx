@@ -8,12 +8,17 @@ import { groupWeaponsIntoRows } from '@/utils/weapon-grouper';
 
 import type { Weapon, WeaponType } from '@/types';
 
+export interface WeaponListProps {
+    mode?: 'display' | 'selector';
+    onWeaponSelect?: (weapon: Weapon) => void;
+}
+
 /**
  * WeaponList 组件
  *
  * 显示武器列表，支持按武器类型筛选和搜索，使用12列网格布局展示武器
  */
-export function WeaponList() {
+export function WeaponList({ mode = 'display', onWeaponSelect }: WeaponListProps) {
     // 状态管理
     const [selectedWeaponType, setSelectedWeaponType] = useState<WeaponType>('rod');
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -115,9 +120,10 @@ export function WeaponList() {
                                     gridRowStart: rowIndex + 2, // +2 因为表头占用了第1行
                                     gridColumnStart: weapon.rarity,
                                 }}
-                                className="weapon-card-container"
+                                className={`weapon-card-container ${mode === 'selector' ? 'cursor-pointer hover:bg-accent/50 transition-colors rounded-lg' : ''}`}
+                                onClick={mode === 'selector' && onWeaponSelect ? () => onWeaponSelect(weapon) : undefined}
                             >
-                                <EquipmentCard item={weapon} />
+                                <EquipmentCard item={weapon} variant={mode === 'selector' ? 'compact' : 'full'} />
                             </div>
                         ))
                     )}

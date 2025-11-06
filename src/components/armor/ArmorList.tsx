@@ -33,7 +33,12 @@ interface GroupedArmor {
  *
  * 显示按系列分组的防具列表表格
  */
-export function ArmorList() {
+export interface ArmorListProps {
+    mode?: 'display' | 'selector';
+    onPieceSelect?: (piece: Armor) => void;
+}
+
+export function ArmorList({ mode = 'display', onPieceSelect }: ArmorListProps) {
     const { armor, loading, error } = useArmor();
     const { skills } = useSkills();
     const [searchQuery, setSearchQuery] = useState('');
@@ -171,9 +176,14 @@ export function ArmorList() {
             return <TableCell>-</TableCell>;
         }
 
+        const isSelector = mode === 'selector';
+
         return (
-            <TableCell>
-                <EquipmentCard item={piece} />
+            <TableCell
+                className={isSelector ? 'cursor-pointer hover:bg-accent/50 transition-colors' : ''}
+                onClick={isSelector && onPieceSelect ? () => onPieceSelect(piece) : undefined}
+            >
+                <EquipmentCard item={piece} variant={isSelector ? 'compact' : 'full'} />
             </TableCell>
         );
     };

@@ -21,6 +21,8 @@ import type { Charm, CharmSortField, SortDirection } from '@/types';
 
 interface CharmListProps {
     onEdit?: (charm: Charm) => void;
+    mode?: 'display' | 'selector';
+    onCharmSelect?: (charm: Charm) => void;
 }
 
 /**
@@ -32,7 +34,7 @@ interface CharmListProps {
  * - 排序字段切换
  * - 编辑和删除操作
  */
-export function CharmList({ onEdit }: CharmListProps) {
+export function CharmList({ onEdit, mode = 'display', onCharmSelect }: CharmListProps) {
     const { charms, deleteCharm } = useCharms();
     const { skills } = useSkills();
 
@@ -287,34 +289,38 @@ export function CharmList({ onEdit }: CharmListProps) {
                             </TableHead>
                             <TableHead className="text-center bg-primary text-primary-foreground">技能</TableHead>
                             <TableHead className="hidden md:table-cell text-center bg-primary text-primary-foreground">孔位</TableHead>
-                            <TableHead
-                                className="cursor-pointer text-center bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
-                                onClick={() => handleSortFieldChange('keySkillValue')}
-                            >
-                                <span className="hidden sm:inline">核心价值</span>
-                                <span className="sm:hidden">价值</span>
-                                {' '}<SortIcon field="keySkillValue" />
-                            </TableHead>
-                            <TableHead className="hidden lg:table-cell text-center bg-primary text-primary-foreground">等效孔位</TableHead>
-                            <TableHead
-                                className="hidden lg:table-cell cursor-pointer text-center bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
-                                onClick={() => handleSortFieldChange('createdAt')}
-                            >
-                                创建时间 <SortIcon field="createdAt" />
-                            </TableHead>
-                            <TableHead className="text-right bg-primary text-primary-foreground">
-                                <div className="flex items-center justify-end gap-1">
-                                    操作
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8"
-                                        onClick={() => setIsFilterVisible((prev) => !prev)}
+                            {mode === 'display' && (
+                                <>
+                                    <TableHead
+                                        className="cursor-pointer text-center bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
+                                        onClick={() => handleSortFieldChange('keySkillValue')}
                                     >
-                                        <Filter className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </TableHead>
+                                        <span className="hidden sm:inline">核心价值</span>
+                                        <span className="sm:hidden">价值</span>
+                                        {' '}<SortIcon field="keySkillValue" />
+                                    </TableHead>
+                                    <TableHead className="hidden lg:table-cell text-center bg-primary text-primary-foreground">等效孔位</TableHead>
+                                    <TableHead
+                                        className="hidden lg:table-cell cursor-pointer text-center bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
+                                        onClick={() => handleSortFieldChange('createdAt')}
+                                    >
+                                        创建时间 <SortIcon field="createdAt" />
+                                    </TableHead>
+                                    <TableHead className="text-right bg-primary text-primary-foreground">
+                                        <div className="flex items-center justify-end gap-1">
+                                            操作
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8"
+                                                onClick={() => setIsFilterVisible((prev) => !prev)}
+                                            >
+                                                <Filter className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </TableHead>
+                                </>
+                            )}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -326,7 +332,11 @@ export function CharmList({ onEdit }: CharmListProps) {
                             </TableRow>
                         ) : (
                             paginatedCharms.map((charm) => (
-                                <TableRow key={charm.id}>
+                                <TableRow
+                                    key={charm.id}
+                                    className={mode === 'selector' ? 'cursor-pointer hover:bg-accent/50 transition-colors' : ''}
+                                    onClick={mode === 'selector' && onCharmSelect ? () => onCharmSelect(charm) : undefined}
+                                >
                                     <TableCell className="text-center">
                                         <Badge variant="outline" className="text-xs" style={{
                                             color: charm.rarity === 12 ? 'black' : `var(--rarity-${charm.rarity})`,
@@ -376,46 +386,50 @@ export function CharmList({ onEdit }: CharmListProps) {
                                             })}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-center">
-                                        <span className="font-medium text-primary text-sm sm:text-base">{charm.keySkillValue}</span>
-                                    </TableCell>
-                                    <TableCell className="hidden lg:table-cell text-center">
-                                        <div className="text-sm flex flex-col md:flex-row gap-2 md:gap-4 justify-center">
-                                            <div className="flex items-center gap-1">
-                                                <img src="/weapon.png" alt="WeaponSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
-                                                {charm.equivalentSlots.weaponSlot3}/{charm.equivalentSlots.weaponSlot2}/{charm.equivalentSlots.weaponSlot1}
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <img src="/armor.png" alt="ArmorSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
-                                                {charm.equivalentSlots.armorSlot3}/{charm.equivalentSlots.armorSlot2}/{charm.equivalentSlots.armorSlot1}
-                                            </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="hidden lg:table-cell text-xs text-muted-foreground text-center">
-                                        {new Date(charm.createdAt).toLocaleDateString('zh-CN')}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex gap-1 sm:gap-2 justify-end">
-                                            {onEdit && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => onEdit(charm)}
-                                                    className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
-                                                >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                            )}
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleDelete(charm.id)}
-                                                className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
-                                        </div>
-                                    </TableCell>
+                                    {mode === 'display' && (
+                                        <>
+                                            <TableCell className="text-center">
+                                                <span className="font-medium text-primary text-sm sm:text-base">{charm.keySkillValue}</span>
+                                            </TableCell>
+                                            <TableCell className="hidden lg:table-cell text-center">
+                                                <div className="text-sm flex flex-col md:flex-row gap-2 md:gap-4 justify-center">
+                                                    <div className="flex items-center gap-1">
+                                                        <img src="/weapon.png" alt="WeaponSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
+                                                        {charm.equivalentSlots.weaponSlot3}/{charm.equivalentSlots.weaponSlot2}/{charm.equivalentSlots.weaponSlot1}
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <img src="/armor.png" alt="ArmorSlot" style={{ width: '1.5rem', height: '1.5rem' }} />
+                                                        {charm.equivalentSlots.armorSlot3}/{charm.equivalentSlots.armorSlot2}/{charm.equivalentSlots.armorSlot1}
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden lg:table-cell text-xs text-muted-foreground text-center">
+                                                {new Date(charm.createdAt).toLocaleDateString('zh-CN')}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex gap-1 sm:gap-2 justify-end">
+                                                    {onEdit && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => onEdit(charm)}
+                                                            className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleDelete(charm.id)}
+                                                        className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </>
+                                    )}
                                 </TableRow>
                             ))
                         )}
