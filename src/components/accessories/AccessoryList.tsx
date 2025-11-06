@@ -11,11 +11,14 @@ import {
 import { useAccessories } from '@/contexts';
 import { useSkills } from '@/contexts/SkillContext';
 
-import type { Accessory } from '@/types';
+import type { Accessory, SlotLevel } from '@/types';
 
-interface AccessoryListProps {
-    onEdit: (accessory: Accessory) => void;
+export interface AccessoryListProps {
+    onEdit?: (accessory: Accessory) => void;
     isLocked?: boolean;
+    mode?: 'display' | 'selector';
+    onAccessorySelect?: (accessory: Accessory) => void;
+    filterBySlotLevel?: SlotLevel;
 }
 
 /**
@@ -23,7 +26,7 @@ interface AccessoryListProps {
  * 显示所有装饰品并支持筛选、排序、编辑和删除
  */
 
-export function AccessoryList({ onEdit, isLocked }: AccessoryListProps) {
+export function AccessoryList({ onEdit, isLocked, mode = 'display', onAccessorySelect, filterBySlotLevel }: AccessoryListProps) {
     const { accessories, deleteAccessory } = useAccessories();
     const { skills } = useSkills();
     const [typeFilter, setTypeFilter] = useState<'all' | 'weapon' | 'armor'>('all');
@@ -48,6 +51,7 @@ export function AccessoryList({ onEdit, isLocked }: AccessoryListProps) {
     // 筛选装饰品
     const filteredAccessories = accessories.filter((accessory) => {
         if (typeFilter !== 'all' && accessory.type !== typeFilter) return false;
+        if (filterBySlotLevel && accessory.slotLevel > filterBySlotLevel) return false;
         if (searchQuery) {
             const keyword = searchQuery.toLowerCase();
             return accessory.name.toLowerCase().includes(keyword) ||
@@ -151,7 +155,11 @@ export function AccessoryList({ onEdit, isLocked }: AccessoryListProps) {
                             </TableRow>
                         ) : (
                             paginatedAccessories.map((accessory) => (
-                                <TableRow key={accessory.id}>
+                                <TableRow
+                                    key={accessory.id}
+                                    onClick={() => mode === 'selector' && onAccessorySelect?.(accessory)}
+                                    className={mode === 'selector' ? 'cursor-pointer hover:bg-muted/50' : ''}
+                                >
                                     <TableCell className="text-center">
                                         <div className="flex items-center justify-center">
                                             <img
@@ -199,26 +207,28 @@ export function AccessoryList({ onEdit, isLocked }: AccessoryListProps) {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <div className="flex justify-end gap-1 sm:gap-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => onEdit(accessory)}
-                                                disabled={isLocked}
-                                                className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleDelete(accessory)}
-                                                disabled={isLocked}
-                                                className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
-                                            >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
-                                        </div>
+                                        {mode === 'display' && (
+                                            <div className="flex justify-end gap-1 sm:gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => onEdit?.(accessory)}
+                                                    disabled={isLocked}
+                                                    className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(accessory)}
+                                                    disabled={isLocked}
+                                                    className="h-8 w-8 p-0 sm:h-auto sm:w-auto sm:p-2"
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            </div>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))
