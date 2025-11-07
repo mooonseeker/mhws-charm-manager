@@ -31,80 +31,84 @@ export function Settings() {
 
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-baseline">
+        <div className="h-full flex flex-col gap-6">
+            {/* 固定标题区域 */}
+            <div className="flex items-baseline flex-shrink-0">
                 <h1 className="font-bold tracking-tight">设置</h1>
                 <p className="text-foreground">管理系统设置和数据</p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-5">
-                {/* 数据统计 */}
-                <Card className="md:col-span-4">
-                    <CardHeader>
-                        <CardTitle>数据统计</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div>
-                                <p className="text-sm text-foreground">技能总数</p>
-                                <p className="text-2xl font-bold">{skills.length}</p>
+            {/* 可滚动内容区域 */}
+            <div className="flex-1 min-h-0 overflow-y-auto">
+                <div className="grid gap-6 md:grid-cols-5">
+                    {/* 数据统计 */}
+                    <Card className="md:col-span-4">
+                        <CardHeader>
+                            <CardTitle>数据统计</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div>
+                                    <p className="text-sm text-foreground">技能总数</p>
+                                    <p className="text-2xl font-bold">{skills.length}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-foreground">核心技能</p>
+                                    <p className="text-2xl font-bold">
+                                        {skills.filter((s) => s.isKey).length}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-foreground">护石总数</p>
+                                    <p className="text-2xl font-bold">{charms.length}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-foreground">平均核心技能价值</p>
+                                    <p className="text-2xl font-bold">
+                                        {charms.length > 0
+                                            ? (
+                                                charms.reduce((sum, c) => sum + c.keySkillValue, 0) /
+                                                charms.length
+                                            ).toFixed(1)
+                                            : '0'}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-sm text-foreground">核心技能</p>
-                                <p className="text-2xl font-bold">
-                                    {skills.filter((s) => s.isKey).length}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-foreground">护石总数</p>
-                                <p className="text-2xl font-bold">{charms.length}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-foreground">平均核心技能价值</p>
-                                <p className="text-2xl font-bold">
-                                    {charms.length > 0
-                                        ? (
-                                            charms.reduce((sum, c) => sum + c.keySkillValue, 0) /
-                                            charms.length
-                                        ).toFixed(1)
-                                        : '0'}
-                                </p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
 
-                {/* 重置数据 */}
-                <Card className="md:col-span-1">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-destructive">
-                            <Trash2 className="h-5 w-5" />
-                            重置数据
-                        </CardTitle>
-                        <CardDescription>
-                            清除所有数据并恢复到初始状态
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button
-                            onClick={handleReset}
-                            variant="destructive"
-                            className="w-full"
-                        >
-                            重置数据
-                        </Button>
-                        <p className="mt-2 text-xs text-muted-foreground leading-tight">
-                            ⚠️ 警告：此操作将永久删除所有数据，且无法恢复！
-                        </p>
-                    </CardContent>
-                </Card>
+                    {/* 重置数据 */}
+                    <Card className="md:col-span-1">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-destructive">
+                                <Trash2 className="h-5 w-5" />
+                                重置数据
+                            </CardTitle>
+                            <CardDescription>
+                                清除所有数据并恢复到初始状态
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button
+                                onClick={handleReset}
+                                variant="destructive"
+                                className="w-full"
+                            >
+                                重置数据
+                            </Button>
+                            <p className="mt-2 text-xs text-muted-foreground leading-tight">
+                                ⚠️ 警告：此操作将永久删除所有数据，且无法恢复！
+                            </p>
+                        </CardContent>
+                    </Card>
 
 
-                {/* 数据库管理 */}
-                <DataIO />
+                    {/* 数据库管理 */}
+                    <DataIO />
 
-                {/* 护石展示 */}
-                <CharmShowcase />
+                    {/* 护石展示 */}
+                    <CharmShowcase />
+                </div>
             </div>
         </div>
     );

@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react';
 
 import { EquipmentCard } from '@/components/equipments/EquipmentCard';
 import { Input } from '@/components/ui/input';
+import {
+    Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+} from '@/components/ui/table';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useWeapon } from '@/hooks';
 import { cn } from '@/lib/utils';
@@ -70,9 +73,9 @@ export function WeaponList({
     ];
 
     return (
-        <div className="weapon-list space-y-4">
+        <div className="h-full flex flex-col gap-4">
             {/* 菜单栏 */}
-            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm">
+            <div className="bg-card p-2 sm:p-4 rounded-lg border shadow-sm flex-shrink-0">
                 <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
                     {/* 武器类型切换 */}
                     <ToggleGroup
@@ -105,57 +108,73 @@ export function WeaponList({
             </div>
 
             {/* 武器表格 */}
-            <div className="weapon-grid bg-card rounded-lg border shadow-sm overflow-x-auto">
-                <div
-                    className="grid gap-2 p-4 min-w-max"
-                    style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(12, minmax(120px, 1fr))',
-                    }}
-                >
-                    {/* 表头：R1 到 R12 */}
-                    {Array.from({ length: 12 }, (_, i) => (
-                        <div key={`header-${i}`} className="text-center font-bold text-sm p-2">
-                            R{i + 1}
-                        </div>
-                    ))}
+            <div className="flex-1 min-h-0 bg-card rounded-lg border shadow-sm overflow-x-auto">
+                <Table>
+                    {/* 表头 */}
+                    <TableHeader>
+                        <TableRow>
+                            {Array.from({ length: 12 }, (_, i) => (
+                                <TableHead
+                                    key={`header-${i}`}
+                                    className={`text-center bg-primary text-primary-foreground ${i === 0 ? 'rounded-tl-lg' : i === 11 ? 'rounded-tr-lg' : ''
+                                        }`}
+                                >
+                                    R{i + 1}
+                                </TableHead>
+                            ))}
+                        </TableRow>
+                    </TableHeader>
 
-                    {/* 武器卡片 */}
-                    {weaponRows.map((row, rowIndex) =>
-                        row.map((weapon: Weapon) => {
-                            const isSelector = mode === 'selector';
-                            const isSelected = !!currentWeapon && currentWeapon.id === weapon.id;
-                            const isMatchingSlot = isSelector && selectingFor === 'weapon';
+                    {/* 表体 */}
+                    <TableBody>
+                        {weaponRows.map((row, rowIndex) => {
+                            // 创建包含12个单元格的数组
+                            const cells = Array(12).fill(null);
+
+                            // 将武器放置到对应的稀有度位置
+                            row.forEach((weapon: Weapon) => {
+                                cells[weapon.rarity - 1] = weapon;
+                            });
 
                             return (
-                                <div
-                                    key={weapon.id}
-                                    style={{
-                                        gridRowStart: rowIndex + 2, // +2 因为表头占用了第1行
-                                        gridColumnStart: weapon.rarity,
-                                    }}
-                                    className={cn(
-                                        'weapon-card-container',
-                                        isSelector && 'transition-colors rounded-lg',
-                                        isSelector && isMatchingSlot && 'cursor-pointer hover:bg-accent/50',
-                                        isSelector && !isMatchingSlot && 'cursor-not-allowed opacity-50'
-                                    )}
-                                    onClick={
-                                        isSelector && onWeaponSelect && isMatchingSlot
-                                            ? () => onWeaponSelect(weapon)
-                                            : undefined
-                                    }
-                                >
-                                    <EquipmentCard
-                                        item={weapon}
-                                        variant={mode === 'selector' ? 'compact' : 'full'}
-                                        isSelected={isSelected}
-                                    />
-                                </div>
+                                <TableRow key={`row-${rowIndex}`}>
+                                    {cells.map((weapon, index) => {
+                                        const isSelector = mode === 'selector';
+                                        const isSelected = !!currentWeapon && currentWeapon?.id === weapon?.id;
+                                        const isMatchingSlot = isSelector && selectingFor === 'weapon';
+
+                                        return (
+                                            <TableCell
+                                                key={`cell-${rowIndex}-${index}`}
+                                                className={cn(
+                                                    'p-2',
+                                                    isSelector && 'transition-colors rounded-lg',
+                                                    isSelector && isMatchingSlot && 'cursor-pointer hover:bg-accent/50',
+                                                    isSelector && !isMatchingSlot && 'cursor-not-allowed opacity-50'
+                                                )}
+                                                onClick={
+                                                    isSelector && onWeaponSelect && isMatchingSlot && weapon
+                                                        ? () => onWeaponSelect(weapon)
+                                                        : undefined
+                                                }
+                                            >
+                                                {weapon ? (
+                                                    <EquipmentCard
+                                                        item={weapon}
+                                                        variant={mode === 'selector' ? 'compact' : 'full'}
+                                                        isSelected={isSelected}
+                                                    />
+                                                ) : (
+                                                    <span className="text-muted-foreground">—</span>
+                                                )}
+                                            </TableCell>
+                                        );
+                                    })}
+                                </TableRow>
                             );
-                        })
-                    )}
-                </div>
+                        })}
+                    </TableBody>
+                </Table>
             </div>
         </div>
     );

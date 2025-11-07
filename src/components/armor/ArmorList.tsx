@@ -237,9 +237,9 @@ export function ArmorList({
     };
 
     return (
-        <div className="space-y-6">
+        <div className="h-full flex flex-col gap-6">
             {/* 菜单栏 */}
-            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm">
+            <div className="flex-shrink-0 bg-card p-2 sm:p-4 rounded-lg border shadow-sm">
                 <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Button
@@ -272,17 +272,17 @@ export function ArmorList({
             </div>
 
             {/* 防具表格 */}
-            <div className="bg-card rounded-lg border shadow-sm overflow-auto">
+            <div className="flex-1 min-h-0 bg-card rounded-lg border shadow-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[10%] text-center bg-primary text-primary-foreground">防具系列</TableHead>
+                            <TableHead className="w-[10%] text-center bg-primary text-primary-foreground rounded-tl-lg">防具系列</TableHead>
                             <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">头盔</TableHead>
                             <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">胸甲</TableHead>
                             <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">臂甲</TableHead>
                             <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">腰甲</TableHead>
                             <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">腿甲</TableHead>
-                            <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">全套技能</TableHead>
+                            <TableHead className="w-[15%] text-center bg-primary text-primary-foreground rounded-tr-lg">全套技能</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

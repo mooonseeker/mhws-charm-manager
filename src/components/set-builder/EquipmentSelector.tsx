@@ -27,9 +27,8 @@ export function EquipmentSelector({ selectingFor, currentEquipment, onSelect }: 
     const currentTab = getInitialTab();
 
     return (
-        <div className="border rounded-lg shadow-sm bg-background p-4 max-w-7xl h-[90vh] flex flex-col">
-            <div className="flex justify-end items-center mb-4" />
-            <div className="flex-1 overflow-y-auto mt-4">
+        <div className="h-full flex flex-col">
+            <div className="flex-1 overflow-y-auto">
                 {currentTab === 'armor' && (
                     <ArmorList
                         mode="selector"

@@ -159,8 +159,8 @@ export function DatabaseManager() {
     const addButtonText = currentDb === 'skills' ? '添加技能' : currentDb === 'accessories' ? '添加装饰品' : '添加';
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
+        <div className="h-full flex flex-col gap-6">
+            <div className="flex justify-between items-center flex-shrink-0">
                 <div className="flex items-center space-x-4">
                     <h1 className="font-bold tracking-tight">数据库管理</h1>
                     <ToggleGroup
@@ -204,24 +204,26 @@ export function DatabaseManager() {
                 </Button>
             </div>
 
-            {currentDb === 'skills' && (
-                <SkillList
-                    onEdit={(skill) => handleEdit(skill, 'skill')}
-                    isLocked={isLocked}
-                />
-            )}
-            {currentDb === 'accessories' && (
-                <AccessoryList
-                    onEdit={(accessory) => handleEdit(accessory, 'accessory')}
-                    isLocked={isLocked}
-                />
-            )}
-            {currentDb === 'armor' && (
-                <ArmorList />
-            )}
-            {currentDb === 'weapons' && (
-                <WeaponList />
-            )}
+            <div className="flex-1 min-h-0">
+                {currentDb === 'skills' && (
+                    <SkillList
+                        onEdit={(skill) => handleEdit(skill, 'skill')}
+                        isLocked={isLocked}
+                    />
+                )}
+                {currentDb === 'accessories' && (
+                    <AccessoryList
+                        onEdit={(accessory) => handleEdit(accessory, 'accessory')}
+                        isLocked={isLocked}
+                    />
+                )}
+                {currentDb === 'armor' && (
+                    <ArmorList />
+                )}
+                {currentDb === 'weapons' && (
+                    <WeaponList />
+                )}
+            </div>
 
             {editingItem?.type === 'skill' && (
                 <SkillForm

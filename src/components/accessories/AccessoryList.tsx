@@ -83,9 +83,9 @@ export function AccessoryList({ onEdit, isLocked, mode = 'display', onAccessoryS
     };
 
     return (
-        <div className="space-y-6">
+        <div className="h-full flex flex-col gap-6">
             {/* 菜单栏 */}
-            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm">
+            <div className="flex-shrink-0 bg-card p-2 sm:p-4 rounded-lg border shadow-sm">
                 <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Button
@@ -135,15 +135,15 @@ export function AccessoryList({ onEdit, isLocked, mode = 'display', onAccessoryS
             </div>
 
             {/* 装饰品表格 */}
-            <div className="bg-card rounded-lg border shadow-sm overflow-auto">
+            <div className="flex-1 min-h-0 bg-card rounded-lg border shadow-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">孔位</TableHead>
+                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground rounded-tl-lg">孔位</TableHead>
                             <TableHead className="text-center min-w-[150px] bg-primary text-primary-foreground">装饰品名称</TableHead>
                             <TableHead className="text-center min-w-[200px] bg-primary text-primary-foreground">技能</TableHead>
                             <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">类型</TableHead>
-                            <TableHead className="text-right min-w-[80px] bg-primary text-primary-foreground">操作</TableHead>
+                            <TableHead className="text-right min-w-[80px] bg-primary text-primary-foreground rounded-tr-lg">操作</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

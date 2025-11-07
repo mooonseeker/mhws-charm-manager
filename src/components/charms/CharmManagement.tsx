@@ -140,8 +140,8 @@ export function CharmManagement() {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
+        <div className="h-full flex flex-col gap-6">
+            <div className="flex justify-between items-center flex-shrink-0">
                 <div className="flex items-baseline">
                     <h1 className="font-bold tracking-tight">护石管理</h1>
                     <p className="text-foreground">
@@ -200,12 +200,14 @@ export function CharmManagement() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <CharmList
-                onEdit={(charm) => {
-                    setCharmToEdit(charm);
-                    setIsFormOpen(true);
-                }}
-            />
+            <div className="flex-1 min-h-0">
+                <CharmList
+                    onEdit={(charm) => {
+                        setCharmToEdit(charm);
+                        setIsFormOpen(true);
+                    }}
+                />
+            </div>
         </div>
     );
 }

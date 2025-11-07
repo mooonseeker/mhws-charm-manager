@@ -41,7 +41,7 @@ export function EquipmentCell({ type, isSelected, slottedEquipment, onEquipmentC
     return (
         <Card className={cn(isSelected && 'ring-2 ring-primary ring-offset-2 ring-offset-background')}>
             <CardContent className="p-2">
-                <div className="flex items-stretch gap-4 min-h-[80px]">
+                <div className="flex items-stretch gap-4">
                     {/* 左侧：图标 */}
                     <div
                         className="flex items-center justify-center cursor-pointer shrink-0 w-[12%]"

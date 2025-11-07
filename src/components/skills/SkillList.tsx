@@ -87,9 +87,9 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="h-full flex flex-col gap-6">
             {/* 菜单栏 */}
-            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm">
+            <div className="flex-shrink-0 bg-card p-2 sm:p-4 rounded-lg border shadow-sm">
                 <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Button
@@ -166,17 +166,17 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
             </div>
 
             {/* 技能表格 */}
-            <div className="bg-card rounded-lg border shadow-sm overflow-auto">
+            <div className="flex-1 min-h-0 bg-card rounded-lg border shadow-sm">
                 <Table className="w-full table-fixed">
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="text-center w-[5%] bg-primary text-primary-foreground">核心</TableHead>
+                            <TableHead className="text-center w-[5%] bg-primary text-primary-foreground rounded-tl-lg">核心</TableHead>
                             <TableHead className="text-center w-[23%] bg-primary text-primary-foreground">技能名称</TableHead>
                             <TableHead className="text-center w-[32%] bg-primary text-primary-foreground hidden lg:table-cell">技能描述</TableHead>
                             <TableHead className="text-center w-[12%] bg-primary text-primary-foreground hidden md:table-cell">分类</TableHead>
                             <TableHead className="text-center w-[8%] bg-primary text-primary-foreground">装饰品</TableHead>
                             <TableHead className="text-center w-[8%] bg-primary text-primary-foreground">最大等级</TableHead>
-                            <TableHead className="text-right w-[12%] bg-primary text-primary-foreground">操作</TableHead>
+                            <TableHead className="text-right w-[12%] bg-primary text-primary-foreground rounded-tr-lg">操作</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

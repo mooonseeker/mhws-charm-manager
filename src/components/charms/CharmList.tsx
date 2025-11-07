@@ -185,9 +185,9 @@ export function CharmList({
     };
 
     return (
-        <div className="space-y-6">
+        <div className="h-full flex flex-col gap-6">
             {/* 菜单栏 */}
-            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm">
+            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm flex-shrink-0">
                 <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Button
@@ -238,7 +238,7 @@ export function CharmList({
 
             {/* 可折叠筛选器 */}
             {isFilterVisible && (
-                <div className="p-4 sm:p-6 bg-muted rounded-lg space-y-4">
+                <div className="p-4 sm:p-6 bg-muted rounded-lg space-y-4 flex-shrink-0">
                     <h3 className="font-medium text-base sm:text-lg">筛选条件</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                         <div className="space-y-3">
@@ -285,12 +285,12 @@ export function CharmList({
             )}
 
             {/* 护石列表 */}
-            <div className="rounded-lg border shadow-sm overflow-hidden">
+            <div className="flex-1 min-h-0 rounded-lg border shadow-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead
-                                className="cursor-pointer text-center bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
+                                className="cursor-pointer text-center bg-primary text-primary-foreground rounded-tl-lg hover:bg-accent hover:text-accent-foreground"
                                 onClick={() => handleSortFieldChange('rarity')}
                             >
                                 <span className="hidden sm:inline">稀有度</span>
@@ -316,7 +316,7 @@ export function CharmList({
                                     >
                                         创建时间 <SortIcon field="createdAt" />
                                     </TableHead>
-                                    <TableHead className="text-right bg-primary text-primary-foreground">
+                                    <TableHead className="text-right bg-primary text-primary-foreground rounded-tr-lg">
                                         <div className="flex items-center justify-end gap-1">
                                             操作
                                             <Button
