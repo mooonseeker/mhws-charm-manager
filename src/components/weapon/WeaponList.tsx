@@ -8,12 +8,12 @@ import { cn } from '@/lib/utils';
 import { groupWeaponsIntoRows } from '@/utils/weapon-grouper';
 
 import type { Weapon, WeaponType } from '@/types';
-import type { EquipmentSlotType } from '@/types/set-builder';
+import type { EquipmentCellType } from '@/types/set-builder';
 
 export interface WeaponListProps {
     mode?: 'display' | 'selector';
     onWeaponSelect?: (weapon: Weapon) => void;
-    selectingFor?: EquipmentSlotType; // 新增
+    selectingFor?: EquipmentCellType; // 新增
     currentWeapon?: Weapon | null;    // 新增
 }
 

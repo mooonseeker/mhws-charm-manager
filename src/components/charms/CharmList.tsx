@@ -19,13 +19,13 @@ import { CHARMS_PER_PAGE } from '@/types/constants';
 import { sortCharms } from '@/utils';
 
 import type { Charm, CharmSortField, SortDirection } from '@/types';
-import type { EquipmentSlotType } from '@/types/set-builder';
+import type { EquipmentCellType } from '@/types/set-builder';
 
 interface CharmListProps {
     onEdit?: (charm: Charm) => void;
     mode?: 'display' | 'selector';
     onCharmSelect?: (charm: Charm) => void;
-    selectingFor?: EquipmentSlotType; // 新增
+    selectingFor?: EquipmentCellType; // 新增
     currentCharm?: Charm | null;      // 新增
 }
 

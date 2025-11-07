@@ -1,4 +1,4 @@
 export * from './SetBuilder';
-export * from './EquipmentSlot';
+export * from './EquipmentCell';
 export * from './EquipmentSelector';
 export * from './SetSummary';

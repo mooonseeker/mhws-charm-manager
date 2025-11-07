@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { ARMOR_SERIES_PER_PAGE } from '@/types/constants';
 
 import type { Armor, SkillWithLevel } from '@/types';
-import type { EquipmentSlotType } from '@/types/set-builder';
+import type { EquipmentCellType } from '@/types/set-builder';
 
 /**
  * 按系列分组的防具数据结构
@@ -38,7 +38,7 @@ interface GroupedArmor {
 export interface ArmorListProps {
     mode?: 'display' | 'selector';
     onPieceSelect?: (piece: Armor) => void;
-    selectingFor?: EquipmentSlotType; // 新增
+    selectingFor?: EquipmentCellType; // 新增
     currentPiece?: Armor | null;      // 新增
 }
 

@@ -3,22 +3,22 @@ import { useState } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 import { AccessorySelector } from './AccessorySelector';
+import { EquipmentCell } from './EquipmentCell';
 import { EquipmentSelector } from './EquipmentSelector';
-import { EquipmentSlot } from './EquipmentSlot';
 import { SetSummary } from './SetSummary';
 
-import type { EquipmentSet, EquipmentSlotType } from '@/types/set-builder';
+import type { EquipmentSet, EquipmentCellType } from '@/types/set-builder';
 import type { Armor, Charm, Weapon, Accessory, Slot } from '@/types';
-const slotTypes: EquipmentSlotType[] = ['weapon', 'helm', 'body', 'arm', 'waist', 'leg', 'charm'];
+const slotTypes: EquipmentCellType[] = ['weapon', 'helm', 'body', 'arm', 'waist', 'leg', 'charm'];
 
 export function SetBuilder() {
     const [mode, setMode] = useState<'manual' | 'auto'>('manual');
     const [equipmentSet, setEquipmentSet] = useState<EquipmentSet>({});
     const [isAccSelectorOpen, setIsAccSelectorOpen] = useState(false);
-    const [selectingEqFor, setSelectingEqFor] = useState<EquipmentSlotType | null>(null);
-    const [selectingAccFor, setSelectingAccFor] = useState<{ slotType: EquipmentSlotType; slotIndex: number; slot: Slot } | null>(null);
+    const [selectingEqFor, setSelectingEqFor] = useState<EquipmentCellType | null>(null);
+    const [selectingAccFor, setSelectingAccFor] = useState<{ slotType: EquipmentCellType; slotIndex: number; slot: Slot } | null>(null);
 
-    const handleEqSlotClick = (type: EquipmentSlotType) => {
+    const handleEqSlotClick = (type: EquipmentCellType) => {
         if (selectingEqFor === type) {
             setSelectingEqFor(null);
         } else {
@@ -33,7 +33,7 @@ export function SetBuilder() {
         setSelectingEqFor(null);
     };
 
-    const handleSlotClick = (slotType: EquipmentSlotType, slotIndex: number, slot: Slot) => {
+    const handleSlotClick = (slotType: EquipmentCellType, slotIndex: number, slot: Slot) => {
         setSelectingAccFor({ slotType, slotIndex, slot });
         setIsAccSelectorOpen(true);
     };
@@ -68,7 +68,7 @@ export function SetBuilder() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-1 space-y-4">
                     {slotTypes.map(type => (
-                        <EquipmentSlot
+                        <EquipmentCell
                             key={type}
                             type={type}
                             slottedEquipment={equipmentSet[type as keyof EquipmentSet]}

@@ -1,7 +1,7 @@
 import type { Accessory, Armor, Charm, Weapon, ArmorType } from '@/types';
 
-/** 装备槽位类型 */
-export type EquipmentSlotType = ArmorType | 'weapon' | 'charm';
+/** 装备栏类型 */
+export type EquipmentCellType = ArmorType | 'weapon' | 'charm';
 
 /** 带有镶嵌信息的装备槽 */
 export interface SlottedEquipment<T extends Weapon | Armor | Charm> {

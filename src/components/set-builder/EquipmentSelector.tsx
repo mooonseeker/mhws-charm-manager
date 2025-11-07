@@ -6,10 +6,10 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { WeaponList } from '@/components/weapon';
 
 import type { Armor, Charm, Weapon } from '@/types';
-import type { EquipmentSlotType } from '@/types/set-builder';
+import type { EquipmentCellType } from '@/types/set-builder';
 
 export interface EquipmentSelectorProps {
-    selectingFor: EquipmentSlotType;
+    selectingFor: EquipmentCellType;
     currentEquipment?: Armor | Weapon | Charm | null;
     onSelect: (item: Armor | Weapon | Charm) => void;
     onClose: () => void;
