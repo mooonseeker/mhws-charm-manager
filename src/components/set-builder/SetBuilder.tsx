@@ -9,7 +9,7 @@ import { SetSummary } from './SetSummary';
 
 import type { EquipmentSet, EquipmentCellType } from '@/types/set-builder';
 import type { Armor, Charm, Weapon, Accessory, Slot } from '@/types';
-const slotTypes: EquipmentCellType[] = ['weapon', 'helm', 'body', 'arm', 'waist', 'leg', 'charm'];
+const cellTypes: EquipmentCellType[] = ['weapon', 'helm', 'body', 'arm', 'waist', 'leg', 'charm'];
 
 export function SetBuilder() {
     const [mode, setMode] = useState<'manual' | 'auto'>('manual');
@@ -67,10 +67,11 @@ export function SetBuilder() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-1 space-y-4">
-                    {slotTypes.map(type => (
+                    {cellTypes.map(type => (
                         <EquipmentCell
                             key={type}
                             type={type}
+                            isSelected={selectingEqFor === type}
                             slottedEquipment={equipmentSet[type as keyof EquipmentSet]}
                             onEquipmentClick={() => handleEqSlotClick(type)}
                             onSlotClick={(slotIndex, slot) => handleSlotClick(type, slotIndex, slot)}
@@ -84,7 +85,6 @@ export function SetBuilder() {
                             selectingFor={selectingEqFor!}
                             currentEquipment={equipmentSet[selectingEqFor as keyof EquipmentSet]?.equipment}
                             onSelect={handleEqSelect}
-                            onClose={() => setSelectingEqFor(null)}
                         />
                     ) : (
                         <SetSummary equipmentSet={equipmentSet} />

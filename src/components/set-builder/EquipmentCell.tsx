@@ -1,10 +1,12 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 import type { Slot, Weapon, Armor, Charm } from '@/types';
 import type { EquipmentCellType, SlottedEquipment } from '@/types/set-builder';
 
 export interface EquipmentCellProps {
     type: EquipmentCellType;
+    isSelected?: boolean;
     slottedEquipment?: SlottedEquipment<Weapon | Armor | Charm>;
     onEquipmentClick: () => void;
     onSlotClick: (slotIndex: number, slot: Slot) => void;
@@ -31,13 +33,13 @@ const getAccessoryIcon = (slotType: 'weapon' | 'armor', level: number) => {
     return `/slot/${slotType}-slot-${validLevel}.png`;
 };
 
-export function EquipmentCell({ type, slottedEquipment, onEquipmentClick, onSlotClick }: EquipmentCellProps) {
+export function EquipmentCell({ type, isSelected, slottedEquipment, onEquipmentClick, onSlotClick }: EquipmentCellProps) {
     const label = typeToLabel[type];
     const iconPath = getIconPath(type);
     const { equipment, accessories } = slottedEquipment || {};
 
     return (
-        <Card>
+        <Card className={cn(isSelected && 'ring-2 ring-primary ring-offset-2 ring-offset-background')}>
             <CardContent className="p-2">
                 <div className="flex items-stretch gap-4 min-h-[80px]">
                     {/* 左侧：图标 */}
