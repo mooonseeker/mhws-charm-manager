@@ -66,7 +66,7 @@ export function SetBuilder() {
             </div>
 
             <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-8">
-                <div className="w-full lg:w-1/3 h-full flex flex-col justify-between items-start">
+                <div className="w-full lg:w-9/20 h-full flex flex-col justify-between items-start gap-2">
                     {cellTypes.map(type => (
                         <EquipmentCell
                             key={type}
@@ -79,7 +79,7 @@ export function SetBuilder() {
                     ))}
                 </div>
 
-                <div className="w-full lg:w-2/3 h-full overflow-y-auto">
+                <div className="w-full lg:w-11/20 h-full overflow-y-auto">
                     {selectingEqFor ? (
                         <EquipmentSelector
                             selectingFor={selectingEqFor!}

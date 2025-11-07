@@ -39,40 +39,36 @@ export function EquipmentCell({ type, isSelected, slottedEquipment, onEquipmentC
     const { equipment, accessories } = slottedEquipment || {};
 
     return (
-        <Card className={cn(isSelected && 'ring-2 ring-primary ring-offset-2 ring-offset-background')}>
-            <CardContent className="p-2">
-                <div className="flex items-stretch gap-4">
-                    {/* 左侧：图标 */}
-                    <div
-                        className="flex items-center justify-center cursor-pointer shrink-0 w-[12%]"
-                        onClick={onEquipmentClick}
-                    >
-                        <img
-                            src={iconPath}
-                            alt={label}
-                            className="max-w-full max-h-full object-contain"
-                            style={{ maxWidth: '80%', maxHeight: '80%' }}
-                        />
-                    </div>
+        <Card className={cn(
+            "h-full w-full", // 占满父容器
+            isSelected && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+        )}>
+            <CardContent className="p-2 h-full w-full flex items-stretch gap-2" onClick={onEquipmentClick}>
+                {/* 左侧图标区 */}
+                <div className="w-12 aspect-square self-center flex items-center justify-center p-1 shrink-0">
+                    <img src={iconPath} alt={label} className="max-w-full max-h-full object-contain" />
+                </div>
+                <div className="border-l border-border/50" />
 
-                    {/* 中间：装备信息 */}
-                    <div
-                        className="flex flex-col justify-center cursor-pointer gap-1 border-l border-border pl-4 w-[38%] lg:w-[48%]"
-                        onClick={onEquipmentClick}
-                    >
-                        <p className="text-sm text-muted-foreground">{label}</p>
-                        <div className="border-t border-border/50 my-1" />
-                        {equipment ? (
-                            <h3 className="font-semibold truncate">
-                                {'name' in equipment ? equipment.name : '收藏护石'}
+                {/* 右侧内容区 */}
+                <div className="flex-1 flex flex-col min-w-0">
+                    {/* 上半部分: Label + Name */}
+                    <div className="flex-1 flex items-center gap-2" >
+                        <div className="flex-[1] flex justify-center items-center">
+                            <p className="text-sm text-muted-foreground">{label}</p>
+                        </div>
+                        <div className="border-l border-border/20 self-stretch my-1" />
+                        <div className="flex-[5] flex items-center px-2">
+                            <h3 className="font-semibold truncate text-sm">
+                                {equipment ? ('name' in equipment ? equipment.name : '收藏护石') : '点击选择...'}
                             </h3>
-                        ) : (
-                            <p className="text-foreground/80">点击选择...</p>
-                        )}
+                        </div>
                     </div>
 
-                    {/* 右侧：孔位 */}
-                    <div className="flex-1 flex flex-col gap-1 lg:flex-none lg:w-[40%]">
+                    <div className="border-t border-border/50" />
+
+                    {/* 下半部分: 孔位 */}
+                    <div className="flex-1 flex items-center justify-around gap-1 p-1">
                         {Array.from({ length: 3 }).map((_, index) => {
                             const slot = equipment?.slots[index];
                             const accessory = accessories?.[index];
@@ -81,27 +77,28 @@ export function EquipmentCell({ type, isSelected, slottedEquipment, onEquipmentC
                             return (
                                 <div
                                     key={index}
-                                    onClick={() => canClick && onSlotClick(index, slot)}
-                                    className={`flex items-center justify-center flex-1 px-2 py-1 rounded-md bg-muted/40 ${canClick ? 'cursor-pointer hover:bg-muted' : ''
-                                        }`}
+                                    onClick={(e) => {
+                                        if (!canClick) return;
+                                        e.stopPropagation(); // 阻止冒泡到 CardContent 的 onEquipmentClick
+                                        onSlotClick(index, slot);
+                                    }}
+                                    className={`flex-1 h-full flex items-center gap-1 rounded-sm bg-muted/30 ${canClick ? 'cursor-pointer hover:bg-muted' : ''}`}
                                 >
-                                    {slot ? (
-                                        <div className="flex items-center justify-center w-full">
+                                    <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                                        {slot && (
                                             <img
                                                 src={getAccessoryIcon(slot.type, slot.level)}
                                                 alt={`孔位 ${slot.level}`}
-                                                className="shrink-0 mr-2"
-                                                style={{ width: '1rem', height: '1rem' }}
+                                                className="max-w-full max-h-full object-contain"
                                             />
-                                            {accessory ? (
-                                                <span className="text-sm truncate text-center flex-1">{accessory.name}</span>
-                                            ) : (
-                                                <span className="text-sm text-muted-foreground text-center flex-1">——————</span>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div className="w-full h-full" />
-                                    )}
+                                        )}
+                                    </div>
+
+                                    <div className="flex-1 flex justify-center items-center min-w-0">
+                                        <span className="text-xs truncate">
+                                            {slot ? (accessory ? accessory.name : '————') : ''}
+                                        </span>
+                                    </div>
                                 </div>
                             );
                         })}
