@@ -19,6 +19,8 @@ export interface AccessoryListProps {
     mode?: 'display' | 'selector';
     onAccessorySelect?: (accessory: Accessory) => void;
     filterBySlotLevel?: SlotLevel;
+    /** 按孔位类型过滤：用于区分武器孔位/防具孔位装饰品 */
+    filterBySlotType?: 'weapon' | 'armor';
 }
 
 /**
@@ -26,7 +28,14 @@ export interface AccessoryListProps {
  * 显示所有装饰品并支持筛选、排序、编辑和删除
  */
 
-export function AccessoryList({ onEdit, isLocked, mode = 'display', onAccessorySelect, filterBySlotLevel }: AccessoryListProps) {
+export function AccessoryList({
+    onEdit,
+    isLocked,
+    mode = 'display',
+    onAccessorySelect,
+    filterBySlotLevel,
+    filterBySlotType,
+}: AccessoryListProps) {
     const { accessories, deleteAccessory } = useAccessories();
     const { skills } = useSkills();
     const [typeFilter, setTypeFilter] = useState<'all' | 'weapon' | 'armor'>('all');
@@ -50,7 +59,13 @@ export function AccessoryList({ onEdit, isLocked, mode = 'display', onAccessoryS
 
     // 筛选装饰品
     const filteredAccessories = accessories.filter((accessory) => {
-        if (typeFilter !== 'all' && accessory.type !== typeFilter) return false;
+        // 显式孔位类型过滤（用于配装器：区分武器孔/防具孔）
+        if (filterBySlotType && accessory.type !== filterBySlotType) return false;
+
+        // 顶部按钮的类型过滤（仅在未指定filterBySlotType时由用户切换）
+        if (!filterBySlotType && typeFilter !== 'all' && accessory.type !== typeFilter) return false;
+
+        // 孔位等级过滤：装饰品需要的等级不得高于孔位等级
         if (filterBySlotLevel && accessory.slotLevel > filterBySlotLevel) return false;
         if (searchQuery) {
             const keyword = searchQuery.toLowerCase();
@@ -88,36 +103,56 @@ export function AccessoryList({ onEdit, isLocked, mode = 'display', onAccessoryS
             <div className="flex-shrink-0 bg-card p-2 sm:p-4 rounded-lg border shadow-sm">
                 <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                        <Button
-                            variant={typeFilter === 'all' ? 'default' : 'outline'}
-                            size="icon"
-                            onClick={() => setTypeFilter('all')}
-                            title="全部"
-                        >
-                            <List className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant={typeFilter === 'weapon' ? 'default' : 'outline'}
-                            size="icon"
-                            onClick={() => setTypeFilter('weapon')}
-                            title="武器珠"
-                        >
-                            <img src="/weapon.png" alt="武器" className="h-5 w-5" />
-                        </Button>
-                        <Button
-                            variant={typeFilter === 'armor' ? 'default' : 'outline'}
-                            size="icon"
-                            onClick={() => setTypeFilter('armor')}
-                            title="防具珠"
-                        >
-                            <img src="/armor.png" alt="防具" className="h-5 w-5" />
-                        </Button>
+                        {filterBySlotType ? (
+                            <Button
+                                variant="default"
+                                size="icon"
+                                disabled
+                                title={filterBySlotType === 'weapon' ? '武器珠' : '防具珠'}
+                            >
+                                <img
+                                    src={filterBySlotType === 'weapon' ? '/weapon.png' : '/armor.png'}
+                                    alt={filterBySlotType === 'weapon' ? '武器' : '防具'}
+                                    className="h-5 w-5"
+                                />
+                            </Button>
+                        ) : (
+                            <>
+                                <Button
+                                    variant={typeFilter === 'all' ? 'default' : 'outline'}
+                                    size="icon"
+                                    onClick={() => setTypeFilter('all')}
+                                    title="全部"
+                                >
+                                    <List className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant={typeFilter === 'weapon' ? 'default' : 'outline'}
+                                    size="icon"
+                                    onClick={() => setTypeFilter('weapon')}
+                                    title="武器珠"
+                                >
+                                    <img src="/weapon.png" alt="武器" className="h-5 w-5" />
+                                </Button>
+                                <Button
+                                    variant={typeFilter === 'armor' ? 'default' : 'outline'}
+                                    size="icon"
+                                    onClick={() => setTypeFilter('armor')}
+                                    title="防具珠"
+                                >
+                                    <img src="/armor.png" alt="防具" className="h-5 w-5" />
+                                </Button>
+                            </>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-4 justify-end">
-                        <div className="text-muted-foreground text-sm">
-                            共 {filteredAccessories.length} 种装饰品
-                        </div>
+                        {/* selector模式下隐藏数量信息 */}
+                        {mode !== 'selector' && (
+                            <div className="text-muted-foreground text-sm">
+                                共 {filteredAccessories.length} 种装饰品
+                            </div>
+                        )}
                         <Input
                             type="text"
                             placeholder="搜索装饰品名称或技能..."

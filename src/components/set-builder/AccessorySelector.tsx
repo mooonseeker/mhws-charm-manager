@@ -1,5 +1,5 @@
 import { AccessoryList } from '@/components/accessories';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 import type { Accessory, Slot } from '@/types';
 
@@ -16,14 +16,12 @@ export function AccessorySelector({ open, onOpenChange, onSelect, slot }: Access
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
-                <DialogHeader>
-                    <DialogTitle>选择 {slot.level} 级装饰品</DialogTitle>
-                </DialogHeader>
                 <div className="flex-1 overflow-y-auto mt-4">
                     <AccessoryList
                         mode="selector"
                         onAccessorySelect={onSelect}
                         filterBySlotLevel={slot.level}
+                        filterBySlotType={slot.type}
                     />
                 </div>
             </DialogContent>
