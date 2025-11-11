@@ -177,14 +177,21 @@ export function AccessoryList({
                             <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground rounded-tl-lg">孔位</TableHead>
                             <TableHead className="text-center min-w-[150px] bg-primary text-primary-foreground">装饰品名称</TableHead>
                             <TableHead className="text-center min-w-[200px] bg-primary text-primary-foreground">技能</TableHead>
-                            <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">类型</TableHead>
-                            <TableHead className="text-right min-w-[80px] bg-primary text-primary-foreground rounded-tr-lg">操作</TableHead>
+                            {mode !== 'selector' && (
+                                <TableHead className="text-center min-w-[80px] bg-primary text-primary-foreground">类型</TableHead>
+                            )}
+                            {mode !== 'selector' && (
+                                <TableHead className="text-right min-w-[80px] bg-primary text-primary-foreground rounded-tr-lg">操作</TableHead>
+                            )}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredAccessories.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                <TableCell
+                                    colSpan={mode === 'selector' ? 3 : 5}
+                                    className="text-center py-8 text-muted-foreground"
+                                >
                                     暂无装饰品数据
                                 </TableCell>
                             </TableRow>
@@ -236,13 +243,15 @@ export function AccessoryList({
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-center">
-                                        <Badge variant="outline" className="text-center text-xs">
-                                            {accessory.type === 'weapon' ? '武器' : '防具'}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {mode === 'display' && (
+                                    {mode !== 'selector' && (
+                                        <TableCell className="text-center">
+                                            <Badge variant="outline" className="text-center text-xs">
+                                                {accessory.type === 'weapon' ? '武器' : '防具'}
+                                            </Badge>
+                                        </TableCell>
+                                    )}
+                                    {mode !== 'selector' && (
+                                        <TableCell className="text-right">
                                             <div className="flex justify-end gap-1 sm:gap-2">
                                                 <Button
                                                     variant="ghost"
@@ -263,8 +272,8 @@ export function AccessoryList({
                                                     <Trash2 className="h-4 w-4 text-destructive" />
                                                 </Button>
                                             </div>
-                                        )}
-                                    </TableCell>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             ))
                         )}

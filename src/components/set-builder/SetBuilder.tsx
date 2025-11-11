@@ -2,45 +2,47 @@ import { useState } from 'react';
 
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-import { AccessorySelector } from './AccessorySelector';
 import { EquipmentCell } from './EquipmentCell';
-import { EquipmentSelector } from './EquipmentSelector';
+import { AccessorySelector, EquipmentSelector } from './EquipmentSelector';
 import { SetSummary } from './SetSummary';
 
 import type { EquipmentSet, EquipmentCellType } from '@/types/set-builder';
 import type { Armor, Charm, Weapon, Accessory, Slot } from '@/types';
 const cellTypes: EquipmentCellType[] = ['weapon', 'helm', 'body', 'arm', 'waist', 'leg', 'charm'];
 
+type SelectionContext =
+    | { type: 'equipment'; equipmentType: EquipmentCellType }
+    | { type: 'accessory'; slotType: EquipmentCellType; slotIndex: number; slot: Slot };
+
 export function SetBuilder() {
     const [mode, setMode] = useState<'manual' | 'auto'>('manual');
     const [equipmentSet, setEquipmentSet] = useState<EquipmentSet>({});
-    const [isAccSelectorOpen, setIsAccSelectorOpen] = useState(false);
-    const [selectingEqFor, setSelectingEqFor] = useState<EquipmentCellType | null>(null);
-    const [selectingAccFor, setSelectingAccFor] = useState<{ slotType: EquipmentCellType; slotIndex: number; slot: Slot } | null>(null);
+    const [selectionContext, setSelectionContext] = useState<SelectionContext | null>(null);
 
     const handleEqSlotClick = (type: EquipmentCellType) => {
-        if (selectingEqFor === type) {
-            setSelectingEqFor(null);
+        if (selectionContext?.type === 'equipment' && selectionContext.equipmentType === type) {
+            setSelectionContext(null);
         } else {
-            setSelectingEqFor(type);
+            setSelectionContext({ type: 'equipment', equipmentType: type });
         }
     };
 
     const handleEqSelect = (item: Armor | Weapon | Charm) => {
-        if (!selectingEqFor) return;
+        if (!selectionContext || selectionContext.type !== 'equipment') return;
+
         const newSlottedEq = { equipment: item, accessories: Array(item.slots.length).fill(null) };
-        setEquipmentSet(prev => ({ ...prev, [selectingEqFor]: newSlottedEq }));
-        setSelectingEqFor(null);
+        setEquipmentSet(prev => ({ ...prev, [selectionContext.equipmentType]: newSlottedEq }));
+        setSelectionContext(null);
     };
 
     const handleSlotClick = (slotType: EquipmentCellType, slotIndex: number, slot: Slot) => {
-        setSelectingAccFor({ slotType, slotIndex, slot });
-        setIsAccSelectorOpen(true);
+        setSelectionContext({ type: 'accessory', slotType, slotIndex, slot });
     };
 
     const handleAccessorySelect = (accessory: Accessory) => {
-        if (!selectingAccFor) return;
-        const { slotType, slotIndex } = selectingAccFor;
+        if (!selectionContext || selectionContext.type !== 'accessory') return;
+
+        const { slotType, slotIndex } = selectionContext;
 
         setEquipmentSet(prev => {
             const newSet = { ...prev };
@@ -52,7 +54,8 @@ export function SetBuilder() {
             }
             return newSet;
         });
-        setIsAccSelectorOpen(false);
+
+        setSelectionContext(null);
     };
 
     return (
@@ -71,7 +74,10 @@ export function SetBuilder() {
                         <EquipmentCell
                             key={type}
                             type={type}
-                            isSelected={selectingEqFor === type}
+                            isSelected={
+                                selectionContext?.type === 'equipment' &&
+                                selectionContext.equipmentType === type
+                            }
                             slottedEquipment={equipmentSet[type as keyof EquipmentSet]}
                             onEquipmentClick={() => handleEqSlotClick(type)}
                             onSlotClick={(slotIndex, slot) => handleSlotClick(type, slotIndex, slot)}
@@ -80,24 +86,24 @@ export function SetBuilder() {
                 </div>
 
                 <div className="w-full lg:w-11/20 h-full overflow-y-auto">
-                    {selectingEqFor ? (
-                        <EquipmentSelector
-                            selectingFor={selectingEqFor!}
-                            currentEquipment={equipmentSet[selectingEqFor as keyof EquipmentSet]?.equipment}
-                            onSelect={handleEqSelect}
-                        />
+                    {selectionContext ? (
+                        selectionContext.type === 'equipment' ? (
+                            <EquipmentSelector
+                                selectingFor={selectionContext.equipmentType}
+                                currentEquipment={equipmentSet[selectionContext.equipmentType]?.equipment}
+                                onSelect={handleEqSelect}
+                            />
+                        ) : (
+                            <AccessorySelector
+                                slot={selectionContext.slot}
+                                onAccessorySelect={handleAccessorySelect}
+                            />
+                        )
                     ) : (
                         <SetSummary equipmentSet={equipmentSet} />
                     )}
                 </div>
             </div>
-
-            <AccessorySelector
-                open={isAccSelectorOpen}
-                onOpenChange={setIsAccSelectorOpen}
-                onSelect={handleAccessorySelect}
-                slot={selectingAccFor?.slot ?? null}
-            />
         </div>
     );
 }

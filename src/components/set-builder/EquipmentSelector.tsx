@@ -1,8 +1,9 @@
+import { AccessoryList } from '@/components/accessories';
 import { ArmorList } from '@/components/armor';
 import { CharmList } from '@/components/charms';
 import { WeaponList } from '@/components/weapon';
 
-import type { Armor, Charm, Weapon } from '@/types';
+import type { Armor, Charm, Weapon, Accessory, Slot } from '@/types';
 import type { EquipmentCellType } from '@/types/set-builder';
 
 export interface EquipmentSelectorProps {
@@ -11,8 +12,12 @@ export interface EquipmentSelectorProps {
     onSelect: (item: Armor | Weapon | Charm) => void;
 }
 
+interface AccessorySelectorProps {
+    slot: Slot;
+    onAccessorySelect: (accessory: Accessory) => void;
+}
+
 export function EquipmentSelector({ selectingFor, currentEquipment, onSelect }: EquipmentSelectorProps) {
-    // 根据 selectingFor 决定初始标签页
     const getInitialTab = () => {
         if (['helm', 'body', 'arm', 'waist', 'leg'].includes(selectingFor)) {
             return 'armor';
@@ -21,7 +26,7 @@ export function EquipmentSelector({ selectingFor, currentEquipment, onSelect }: 
         } else if (selectingFor === 'charm') {
             return 'charm';
         }
-        return 'armor'; // 默认值
+        return 'armor';
     };
 
     const currentTab = getInitialTab();
@@ -53,6 +58,21 @@ export function EquipmentSelector({ selectingFor, currentEquipment, onSelect }: 
                         currentCharm={currentEquipment as Charm}
                     />
                 )}
+            </div>
+        </div>
+    );
+}
+
+export function AccessorySelector({ slot, onAccessorySelect }: AccessorySelectorProps) {
+    return (
+        <div className="h-full flex flex-col">
+            <div className="flex-1 overflow-y-auto">
+                <AccessoryList
+                    mode="selector"
+                    onAccessorySelect={onAccessorySelect}
+                    filterBySlotLevel={slot.level}
+                    filterBySlotType={slot.type}
+                />
             </div>
         </div>
     );
