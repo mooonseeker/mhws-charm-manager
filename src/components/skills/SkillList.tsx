@@ -1,4 +1,4 @@
-import { Pencil, Star, Trash2 } from 'lucide-react';
+import { List, Pencil, Star, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -94,44 +94,27 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Button
                             variant={categoryFilter === 'all' ? 'default' : 'outline'}
-                            size="sm"
+                            size="icon"
                             onClick={() => setCategoryFilter('all')}
-                            className="text-xs sm:text-sm"
+                            title="全部技能"
                         >
-                            全部
+                            <List className="h-4 w-4" />
                         </Button>
-                        <Button
-                            variant={categoryFilter === 'weapon' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setCategoryFilter('weapon')}
-                            className="text-xs sm:text-sm"
-                        >
-                            武器
-                        </Button>
-                        <Button
-                            variant={categoryFilter === 'armor' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setCategoryFilter('armor')}
-                            className="text-xs sm:text-sm"
-                        >
-                            防具
-                        </Button>
-                        <Button
-                            variant={categoryFilter === 'series' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setCategoryFilter('series')}
-                            className="text-xs sm:text-sm"
-                        >
-                            系列
-                        </Button>
-                        <Button
-                            variant={categoryFilter === 'group' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setCategoryFilter('group')}
-                            className="text-xs sm:text-sm"
-                        >
-                            组合
-                        </Button>
+                        {(['weapon', 'armor', 'series', 'group'] as SkillCategory[]).map((category) => (
+                            <Button
+                                key={category}
+                                variant={categoryFilter === category ? 'default' : 'outline'}
+                                size="icon"
+                                onClick={() => setCategoryFilter(category)}
+                                title={SKILL_CATEGORY_LABELS[category]}
+                            >
+                                <img
+                                    src={`/skill-category/${category}.png`}
+                                    alt={SKILL_CATEGORY_LABELS[category]}
+                                    className="h-6 w-6"
+                                />
+                            </Button>
+                        ))}
                         <div className="w-2"></div>
                         <div className="flex items-center gap-2">
                             <Checkbox

@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from 'lucide-react';
+import { List, Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -90,27 +90,27 @@ export function AccessoryList({ onEdit, isLocked, mode = 'display', onAccessoryS
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Button
                             variant={typeFilter === 'all' ? 'default' : 'outline'}
-                            size="sm"
+                            size="icon"
                             onClick={() => setTypeFilter('all')}
-                            className="text-xs sm:text-sm"
+                            title="全部"
                         >
-                            全部
+                            <List className="h-4 w-4" />
                         </Button>
                         <Button
                             variant={typeFilter === 'weapon' ? 'default' : 'outline'}
-                            size="sm"
+                            size="icon"
                             onClick={() => setTypeFilter('weapon')}
-                            className="text-xs sm:text-sm"
+                            title="武器珠"
                         >
-                            武器
+                            <img src="/weapon.png" alt="武器" className="h-5 w-5" />
                         </Button>
                         <Button
                             variant={typeFilter === 'armor' ? 'default' : 'outline'}
-                            size="sm"
+                            size="icon"
                             onClick={() => setTypeFilter('armor')}
-                            className="text-xs sm:text-sm"
+                            title="防具珠"
                         >
-                            防具
+                            <img src="/armor.png" alt="防具" className="h-5 w-5" />
                         </Button>
                     </div>
 

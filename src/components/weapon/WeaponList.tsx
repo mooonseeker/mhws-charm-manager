@@ -1,3 +1,4 @@
+import { Award, ChevronDown, ChevronsDown, List } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { EquipmentCard } from '@/components/equipments/EquipmentCard';
@@ -109,14 +110,14 @@ export function WeaponList({
                         type="single"
                         value={selectedWeaponType}
                         onValueChange={(value) => value && setSelectedWeaponType(value as WeaponType)}
-                        className="justify-start flex-wrap"
+                        className="justify-start flex-wrap gap-0"
                     >
                         {weaponTypes.map((type) => (
                             <ToggleGroupItem key={type} value={type} className="text-xs">
                                 <img
                                     src={`/weapon-type/${type}.png`}
                                     alt={type}
-                                    className="w-6 h-6 mr-1"
+                                    className="w-6 h-6"
                                 />
                             </ToggleGroupItem>
                         ))}
@@ -128,35 +129,35 @@ export function WeaponList({
                         <div className="flex items-center gap-2">
                             <Button
                                 variant={selectedRarity === 'all' ? 'default' : 'outline'}
-                                size="sm"
+                                size="icon"
                                 onClick={() => setSelectedRarity('all')}
-                                className="text-xs sm:text-sm"
+                                title="全部武器"
                             >
-                                全部
+                                <List className="w-4 h-4" />
                             </Button>
                             <Button
                                 variant={selectedRarity === 'low' ? 'default' : 'outline'}
-                                size="sm"
+                                size="icon"
                                 onClick={() => setSelectedRarity('low')}
-                                className="text-xs sm:text-sm"
+                                title="下位武器"
                             >
-                                下位
+                                <ChevronDown className="w-4 h-4" />
                             </Button>
                             <Button
                                 variant={selectedRarity === 'high' ? 'default' : 'outline'}
-                                size="sm"
+                                size="icon"
                                 onClick={() => setSelectedRarity('high')}
-                                className="text-xs sm:text-sm"
+                                title="上位武器"
                             >
-                                上位
+                                <ChevronsDown className="w-4 h-4" />
                             </Button>
                             <Button
                                 variant={selectedRarity === 'master' ? 'default' : 'outline'}
-                                size="sm"
+                                size="icon"
                                 onClick={() => setSelectedRarity('master')}
-                                className="text-xs sm:text-sm"
+                                title="大师位武器"
                             >
-                                大师
+                                <Award className="w-4 h-4" />
                             </Button>
                         </div>
 

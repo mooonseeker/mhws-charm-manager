@@ -1,3 +1,4 @@
+import { Award, ChevronDown, ChevronsDown, List } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ErrorMessage, Loading } from '@/components/common';
@@ -264,50 +265,52 @@ export function ArmorList({
         <div className="h-full flex flex-col gap-6">
             {/* 菜单栏 */}
             <div className="flex-shrink-0 bg-card p-2 sm:p-4 rounded-lg border shadow-sm">
-                <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
+                <div className="flex flex-nowrap justify-between items-center gap-2 sm:gap-3">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Button
                             variant={selectedRarity === 'all' ? 'default' : 'outline'}
-                            size="sm"
+                            size="icon"
                             onClick={() => setSelectedRarity('all')}
-                            className="text-xs sm:text-sm"
+                            title="全部防具"
                         >
-                            全部
+                            <List className="w-4 h-4" />
                         </Button>
                         <Button
                             variant={selectedRarity === 'low' ? 'default' : 'outline'}
-                            size="sm"
+                            size="icon"
                             onClick={() => setSelectedRarity('low')}
-                            className="text-xs sm:text-sm"
+                            title="下位防具"
                         >
-                            下位
+                            <ChevronDown className="w-4 h-4" />
                         </Button>
                         <Button
                             variant={selectedRarity === 'high' ? 'default' : 'outline'}
-                            size="sm"
+                            size="icon"
                             onClick={() => setSelectedRarity('high')}
-                            className="text-xs sm:text-sm"
+                            title="上位防具"
                         >
-                            上位
+                            <ChevronsDown className="w-4 h-4" />
                         </Button>
                         <Button
                             variant={selectedRarity === 'master' ? 'default' : 'outline'}
-                            size="sm"
+                            size="icon"
                             onClick={() => setSelectedRarity('master')}
-                            className="text-xs sm:text-sm"
+                            title="大师位防具"
                         >
-                            大师
+                            <Award className="w-4 h-4" />
                         </Button>
                     </div>
 
                     <div className="flex items-center gap-4 justify-end">
-                        <div className="text-muted-foreground text-sm whitespace-nowrap">
-                            共 {filteredAndPaginatedArmor.totalCount} 个防具系列
-                        </div>
+                        {mode !== 'selector' && (
+                            <div className="text-muted-foreground text-sm whitespace-nowrap">
+                                共 {filteredAndPaginatedArmor.totalCount} 个防具系列
+                            </div>
+                        )}
                         <Input
                             type="text"
                             placeholder="搜索系列、防具或技能..."
-                            className="h-9 max-w-64"
+                            className="h-9 flex-1 max-w-64"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -331,13 +334,15 @@ export function ArmorList({
                             <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">臂甲</TableHead>
                             <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">腰甲</TableHead>
                             <TableHead className="w-[15%] text-center bg-primary text-primary-foreground">腿甲</TableHead>
-                            <TableHead className="w-[15%] text-center bg-primary text-primary-foreground rounded-tr-lg">全套技能</TableHead>
+                            {mode !== 'selector' && (
+                                <TableHead className="w-[15%] text-center bg-primary text-primary-foreground rounded-tr-lg">全套技能</TableHead>
+                            )}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredAndPaginatedArmor.data.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                <TableCell colSpan={mode === 'selector' ? 6 : 7} className="text-center py-8 text-muted-foreground">
                                     暂无防具数据
                                 </TableCell>
                             </TableRow>
@@ -352,7 +357,7 @@ export function ArmorList({
                                     {renderArmorPiece(group.arm)}
                                     {renderArmorPiece(group.waist)}
                                     {renderArmorPiece(group.leg)}
-                                    {renderFullSetSkills(group.fullSetSkills)}
+                                    {mode !== 'selector' && renderFullSetSkills(group.fullSetSkills)}
                                 </TableRow>
                             ))
                         )}

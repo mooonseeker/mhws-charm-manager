@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Filter, Pencil, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Filter, List, Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +9,6 @@ import { Pagination } from '@/components/ui/pagination';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
@@ -49,7 +48,7 @@ export function CharmList({
     const { skills } = useSkills();
 
     // 筛选状态
-    const [rarityRange, setRarityRange] = useState<[number, number]>([1, 12]);
+    const [selectedRarity, setSelectedRarity] = useState<'all' | 6 | 7 | 8>('all');
     const [minKeySkillValue, setMinKeySkillValue] = useState<number | null>(null);
     const [filterSkillId, setFilterSkillId] = useState<string>('');
     const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -62,23 +61,13 @@ export function CharmList({
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
-    // 计算动态稀有度范围
-    const rarityBounds = useMemo(() => {
-        if (charms.length === 0) return { min: 1, max: 12 };
-        const rarities = charms.map(c => c.rarity);
-        return {
-            min: Math.min(...rarities),
-            max: Math.max(...rarities)
-        };
-    }, [charms]);
-
     // 筛选护石
     const searchedCharms = useMemo(() => {
         let filtered = [...charms];
 
         // 按稀有度筛选
-        if (rarityRange) {
-            filtered = filtered.filter((c) => c.rarity >= rarityRange[0] && c.rarity <= rarityRange[1]);
+        if (selectedRarity !== 'all') {
+            filtered = filtered.filter((c) => c.rarity === selectedRarity);
         }
 
         // 按核心技能价值筛选
@@ -111,7 +100,7 @@ export function CharmList({
         }
 
         return filtered;
-    }, [charms, rarityRange, minKeySkillValue, filterSkillId, searchQuery, skills]);
+    }, [charms, selectedRarity, minKeySkillValue, filterSkillId, searchQuery, skills]);
 
     // 排序和分页护石
     const paginatedCharms = useMemo(() => {
@@ -140,15 +129,10 @@ export function CharmList({
         }
     };
 
-    // 当稀有度边界变化时，同步滑块状态
-    useEffect(() => {
-        setRarityRange([rarityBounds.min, rarityBounds.max]);
-    }, [rarityBounds]);
-
     // 当筛选条件变化时，重置到第一页
     useEffect(() => {
         setCurrentPage(1);
-    }, [rarityRange, minKeySkillValue, filterSkillId, searchQuery]);
+    }, [selectedRarity, minKeySkillValue, filterSkillId, searchQuery]);
 
     // 删除护石
     const handleDelete = (id: string) => {
@@ -187,39 +171,73 @@ export function CharmList({
     return (
         <div className="h-full flex flex-col gap-6">
             {/* 菜单栏 */}
-            <div className="bg-card p-4 sm:p-6 rounded-lg border shadow-sm flex-shrink-0">
+            <div className="flex-shrink-0 bg-card p-2 sm:p-4 rounded-lg border shadow-sm">
                 <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Button
-                            variant="default"
-                            size="sm"
-                            className="text-xs sm:text-sm"
-                            onClick={() => {
-                                setRarityRange([rarityBounds.min, rarityBounds.max]);
-                                setMinKeySkillValue(null);
-                                setFilterSkillId('all');
-                                setSearchQuery('');
-                            }}
+                            variant={selectedRarity === 'all' ? 'default' : 'outline'}
+                            size="icon"
+                            onClick={() => setSelectedRarity('all')}
+                            title="全部护石"
                         >
-                            全部
+                            <List className="w-4 h-4" />
                         </Button>
-                        <div className="flex items-center gap-2">
-                            <Badge variant="outline">Rare</Badge>
-                            <Slider
-                                value={rarityRange}
-                                onValueChange={(value) => setRarityRange(value as [number, number])}
-                                min={rarityBounds.min}
-                                max={rarityBounds.max}
-                                step={1}
-                                className="w-48 -mt-5"
-                            />
-                        </div>
+                        <Badge
+                            variant="outline"
+                            className={cn(
+                                "text-xs cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground h-9 w-9 flex items-center justify-center",
+                                selectedRarity === 6 && "bg-primary text-primary-foreground hover:bg-primary/90"
+                            )}
+                            style={{
+                                color: selectedRarity === 6 ? undefined : 'var(--rarity-6)',
+                                borderColor: selectedRarity === 6 ? undefined : 'var(--rarity-6)',
+                                background: selectedRarity === 6 ? undefined : 'transparent'
+                            }}
+                            onClick={() => setSelectedRarity(6)}
+                            title="R6护石"
+                        >
+                            R6
+                        </Badge>
+                        <Badge
+                            variant="outline"
+                            className={cn(
+                                "text-xs cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground h-9 w-9 flex items-center justify-center",
+                                selectedRarity === 7 && "bg-primary text-primary-foreground hover:bg-primary/90"
+                            )}
+                            style={{
+                                color: selectedRarity === 7 ? undefined : 'var(--rarity-7)',
+                                borderColor: selectedRarity === 7 ? undefined : 'var(--rarity-7)',
+                                background: selectedRarity === 7 ? undefined : 'transparent'
+                            }}
+                            onClick={() => setSelectedRarity(7)}
+                            title="R7护石"
+                        >
+                            R7
+                        </Badge>
+                        <Badge
+                            variant="outline"
+                            className={cn(
+                                "text-xs cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground h-9 w-9 flex items-center justify-center",
+                                selectedRarity === 8 && "bg-primary text-primary-foreground hover:bg-primary/90"
+                            )}
+                            style={{
+                                color: selectedRarity === 8 ? undefined : 'var(--rarity-8)',
+                                borderColor: selectedRarity === 8 ? undefined : 'var(--rarity-8)',
+                                background: selectedRarity === 8 ? undefined : 'transparent'
+                            }}
+                            onClick={() => setSelectedRarity(8)}
+                            title="R8护石"
+                        >
+                            R8
+                        </Badge>
                     </div>
 
                     <div className="flex items-center gap-4 justify-end">
-                        <div className="text-muted-foreground text-sm">
-                            共 {searchedCharms.length} 个护石
-                        </div>
+                        {mode !== 'selector' && (
+                            <div className="text-muted-foreground text-sm">
+                                共 {searchedCharms.length} 个护石
+                            </div>
+                        )}
                         <Input
                             type="text"
                             placeholder="搜索技能名称..."
@@ -268,12 +286,12 @@ export function CharmList({
                             </Select>
                         </div>
                     </div>
-                    {(rarityRange[0] !== rarityBounds.min || rarityRange[1] !== rarityBounds.max || minKeySkillValue || (filterSkillId && filterSkillId !== 'all')) && (
+                    {(selectedRarity !== 'all' || minKeySkillValue || (filterSkillId && filterSkillId !== 'all')) && (
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                                setRarityRange([rarityBounds.min, rarityBounds.max]);
+                                setSelectedRarity('all');
                                 setMinKeySkillValue(null);
                                 setFilterSkillId('all');
                             }}
