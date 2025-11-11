@@ -52,6 +52,7 @@ export function ArmorList({
     const { skills } = useSkills();
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedRarity, setSelectedRarity] = useState<'all' | 'low' | 'high' | 'master'>('all');
 
     // 获取技能名称的辅助函数
     const getSkillName = useCallback((skillId: string) => {
@@ -151,6 +152,29 @@ export function ArmorList({
             });
         }
 
+        // 稀有度筛选
+        if (selectedRarity !== 'all') {
+            filtered = filtered.filter(group => {
+                const pieces = [group.helm, group.body, group.arm, group.waist, group.leg].filter(Boolean);
+
+                // 检查系列中是否有符合稀有度要求的防具
+                return pieces.some(piece => {
+                    if (!piece) return false;
+
+                    switch (selectedRarity) {
+                        case 'low':
+                            return piece.rarity >= 1 && piece.rarity <= 4;
+                        case 'high':
+                            return piece.rarity >= 5 && piece.rarity <= 8;
+                        case 'master':
+                            return piece.rarity >= 9 && piece.rarity <= 12;
+                        default:
+                            return true;
+                    }
+                });
+            });
+        }
+
         // 分页
         const totalPages = Math.ceil(filtered.length / ARMOR_SERIES_PER_PAGE);
         const startIndex = (currentPage - 1) * ARMOR_SERIES_PER_PAGE;
@@ -162,12 +186,12 @@ export function ArmorList({
             totalCount: filtered.length,
             totalPages
         };
-    }, [groupedArmor, searchQuery, currentPage, getSkillName]);
+    }, [groupedArmor, searchQuery, currentPage, getSkillName, selectedRarity]);
 
-    // 当搜索条件变化时，重置到第一页
+    // 当搜索条件或稀有度筛选变化时，重置到第一页
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery]);
+    }, [searchQuery, selectedRarity]);
 
     if (loading) {
         return <Loading />;
@@ -243,11 +267,36 @@ export function ArmorList({
                 <div className="flex flex-wrap justify-between items-center gap-2 sm:gap-3">
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Button
-                            variant="default"
+                            variant={selectedRarity === 'all' ? 'default' : 'outline'}
                             size="sm"
+                            onClick={() => setSelectedRarity('all')}
                             className="text-xs sm:text-sm"
                         >
                             全部
+                        </Button>
+                        <Button
+                            variant={selectedRarity === 'low' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setSelectedRarity('low')}
+                            className="text-xs sm:text-sm"
+                        >
+                            下位
+                        </Button>
+                        <Button
+                            variant={selectedRarity === 'high' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setSelectedRarity('high')}
+                            className="text-xs sm:text-sm"
+                        >
+                            上位
+                        </Button>
+                        <Button
+                            variant={selectedRarity === 'master' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setSelectedRarity('master')}
+                            className="text-xs sm:text-sm"
+                        >
+                            大师
                         </Button>
                     </div>
 
@@ -295,7 +344,7 @@ export function ArmorList({
                         ) : (
                             filteredAndPaginatedArmor.data.map(group => (
                                 <TableRow key={group.series}>
-                                    <TableCell>
+                                    <TableCell className="text-center">
                                         <Badge variant="outline">{group.series}</Badge>
                                     </TableCell>
                                     {renderArmorPiece(group.helm)}
