@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { EquipmentCard } from '@/components/equipments/EquipmentCard';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
@@ -34,6 +35,7 @@ export function WeaponList({
     // 状态管理
     const [selectedWeaponType, setSelectedWeaponType] = useState<WeaponType>('rod');
     const [searchQuery, setSearchQuery] = useState<string>('');
+    const [selectedRarity, setSelectedRarity] = useState<'all' | 'low' | 'high' | 'master'>('all');
 
     // 获取武器数据
     const { weapons, loading, error } = useWeapon();
@@ -42,18 +44,43 @@ export function WeaponList({
     const weaponRows = useMemo(() => {
         if (!weapons) return [];
 
-        // 筛选：根据武器类型和搜索查询
-        const filteredWeapons = weapons.filter(weapon =>
-            weapon.type === selectedWeaponType &&
-            (searchQuery === '' || weapon.name.toLowerCase().includes(searchQuery.toLowerCase()))
-        );
+        // 筛选：根据武器类型、稀有度和搜索查询
+        const filteredWeapons = weapons.filter(weapon => {
+            // 稀有度筛选
+            const rankMatch =
+                selectedRarity === 'all' ||
+                (selectedRarity === 'low' && weapon.rarity >= 1 && weapon.rarity <= 4) ||
+                (selectedRarity === 'high' && weapon.rarity >= 5 && weapon.rarity <= 8) ||
+                (selectedRarity === 'master' && weapon.rarity >= 9 && weapon.rarity <= 12);
+
+            if (!rankMatch) return false;
+
+            // 武器类型和搜索查询
+            return weapon.type === selectedWeaponType &&
+                (searchQuery === '' || weapon.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        });
 
         // 按sortId升序排序（已在groupWeaponsIntoRows中处理，但这里明确处理）
         filteredWeapons.sort((a, b) => a.sortId - b.sortId);
 
         // 调用groupWeaponsIntoRows分组为行
         return groupWeaponsIntoRows(filteredWeapons);
-    }, [weapons, selectedWeaponType, searchQuery]);
+    }, [weapons, selectedWeaponType, searchQuery, selectedRarity]);
+
+    // 根据选择的稀有度确定要显示的列
+    const rarityColumns = useMemo(() => {
+        switch (selectedRarity) {
+            case 'low':
+                return [1, 2, 3, 4];
+            case 'high':
+                return [5, 6, 7, 8];
+            case 'master':
+                return [9, 10, 11, 12];
+            case 'all':
+            default:
+                return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        }
+    }, [selectedRarity]);
 
     // 加载状态
     if (loading) {
@@ -95,31 +122,73 @@ export function WeaponList({
                         ))}
                     </ToggleGroup>
 
-                    {/* 搜索框 */}
-                    <Input
-                        type="text"
-                        placeholder="搜索武器名称..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="max-w-sm"
-                    />
+                    {/* 右侧组合：稀有度筛选 + 搜索框 */}
+                    <div className="flex items-center gap-2">
+                        {/* 稀有度筛选 */}
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant={selectedRarity === 'all' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setSelectedRarity('all')}
+                                className="text-xs sm:text-sm"
+                            >
+                                全部
+                            </Button>
+                            <Button
+                                variant={selectedRarity === 'low' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setSelectedRarity('low')}
+                                className="text-xs sm:text-sm"
+                            >
+                                下位
+                            </Button>
+                            <Button
+                                variant={selectedRarity === 'high' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setSelectedRarity('high')}
+                                className="text-xs sm:text-sm"
+                            >
+                                上位
+                            </Button>
+                            <Button
+                                variant={selectedRarity === 'master' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setSelectedRarity('master')}
+                                className="text-xs sm:text-sm"
+                            >
+                                大师
+                            </Button>
+                        </div>
+
+                        {/* 搜索框 */}
+                        <Input
+                            type="text"
+                            placeholder="搜索武器名称..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="max-w-sm"
+                        />
+                    </div>
                 </div>
 
             </div>
 
             {/* 武器表格 */}
             <div className="flex-1 min-h-0 bg-card rounded-lg border shadow-sm overflow-x-auto">
-                <Table>
+                <Table className={cn(selectedRarity === "all" ? "w-[200%]" : "")}>
                     {/* 表头 */}
                     <TableHeader>
                         <TableRow>
-                            {Array.from({ length: 12 }, (_, i) => (
+                            {rarityColumns.map((rarity, index) => (
                                 <TableHead
-                                    key={`header-${i}`}
-                                    className={`text-center bg-primary text-primary-foreground ${i === 0 ? 'rounded-tl-lg' : i === 11 ? 'rounded-tr-lg' : ''
-                                        }`}
+                                    key={`header-${rarity}`}
+                                    className={cn(
+                                        "text-center bg-primary text-primary-foreground",
+                                        selectedRarity === "all" ? "1/6" : "w-1/4",
+                                        index === 0 ? 'rounded-tl-lg' : index === rarityColumns.length - 1 ? 'rounded-tr-lg' : ''
+                                    )}
                                 >
-                                    R{i + 1}
+                                    R{rarity}
                                 </TableHead>
                             ))}
                         </TableRow>
@@ -128,26 +197,26 @@ export function WeaponList({
                     {/* 表体 */}
                     <TableBody>
                         {weaponRows.map((row, rowIndex) => {
-                            // 创建包含12个单元格的数组
-                            const cells = Array(12).fill(null);
-
-                            // 将武器放置到对应的稀有度位置
+                            // 创建武器稀有度映射，便于快速查找
+                            const weaponMap = new Map<number, Weapon>();
                             row.forEach((weapon: Weapon) => {
-                                cells[weapon.rarity - 1] = weapon;
+                                weaponMap.set(weapon.rarity, weapon);
                             });
 
                             return (
                                 <TableRow key={`row-${rowIndex}`}>
-                                    {cells.map((weapon, index) => {
+                                    {rarityColumns.map((rarity) => {
+                                        const weapon = weaponMap.get(rarity);
                                         const isSelector = mode === 'selector';
                                         const isSelected = !!currentWeapon && currentWeapon?.id === weapon?.id;
                                         const isMatchingSlot = isSelector && selectingFor === 'weapon';
 
                                         return (
                                             <TableCell
-                                                key={`cell-${rowIndex}-${index}`}
+                                                key={`cell-${rowIndex}-${rarity}`}
                                                 className={cn(
                                                     'p-2',
+                                                    selectedRarity === "all" ? "1/6" : "w-1/4",
                                                     isSelector && 'transition-colors rounded-lg',
                                                     isSelector && isMatchingSlot && 'cursor-pointer hover:bg-accent/50',
                                                     isSelector && !isMatchingSlot && 'cursor-not-allowed opacity-50'
