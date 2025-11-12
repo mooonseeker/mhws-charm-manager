@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { CharmManagement } from '@/components/charms';
+import { CharmManager } from '@/components/charms';
 import { DatabaseManager } from '@/components/database';
 import { MainLayout } from '@/components/layout';
 import { SetBuilder } from '@/components/set-builder';
@@ -17,7 +17,7 @@ function App() {
       case 'database':
         return <DatabaseManager />;
       case 'charms':
-        return <CharmManagement />;
+        return <CharmManager />;
       case 'set-builder':
         return <SetBuilder />;
       case 'settings':

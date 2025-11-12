@@ -80,7 +80,7 @@ export function EquipmentCell({ type, isSelected, slottedEquipment, onEquipmentC
                                     onClick={(e) => {
                                         if (!canClick) return;
                                         e.stopPropagation(); // 阻止冒泡到 CardContent 的 onEquipmentClick
-                                        onSlotClick(index, slot);
+                                        onSlotClick(index, slot as Slot);
                                     }}
                                     className={`flex-1 h-full flex items-center gap-1 rounded-sm bg-muted/30 ${canClick ? 'cursor-pointer hover:bg-muted' : ''}`}
                                 >

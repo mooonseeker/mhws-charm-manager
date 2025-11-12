@@ -1,9 +1,8 @@
 import { useState } from 'react';
 
+import { AccessorySelector, EquipmentCell, EquipmentSelector } from '@/components/equipments';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-import { EquipmentCell } from './EquipmentCell';
-import { AccessorySelector, EquipmentSelector } from './EquipmentSelector';
 import { SetSummary } from './SetSummary';
 
 import type { EquipmentSet, EquipmentCellType } from '@/types/set-builder';
@@ -80,7 +79,7 @@ export function SetBuilder() {
                             }
                             slottedEquipment={equipmentSet[type as keyof EquipmentSet]}
                             onEquipmentClick={() => handleEqSlotClick(type)}
-                            onSlotClick={(slotIndex, slot) => handleSlotClick(type, slotIndex, slot)}
+                            onSlotClick={(slotIndex: number, slot: Slot) => handleSlotClick(type, slotIndex, slot)}
                         />
                     ))}
                 </div>

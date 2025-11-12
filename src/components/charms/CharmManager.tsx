@@ -21,7 +21,7 @@ import type { Charm, SkillWithLevel, Slot, SlotType, SlotLevel } from '@/types';
  * 
  * 整合所有护石相关功能，包括状态管理和布局。
  */
-export function CharmManagement() {
+export function CharmManager() {
     // 弹窗和编辑状态
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [charmToEdit, setCharmToEdit] = useState<Charm | null>(null);

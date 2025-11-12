@@ -1,4 +1,4 @@
-export * from './CharmManagement';
+export * from './CharmManager';
 export * from './CharmList';
 export * from './CharmForm';
 export * from './SkillSelector';
