@@ -9,6 +9,7 @@ import {
 import { useSkills } from '@/contexts';
 
 import type { SkillWithLevel } from '@/types';
+
 interface SkillSelectorProps {
     onSelect: (skill: SkillWithLevel) => void;
     excludeSkillIds?: string[];
@@ -18,7 +19,10 @@ interface SkillSelectorProps {
  * 技能选择器组件
  * 搜索并选择技能，设置等级
  */
-export function SkillSelector({ onSelect, excludeSkillIds = [] }: SkillSelectorProps) {
+export function SkillSelector({
+    onSelect,
+    excludeSkillIds = [],
+}: SkillSelectorProps) {
     const { skills } = useSkills();
     const [search, setSearch] = useState('');
     const [selectedSkillId, setSelectedSkillId] = useState<string>('');
@@ -26,7 +30,8 @@ export function SkillSelector({ onSelect, excludeSkillIds = [] }: SkillSelectorP
 
     // 筛选可用技能
     const availableSkills = skills.filter(
-        (s) => !excludeSkillIds.includes(s.id) && s.name.includes(search)
+        (s) =>
+            !excludeSkillIds.includes(s.id) && s.name.includes(search)
     );
 
     const selectedSkill = skills.find((s) => s.id === selectedSkillId);
@@ -69,12 +74,18 @@ export function SkillSelector({ onSelect, excludeSkillIds = [] }: SkillSelectorP
             </div>
 
             {selectedSkill && (
-                <Select value={level.toString()} onValueChange={(v) => setLevel(parseInt(v))}>
+                <Select
+                    value={level.toString()}
+                    onValueChange={(v) => setLevel(parseInt(v))}
+                >
                     <SelectTrigger className="w-24 h-10">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        {Array.from({ length: selectedSkill.maxLevel }, (_, i) => i + 1).map((l) => (
+                        {Array.from(
+                            { length: selectedSkill.maxLevel },
+                            (_, i) => i + 1
+                        ).map((l) => (
                             <SelectItem key={l} value={l.toString()}>
                                 Lv.{l}
                             </SelectItem>
@@ -83,7 +94,11 @@ export function SkillSelector({ onSelect, excludeSkillIds = [] }: SkillSelectorP
                 </Select>
             )}
 
-            <Button onClick={handleAdd} disabled={!selectedSkillId} className="h-10">
+            <Button
+                onClick={handleAdd}
+                disabled={!selectedSkillId}
+                className="h-10"
+            >
                 添加
             </Button>
         </div>

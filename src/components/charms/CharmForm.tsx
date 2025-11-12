@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 
+import { SkillSelector } from '@/components/skills';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -7,8 +8,6 @@ import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-
-import { SkillSelector } from './SkillSelector';
 
 import type { Skill, SkillWithLevel, Slot, SlotType, SlotLevel, EquivalentSlots } from '@/types';
 
