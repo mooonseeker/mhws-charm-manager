@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { SkillItem } from '@/components/skills';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSkills } from '@/contexts';
 
@@ -53,6 +54,7 @@ export function SetSummary({ equipmentSet }: SetSummaryProps) {
 
     const aggregatedSkills = useMemo(() => {
         const skillMap = new Map<string, {
+            skillId: string;
             level: number;
             name: string;
             maxLevel: number;
@@ -71,6 +73,7 @@ export function SetSummary({ equipmentSet }: SetSummaryProps) {
                         current.level += skill.level;
                     } else {
                         skillMap.set(skill.skillId, {
+                            skillId: skill.skillId,
                             level: skill.level,
                             name: skillData?.name || '未知技能',
                             maxLevel: skillData?.maxLevel || 1,
@@ -89,6 +92,7 @@ export function SetSummary({ equipmentSet }: SetSummaryProps) {
                                 current.level += skill.level;
                             } else {
                                 skillMap.set(skill.skillId, {
+                                    skillId: skill.skillId,
                                     level: skill.level,
                                     name: skillData?.name || '未知技能',
                                     maxLevel: skillData?.maxLevel || 1,
@@ -214,26 +218,16 @@ export function SetSummary({ equipmentSet }: SetSummaryProps) {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
                             {/* 左侧列 */}
-                            <ul className="space-y-2">
+                            <ul className="space-y-1">
                                 {skillColumns.left.map((skill) => (
-                                    <li key={skill.name} className="flex justify-between items-center">
-                                        <span className="font-medium text-sm">{skill.name}</span>
-                                        <span className="text-xs">
-                                            Lv. <span className={skill.level >= skill.maxLevel ? 'text-primary font-bold' : ''}>{skill.level}</span> / {skill.maxLevel}
-                                        </span>
-                                    </li>
+                                    <SkillItem key={skill.skillId} skillId={skill.skillId} level={skill.level} />
                                 ))}
                             </ul>
                             {/* 右侧列 */}
                             {skillColumns.right.length > 0 && (
-                                <ul className="space-y-2">
+                                <ul className="space-y-1">
                                     {skillColumns.right.map((skill) => (
-                                        <li key={skill.name} className="flex justify-between items-center">
-                                            <span className="font-medium text-sm">{skill.name}</span>
-                                            <span className="text-xs">
-                                                Lv. <span className={skill.level >= skill.maxLevel ? 'text-primary font-bold' : ''}>{skill.level}</span> / {skill.maxLevel}
-                                            </span>
-                                        </li>
+                                        <SkillItem key={skill.skillId} skillId={skill.skillId} level={skill.level} />
                                     ))}
                                 </ul>
                             )}

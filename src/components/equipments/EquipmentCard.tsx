@@ -1,5 +1,5 @@
+import { SkillItem } from '@/components/skills';
 import { Badge } from '@/components/ui/badge';
-import { useSkills } from '@/contexts';
 import { cn } from '@/lib/utils';
 
 import type { Equipment, Charm, Armor, Weapon } from '@/types';
@@ -20,13 +20,6 @@ export interface EquipmentCardProps {
  * 显示单个装备的卡片视图，包含图标、稀有度徽章、孔位和技能列表
  */
 export function EquipmentCard({ item, className, variant = 'full', isSelected }: EquipmentCardProps) {
-    const { skills } = useSkills();
-
-    // 获取技能名称的辅助函数
-    const getSkillName = (skillId: string) => {
-        const skill = skills.find((s) => s.id === skillId);
-        return skill?.name || '未知技能';
-    };
 
     // 获取装饰品图标路径
     const getAccessoryIcon = (slotType: 'weapon' | 'armor', level: number) => {
@@ -169,14 +162,18 @@ export function EquipmentCard({ item, className, variant = 'full', isSelected }:
                 })}
             </div>
 
-            {/* Skills: 技能列表 */}
-            <div className="card-skills space-y-2">
-                {item.skills.map((skillWithLevel) => (
-                    <div key={skillWithLevel.skillId} className="skill-item flex justify-between text-sm">
-                        <span>{getSkillName(skillWithLevel.skillId)}</span>
-                        <span>Lv. {skillWithLevel.level}</span>
-                    </div>
-                ))}
+            {/* Skills: 技能列表 (使用 SkillItem 紧凑模式) */}
+            <div className="card-skills space-y-1">
+                <ul className="space-y-1">
+                    {item.skills.map((skillWithLevel) => (
+                        <SkillItem
+                            key={skillWithLevel.skillId}
+                            skillId={skillWithLevel.skillId}
+                            level={skillWithLevel.level}
+                            variant="compact"
+                        />
+                    ))}
+                </ul>
             </div>
         </div>
     );

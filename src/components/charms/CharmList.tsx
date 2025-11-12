@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronUp, Filter, List, Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
+import { SkillItem } from '@/components/skills/SkillItem';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -141,17 +142,6 @@ export function CharmList({
         }
     };
 
-    // 获取技能名称
-    const getSkillName = (skillId: string) => {
-        const skill = skills.find((s) => s.id === skillId);
-        return skill?.name || '未知技能';
-    };
-
-    // 获取技能是否为核心技能
-    const isKeySkill = (skillId: string) => {
-        const skill = skills.find((s) => s.id === skillId);
-        return skill?.isKey || false;
-    };
 
     // 获取装饰品等级图标
     const getAccessoryIcon = (slotType: 'weapon' | 'armor', level: number) => {
@@ -315,7 +305,7 @@ export function CharmList({
                                 <span className="sm:hidden">R</span>
                                 {' '}<SortIcon field="rarity" />
                             </TableHead>
-                            <TableHead className="text-center bg-primary text-primary-foreground">技能</TableHead>
+                            <TableHead className="text-center bg-primary text-primary-foreground px-4">技能</TableHead>
                             <TableHead className="hidden md:table-cell text-center bg-primary text-primary-foreground">孔位</TableHead>
                             {mode === 'display' && (
                                 <>
@@ -389,12 +379,14 @@ export function CharmList({
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <div className="space-y-1 sm:space-y-2">
+                                            <div className="space-y-1 sm:space-y-2 px-2">
                                                 {charm.skills.map((skillWithLevel) => (
-                                                    <div key={skillWithLevel.skillId} className="text-xs sm:text-sm">
-                                                        {getSkillName(skillWithLevel.skillId)} Lv.{skillWithLevel.level}
-                                                        {isKeySkill(skillWithLevel.skillId) && ' ⭐'}
-                                                    </div>
+                                                    <SkillItem
+                                                        key={skillWithLevel.skillId}
+                                                        skillId={skillWithLevel.skillId}
+                                                        level={skillWithLevel.level}
+                                                        variant="default"
+                                                    />
                                                 ))}
                                                 {/* 小屏幕显示孔位信息 */}
                                                 {charm.slots.length > 0 && (
