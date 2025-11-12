@@ -1,3 +1,4 @@
+import { Hand, Search } from 'lucide-react';
 import { useState } from 'react';
 
 import { AccessorySelector, EquipmentCell, EquipmentSelector } from '@/components/equipments';
@@ -59,11 +60,28 @@ export function SetBuilder() {
 
     return (
         <div className="h-full flex flex-col gap-6">
-            <div className="flex justify-between items-center flex-shrink-0">
+            <div className="flex items-center flex-shrink-0 gap-4">
                 <h1 className="text-2xl font-bold">配装器</h1>
-                <ToggleGroup type="single" value={mode} onValueChange={(v) => v && setMode(v as 'manual' | 'auto')}>
-                    <ToggleGroupItem value="manual">手动模式</ToggleGroupItem>
-                    <ToggleGroupItem value="auto" disabled>自动模式</ToggleGroupItem>
+                <ToggleGroup
+                    type="single"
+                    value={mode}
+                    onValueChange={(v) => v && setMode(v as 'manual' | 'auto')}
+                    size="sm"
+                    className="border border-border rounded-md p-1"
+                >
+                    <ToggleGroupItem
+                        value="manual"
+                        aria-label="手动模式"
+                    >
+                        <Hand className="h-4 w-4" />
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
+                        value="auto"
+                        aria-label="自动模式（开发中）"
+                        disabled
+                    >
+                        <Search className="h-4 w-4" />
+                    </ToggleGroupItem>
                 </ToggleGroup>
             </div>
 
