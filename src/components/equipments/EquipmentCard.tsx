@@ -8,21 +8,9 @@ import type { Equipment, Charm, Armor, Weapon } from '@/types';
  * EquipmentCard 组件 Props 接口
  */
 export interface EquipmentCardProps {
-    /**
-     * 要显示的装备对象
-     */
     item: Equipment;
-    /**
-     * 可选的自定义 CSS 类名
-     */
     className?: string;
-    /**
-     * 卡片变体，默认为 'full'
-     */
     variant?: 'full' | 'compact';
-    /**
-     * 是否选中状态
-     */
     isSelected?: boolean;
 }
 
@@ -111,13 +99,21 @@ export function EquipmentCard({ item, className, variant = 'full', isSelected }:
             {variant === 'full' && (
                 <>
                     {isWeapon(item) && (
-                        <div className="card-stats space-y-1 mb-3 text-xs">
-                            <div className="flex justify-between">
-                                <span>攻击力</span>
+                        <div className="card-stats grid grid-cols-2 gap-2 mb-3 text-xs">
+                            <div className="flex items-center gap-1 justify-center">
+                                <img
+                                    src="/skill-type/SKILL_0000.png"
+                                    alt="Attack"
+                                    className="w-4 h-4"
+                                />
                                 <span>{item.attack}</span>
                             </div>
-                            <div className="flex justify-between">
-                                <span>会心率</span>
+                            <div className="flex items-center gap-1 justify-center">
+                                <img
+                                    src="/skill-type/SKILL_0001.png"
+                                    alt="Critical"
+                                    className="w-4 h-4"
+                                />
                                 <span>{item.critical}%</span>
                             </div>
                         </div>
