@@ -1,65 +1,33 @@
 import { Hand, Search } from 'lucide-react';
-import { useState } from 'react';
 
 import { AccessorySelector, EquipmentCell, EquipmentSelector } from '@/components/equipments';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useSetBuilder } from '@/contexts/SetBuilderContext';
 
+import { AutoModeToolbar } from './AutoModeToolbar';
+import SearchResultsModal from './SearchResultsModal';
 import { SetSummary } from './SetSummary';
+import { SkillRequirements } from './SkillRequirements';
 
-import type { EquipmentSet, EquipmentCellType } from '@/types/set-builder';
-import type { Armor, Charm, Weapon, Accessory, Slot } from '@/types';
+import type { Slot } from '@/types';
+import type { EquipmentCellType } from '@/types/set-builder';
 const cellTypes: EquipmentCellType[] = ['weapon', 'helm', 'body', 'arm', 'waist', 'leg', 'charm'];
 
-type SelectionContext =
-    | { type: 'equipment'; equipmentType: EquipmentCellType }
-    | { type: 'accessory'; slotType: EquipmentCellType; slotIndex: number; slot: Slot };
-
 export function SetBuilder() {
-    const [mode, setMode] = useState<'manual' | 'auto'>('manual');
-    const [equipmentSet, setEquipmentSet] = useState<EquipmentSet>({});
-    const [selectionContext, setSelectionContext] = useState<SelectionContext | null>(null);
-
-    const handleEqSlotClick = (type: EquipmentCellType) => {
-        if (selectionContext?.type === 'equipment' && selectionContext.equipmentType === type) {
-            setSelectionContext(null);
-        } else {
-            setSelectionContext({ type: 'equipment', equipmentType: type });
-        }
-    };
-
-    const handleEqSelect = (item: Armor | Weapon | Charm) => {
-        if (!selectionContext || selectionContext.type !== 'equipment') return;
-
-        const newSlottedEq = { equipment: item, accessories: Array(item.slots.length).fill(null) };
-        setEquipmentSet(prev => ({ ...prev, [selectionContext.equipmentType]: newSlottedEq }));
-        setSelectionContext(null);
-    };
-
-    const handleSlotClick = (slotType: EquipmentCellType, slotIndex: number, slot: Slot) => {
-        setSelectionContext({ type: 'accessory', slotType, slotIndex, slot });
-    };
-
-    const handleAccessorySelect = (accessory: Accessory) => {
-        if (!selectionContext || selectionContext.type !== 'accessory') return;
-
-        const { slotType, slotIndex } = selectionContext;
-
-        setEquipmentSet(prev => {
-            const newSet = { ...prev };
-            const targetSlot = newSet[slotType as keyof EquipmentSet];
-            if (targetSlot) {
-                const newAccessories = [...targetSlot.accessories];
-                newAccessories[slotIndex] = accessory;
-                return { ...newSet, [slotType]: { ...targetSlot, accessories: newAccessories } };
-            }
-            return newSet;
-        });
-
-        setSelectionContext(null);
-    };
+    const {
+        mode,
+        setMode,
+        currentEquipmentSet,
+        selectionContext,
+        handleEqSlotClick,
+        handleSlotClick,
+        handleEqSelect,
+        handleAccessorySelect,
+    } = useSetBuilder();
 
     return (
         <div className="h-full flex flex-col gap-6">
+            <SearchResultsModal />
             <div className="flex items-center flex-shrink-0 gap-4">
                 <h1 className="text-2xl font-bold">配装器</h1>
                 <ToggleGroup
@@ -78,11 +46,11 @@ export function SetBuilder() {
                     <ToggleGroupItem
                         value="auto"
                         aria-label="自动模式（开发中）"
-                        disabled
                     >
                         <Search className="h-4 w-4" />
                     </ToggleGroupItem>
                 </ToggleGroup>
+                {mode === 'auto' && <AutoModeToolbar />}
             </div>
 
             <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-8">
@@ -95,7 +63,7 @@ export function SetBuilder() {
                                 selectionContext?.type === 'equipment' &&
                                 selectionContext.equipmentType === type
                             }
-                            slottedEquipment={equipmentSet[type as keyof EquipmentSet]}
+                            slottedEquipment={currentEquipmentSet[type as keyof typeof currentEquipmentSet]}
                             onEquipmentClick={() => handleEqSlotClick(type)}
                             onSlotClick={(slotIndex: number, slot: Slot) => handleSlotClick(type, slotIndex, slot)}
                         />
@@ -103,21 +71,29 @@ export function SetBuilder() {
                 </div>
 
                 <div className="w-full lg:w-11/20 h-full overflow-y-auto">
-                    {selectionContext ? (
-                        selectionContext.type === 'equipment' ? (
-                            <EquipmentSelector
-                                selectingFor={selectionContext.equipmentType}
-                                currentEquipment={equipmentSet[selectionContext.equipmentType]?.equipment}
-                                onSelect={handleEqSelect}
-                            />
+                    {mode === 'manual' ? (
+                        selectionContext ? (
+                            selectionContext.type === 'equipment' ? (
+                                <EquipmentSelector
+                                    selectingFor={selectionContext.equipmentType}
+                                    currentEquipment={currentEquipmentSet[selectionContext.equipmentType as keyof typeof currentEquipmentSet]?.equipment}
+                                    onSelect={handleEqSelect}
+                                />
+                            ) : (
+                                <AccessorySelector
+                                    slot={selectionContext.slot}
+                                    onAccessorySelect={handleAccessorySelect}
+                                />
+                            )
                         ) : (
-                            <AccessorySelector
-                                slot={selectionContext.slot}
-                                onAccessorySelect={handleAccessorySelect}
-                            />
+                            <SetSummary equipmentSet={currentEquipmentSet} />
                         )
                     ) : (
-                        <SetSummary equipmentSet={equipmentSet} />
+                        Object.keys(currentEquipmentSet).length > 0 ? (
+                            <SetSummary equipmentSet={currentEquipmentSet} />
+                        ) : (
+                            <SkillRequirements />
+                        )
                     )}
                 </div>
             </div>

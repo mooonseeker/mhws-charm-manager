@@ -6,6 +6,7 @@ import { MainLayout } from '@/components/layout';
 import { SetBuilder } from '@/components/set-builder';
 import { Settings } from '@/components/settings';
 import { AppProvider } from '@/contexts';
+import { SetBuilderProvider } from '@/contexts/SetBuilderContext';
 
 import type { NavigationTab } from '@/components/layout';
 
@@ -19,7 +20,11 @@ function App() {
       case 'charms':
         return <CharmManager />;
       case 'set-builder':
-        return <SetBuilder />;
+        return (
+          <SetBuilderProvider>
+            <SetBuilder />
+          </SetBuilderProvider>
+        );
       case 'settings':
         return <Settings />;
       default:
