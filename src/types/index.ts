@@ -72,6 +72,8 @@ export type SlotLevel = -1 | 1 | 2 | 3;
 export interface Slot {
     type: SlotType;
     level: SlotLevel;
+    /** 孔位的来源装备ID（可选），用于回溯和结果组装 */
+    sourceId?: string;
 }
 
 /**

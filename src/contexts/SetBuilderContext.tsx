@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash-es';
 import React, { createContext, useCallback, useContext, useState } from 'react';
 
 import { useAccessories } from '@/contexts/AccessoryContext';
@@ -166,7 +167,36 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
     }, [requiredSkills, currentEquipmentSet, armor, weapons, accessories, skills, charms]);
 
     const loadSetToBuilder = (finalSet: FinalSet) => {
-        setCurrentEquipmentSet(finalSet.equipment);
+        console.log('[Debug] loadSetToBuilder received finalSet:', JSON.stringify(finalSet, null, 2));
+
+        const newEquipmentSet = cloneDeep(finalSet.equipment);
+
+        for (const key in newEquipmentSet) {
+            const equipmentKey = key as keyof EquipmentSet;
+            const slottedEquipment = newEquipmentSet[equipmentKey];
+
+            if (slottedEquipment) {
+                const equipmentId = slottedEquipment.equipment.id;
+                const decorationsForEquipment = finalSet.decorations.get(equipmentId) || [];
+
+                // 新增Log，用于验证decorationsForEquipment是否能取到值
+                if (decorationsForEquipment.length > 0) {
+                    console.log(`[Debug] Found ${decorationsForEquipment.length} decorations for equipment ${equipmentId}`);
+                }
+
+                const newAccessories = Array(slottedEquipment.equipment.slots.length).fill(null);
+                decorationsForEquipment.forEach((acc, index) => {
+                    if (index < newAccessories.length) {
+                        newAccessories[index] = acc;
+                    }
+                });
+
+                slottedEquipment.accessories = newAccessories;
+            }
+        }
+
+        console.log('[Debug] Processed newEquipmentSet for UI:', JSON.stringify(newEquipmentSet, null, 2));
+        setCurrentEquipmentSet(newEquipmentSet);
         setIsResultsModalOpen(false);
     };
 

@@ -7,10 +7,11 @@ import type { Accessory, Armor, ArmorType, Charm, FinalSet, Skill, SkillWithLeve
 import type { SearchContext, SkillDeficit } from '@/types/set-builder';
 import { cloneDeep } from 'lodash-es';
 
-import { findArmorCombinations } from './armor-search';
+import { fillArmorScaffold } from './armor-search';
 import { solveDecorations } from './decoration-solver';
 import { preprocess } from './preprocess';
 import { evaluateAndSortResults } from './result-evaluator';
+import { generateArmorScaffolds } from './scaffold-generator';
 import { categorizeTargetSkills } from './utils';
 
 const SEARCH_LIMIT = 20; // Stop search if more than this many results are found
@@ -97,8 +98,8 @@ export const findOptimalSets = async (
             },
             currentSkills,
             availableSlots: {
-                weapon: [...fixedWeapon.slots],
-                armor: [...charm.slots], // 护石的孔位是通用的"armor"孔位
+                weapon: fixedWeapon.slots.map(s => ({ ...s, sourceId: fixedWeapon.id })),
+                armor: charm.slots.map(s => ({ ...s, sourceId: charm.id })),
             },
             skillDeficits: cloneDeep(categorizedSkills), // 深拷贝以防循环间的状态污染
         };
@@ -126,36 +127,84 @@ export const findOptimalSets = async (
             }
 
             // 3c. 更新 SearchContext
-            // 珠子求解器现在直接返回分类好的孔位
             context.availableSlots = solution.remainingSlots;
+            context.skillDeficits.weaponSkills = []; // 武器技能缺口被满足
 
-            // 更新已满足的技能列表和技能缺口
-            context.skillDeficits.weaponSkills = [];
-            for (const [, accessories] of solution.placement) {
-                for (const accessory of accessories) {
-                    accessory.skills.forEach(skill => {
-                        const current = context.currentSkills.get(skill.skillId) || 0;
-                        context.currentSkills.set(skill.skillId, current + skill.level);
+            // 将找到的珠子填充回 context.equipment 中
+            for (const [sourceId, foundAccessories] of solution.placement.entries()) {
+                const equipmentToUpdate = Object.values(context.equipment).find(
+                    (eq) => eq && eq.equipment.id === sourceId
+                );
+
+                if (equipmentToUpdate) {
+                    // 直接将找到的珠子放入accessories数组，剩余位置用null填充
+                    const newAccessories: (Accessory | null)[] = [...foundAccessories];
+                    while (newAccessories.length < equipmentToUpdate.equipment.slots.length) {
+                        newAccessories.push(null);
+                    }
+                    equipmentToUpdate.accessories = newAccessories;
+
+                    // 更新技能总数
+                    foundAccessories.forEach(acc => {
+                        acc.skills.forEach(skill => {
+                            const current = context.currentSkills.get(skill.skillId) || 0;
+                            context.currentSkills.set(skill.skillId, current + skill.level);
+                        });
                     });
                 }
             }
         }
 
-        // 3d. 调用防具回溯搜索
-        console.log(`  -> Delegating to armor search for charm ${charm.id}...`);
-        const shouldContinue = findArmorCombinations(
-            context,
-            allData.armors,
-            preprocessedData,
-            finalResults,
-            SEARCH_LIMIT,
-        );
+        // 3d. [v7.2] 生成防具骨架 (Scaffolds)
+        console.log(`  -> Generating armor scaffolds for charm ${charm.id}...`);
+        const scaffolds = generateArmorScaffolds(context, preprocessedData);
+
+        if (scaffolds.length === 0) {
+            console.log(`  -> Pruned: No viable armor scaffolds found for this charm to satisfy series/group skills.`);
+            continue; // 此 weapon/charm 组合无法满足 series/group 技能，剪枝
+        }
+        console.log(`  -> Found ${scaffolds.length} possible scaffold(s).`);
+
+        // 3e. [v7.2] 遍历骨架，为每个骨架创建独立上下文并进行填充搜索
+        for (const scaffold of scaffolds) {
+            // a. 为此骨架创建独立的搜索上下文
+            const scaffoldContext = cloneDeep(context);
+
+            // b. 将骨架信息合并到新上下文中
+            for (const armorType of Object.keys(scaffold) as ArmorType[]) {
+                const armorPiece = scaffold[armorType];
+                if (armorPiece) {
+                    scaffoldContext.equipment[armorType] = armorPiece;
+                    // b1. 累加技能
+                    armorPiece.equipment.skills.forEach(skill => {
+                        const current = scaffoldContext.currentSkills.get(skill.skillId) || 0;
+                        scaffoldContext.currentSkills.set(skill.skillId, current + skill.level);
+                    });
+                    // b2. 收集孔位，并确保它们携带来源ID
+                    const slotsWithSource = armorPiece.equipment.slots.map(s => ({ ...s, sourceId: armorPiece.equipment.id, }));
+                    scaffoldContext.availableSlots.armor.push(...slotsWithSource);
+                }
+            }
+
+            // c. 调用改造后的骨架填充函数
+            const shouldContinue = fillArmorScaffold(
+                scaffoldContext, // 传入包含骨架信息的新 context
+                allData.armors,
+                preprocessedData,
+                finalResults,
+                SEARCH_LIMIT,
+            );
+
+            if (!shouldContinue) {
+                limitReached = true;
+                break; // Exit the scaffold loop
+            }
+        }
 
         console.log(`  -> Charm ${charm.id} processing finished in ${(performance.now() - charmStartTime).toFixed(2)}ms.`);
 
-        if (!shouldContinue) {
+        if (limitReached) {
             console.log(`[!] Search limit of ${SEARCH_LIMIT} reached. Aborting search.`);
-            limitReached = true;
             break; // Exit the charm loop
         }
     }
@@ -172,5 +221,6 @@ export const findOptimalSets = async (
 
     const endTime = performance.now();
     console.log(`[+] Full search completed in ${(endTime - startTime).toFixed(2)}ms.`);
+    console.log('[Debug] Final sets to be returned to UI:', JSON.stringify(sortedSets.slice(0, SEARCH_LIMIT), null, 2));
     return sortedSets.slice(0, SEARCH_LIMIT);
 };

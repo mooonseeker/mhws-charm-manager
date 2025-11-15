@@ -40,7 +40,7 @@ export function solveDecorations(
     const remainingWeaponSlots = [...availableSlots.weapon].sort((a, b) => a.level - b.level);
     const remainingArmorSlots = [...availableSlots.armor].sort((a, b) => a.level - b.level);
 
-    // 装饰品放置方案：key为孔位标识（type-level-index），value为该孔位上的装饰品列表
+    // 装饰品放置方案: key为装备ID, value为该装备上的装饰品列表
     const placement = new Map<string, Accessory[]>();
 
     let isSuccess = true;
@@ -95,18 +95,25 @@ export function solveDecorations(
 
         // 放置装饰品
         const slot = targetSlots[suitableSlotIndex];
-        const key = `${slot.type}-${slot.level}-${suitableSlotIndex}`;
-        if (!placement.has(key)) {
-            placement.set(key, []);
+        const sourceId = slot.sourceId;
+
+        // 如果孔位没有来源ID，则无法归属，这是一个错误
+        if (!sourceId) {
+            console.error('CRITICAL: slot is missing sourceId in solveDecorations', slot);
+            isSuccess = false;
+            break;
         }
-        placement.get(key)!.push(bestAccessory);
+
+        if (!placement.has(sourceId)) {
+            placement.set(sourceId, []);
+        }
+        placement.get(sourceId)!.push(bestAccessory);
 
         // 移除已使用的孔位
         targetSlots.splice(suitableSlotIndex, 1);
     }
 
-    // 返回分类后的剩余孔位
-    return {
+    const result = {
         isSuccess,
         placement,
         remainingSlots: {
@@ -114,4 +121,11 @@ export function solveDecorations(
             armor: remainingArmorSlots,
         },
     };
+
+    console.log('[Debug] solveDecorations result:', {
+        isSuccess: result.isSuccess,
+        placement: Object.fromEntries(result.placement.entries()),
+    });
+
+    return result;
 }
