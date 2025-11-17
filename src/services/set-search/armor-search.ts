@@ -11,7 +11,7 @@ import type {
 } from '@/types';
 import { cloneDeep } from 'lodash-es';
 
-import { solveDecorations } from './decoration-solver';
+import { solveAccessories } from './accessory-solver';
 import { shouldPrune, validateBaseSkills } from './helpers';
 
 const ARMOR_TYPES: ArmorType[] = ['helm', 'body', 'arm', 'waist', 'leg'];
@@ -97,7 +97,7 @@ function backtrack(
         if (armorSkillDeficits.length === 0) {
             const finalSet: FinalSet = {
                 equipment: cloneDeep(context.equipment),
-                decorations: new Map(), // No decorations are added here
+                accessories: new Map(), // No accessories are added here
                 remainingSlots: [...context.availableSlots.armor, ...context.availableSlots.weapon],
                 extraSkills: [], // Extra skill calculation can be added later
             };
@@ -112,7 +112,7 @@ function backtrack(
         }
 
         // b. 调用珠子求解器来填充 armorSkills
-        console.log(`${indent}  -> Calling decoration solver for ${armorSkillDeficits.length} deficits...`);
+        console.log(`${indent}  -> Calling accessory solver for ${armorSkillDeficits.length} deficits...`);
 
         // 步骤 3 & 4: 收集所有防具孔位并确保 sourceId,然后调用求解器
         const allArmorSlots: Slot[] = [];
@@ -126,7 +126,7 @@ function backtrack(
             }
         }
 
-        const decorationSolution = solveDecorations(
+        const accessorySolutions = solveAccessories(
             armorSkillDeficits,
             { weapon: [], armor: allArmorSlots }, // 只使用防具孔
             preprocessedData.accessoriesBySkill,
@@ -134,52 +134,69 @@ function backtrack(
         );
 
         // c. 如果填充成功，则生成最终配装方案
-        if (decorationSolution.isSuccess) {
-            console.log(`${indent}  -> Success: Decoration solver found a solution.`);
+        if (accessorySolutions.length > 0) {
+            console.log(`${indent}  -> Success: Accessory solver found ${accessorySolutions.length} solution(s).`);
 
-            // 步骤 6: 将计算出的装饰品填充回 context.equipment
-            decorationSolution.placement.forEach((placedAccessories, equipmentId) => {
-                const armorType = ARMOR_TYPES.find(type => context.equipment[type]?.equipment.id === equipmentId);
+            for (const solution of accessorySolutions) {
+                // 为每个解决方案创建独立的 equipment 副本
+                const solutionEquipment = cloneDeep(context.equipment);
 
-                if (armorType) {
-                    const equipmentSlot = context.equipment[armorType]!;
-                    const totalSlots = equipmentSlot.equipment.slots.length;
-                    const newAccessories: (Accessory | null)[] = [...placedAccessories];
-                    // 用 null 补齐以匹配孔位数量
-                    while (newAccessories.length < totalSlots) {
-                        newAccessories.push(null);
+                // 步骤 6: 将计算出的装饰品填充回 solutionEquipment
+                solution.placement.forEach((placedAccessories, equipmentId) => {
+                    const armorType = ARMOR_TYPES.find(type => solutionEquipment[type]?.equipment.id === equipmentId);
+
+                    if (armorType) {
+                        const equipmentSlot = solutionEquipment[armorType]!;
+                        const totalSlots = equipmentSlot.equipment.slots.length;
+                        const newAccessories: (Accessory | null)[] = Array(totalSlots).fill(null);
+                        const originalSlots = equipmentSlot.equipment.slots;
+                        // 优先放置需要高级孔位的珠子
+                        const accessoriesToPlace = [...placedAccessories].sort((a, b) => b.slotLevel - a.slotLevel);
+
+                        for (const accessory of accessoriesToPlace) {
+                            let placed = false;
+                            // 寻找第一个能容纳该珠子的空孔位
+                            for (let i = 0; i < originalSlots.length; i++) {
+                                if (newAccessories[i] === null && originalSlots[i].level >= accessory.slotLevel) {
+                                    newAccessories[i] = accessory;
+                                    placed = true;
+                                    break;
+                                }
+                            }
+                            if (!placed) {
+                                console.error("CRITICAL: Could not place accessory", accessory, "on", equipmentSlot.equipment.id);
+                            }
+                        }
+                        equipmentSlot.accessories = newAccessories;
                     }
-                    equipmentSlot.accessories = newAccessories;
-                }
-            });
+                });
 
-            // 步骤 7: 创建最终方案，深拷贝已填充的 equipment，并反向生成 decorations
-            const finalEquipment = cloneDeep(context.equipment);
-
-            const finalDecorations = new Map<string, Accessory[]>();
-            Object.values(finalEquipment).forEach(slottedEq => {
-                if (slottedEq?.accessories) {
-                    const accessories = slottedEq.accessories.filter((a: Accessory | null): a is Accessory => a !== null);
-                    if (accessories.length > 0) {
-                        finalDecorations.set(slottedEq.equipment.id, accessories);
+                // 步骤 7: 创建最终方案，使用已填充的 solutionEquipment，并反向生成 accessories
+                const finalAccessories = new Map<string, Accessory[]>();
+                Object.values(solutionEquipment).forEach(slottedEq => {
+                    if (slottedEq?.accessories) {
+                        const accessories = slottedEq.accessories.filter((a: Accessory | null): a is Accessory => a !== null);
+                        if (accessories.length > 0) {
+                            finalAccessories.set(slottedEq.equipment.id, accessories);
+                        }
                     }
-                }
-            });
+                });
 
-            const finalSet: FinalSet = {
-                equipment: finalEquipment,
-                decorations: finalDecorations,
-                remainingSlots: [...decorationSolution.remainingSlots.armor, ...context.availableSlots.weapon],
-                extraSkills: [], // Extra skill calculation can be added later
-            };
-            finalResults.push(finalSet);
-            console.log('[Debug] Found a solution (with decorations):', JSON.stringify(finalSet, null, 2));
-            if (finalResults.length >= limit) {
-                console.log(`${indent}  -> Search limit reached!`);
-                return false; // Stop searching
+                const finalSet: FinalSet = {
+                    equipment: solutionEquipment,
+                    accessories: finalAccessories,
+                    remainingSlots: [...solution.remainingSlots.armor, ...context.availableSlots.weapon],
+                    extraSkills: [], // Extra skill calculation can be added later
+                };
+                finalResults.push(finalSet);
+                console.log('[Debug] Found a solution (with accessories):', JSON.stringify(finalSet, null, 2));
+                if (finalResults.length >= limit) {
+                    console.log(`${indent}  -> Search limit reached!`);
+                    return false; // Stop searching
+                }
             }
         } else {
-            console.log(`${indent}  -> Failure: Decoration solver could not find a solution.`);
+            console.log(`${indent}  -> Failure: Accessory solver could not find a solution.`);
         }
         // 如果失败，则此组合无效，直接返回
         return true; // Continue searching this branch's siblings

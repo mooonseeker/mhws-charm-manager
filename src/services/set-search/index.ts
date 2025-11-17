@@ -7,8 +7,8 @@ import type { Accessory, Armor, ArmorType, Charm, FinalSet, Skill, SkillWithLeve
 import type { SearchContext, SkillDeficit } from '@/types/set-builder';
 import { cloneDeep } from 'lodash-es';
 
+import { solveAccessories } from './accessory-solver';
 import { fillArmorScaffold } from './armor-search';
-import { solveDecorations } from './decoration-solver';
 import { preprocess } from './preprocess';
 import { evaluateAndSortResults } from './result-evaluator';
 import { generateArmorScaffolds } from './scaffold-generator';
@@ -93,8 +93,8 @@ export const findOptimalSets = async (
 
         const context: SearchContext = {
             equipment: {
-                weapon: { equipment: fixedWeapon, accessories: [] },
-                charm: { equipment: charm as Charm, accessories: [] },
+                weapon: { equipment: fixedWeapon, accessories: Array(fixedWeapon.slots.length).fill(null) },
+                charm: { equipment: charm as Charm, accessories: Array(charm.slots.length).fill(null) },
             },
             currentSkills,
             availableSlots: {
@@ -118,7 +118,7 @@ export const findOptimalSets = async (
             .filter(deficit => deficit.missingLevel > 0);
 
         if (weaponSkillDeficits.length > 0) {
-            const solution = solveDecorations(
+            const weaponSkillSolutions = solveAccessories(
                 weaponSkillDeficits,
                 context.availableSlots,
                 preprocessedData.accessoriesBySkill,
@@ -126,83 +126,153 @@ export const findOptimalSets = async (
             );
 
             // 如果填充失败，则此 (武器+护石) 组合无法满足武器技能需求，直接剪枝
-            if (!solution.isSuccess) {
+            if (weaponSkillSolutions.length === 0) {
                 console.log(`  -> Pruned: Failed to solve weapon skills for this charm.`);
                 continue;
             }
 
-            // 3c. 更新 SearchContext
-            context.availableSlots = solution.remainingSlots;
-            context.skillDeficits.weaponSkills = []; // 武器技能缺口被满足
+            console.log(`  -> Found ${weaponSkillSolutions.length} weapon skill solution(s).`);
 
-            // 将找到的珠子填充回 context.equipment 中
-            for (const [sourceId, foundAccessories] of solution.placement.entries()) {
-                const equipmentToUpdate = Object.values(context.equipment).find(
-                    (eq) => eq && eq.equipment.id === sourceId
+            // 3c. 为每个武器技能解决方案创建独立的搜索分支
+            for (const solution of weaponSkillSolutions) {
+                // a. 为此解决方案创建独立的搜索上下文
+                const branchContext = cloneDeep(context);
+
+                // b. 更新分支上下文
+                branchContext.availableSlots = solution.remainingSlots;
+                branchContext.skillDeficits.weaponSkills = []; // 武器技能缺口被满足
+
+                // c. 将找到的珠子填充回 branchContext.equipment 中
+                for (const [sourceId, foundAccessories] of solution.placement.entries()) {
+                    const equipmentToUpdate = Object.values(branchContext.equipment).find(
+                        (eq) => eq && eq.equipment.id === sourceId
+                    );
+
+                    if (equipmentToUpdate) {
+                        const newAccessories: (Accessory | null)[] = Array(equipmentToUpdate.equipment.slots.length).fill(null);
+                        const originalSlots = equipmentToUpdate.equipment.slots;
+                        // 优先放置需要高级孔位的珠子
+                        const accessoriesToPlace = [...foundAccessories].sort((a, b) => b.slotLevel - a.slotLevel);
+
+                        for (const accessory of accessoriesToPlace) {
+                            let placed = false;
+                            // 寻找第一个能容纳该珠子的空孔位
+                            for (let i = 0; i < originalSlots.length; i++) {
+                                if (newAccessories[i] === null && originalSlots[i].level >= accessory.slotLevel) {
+                                    newAccessories[i] = accessory;
+                                    placed = true;
+                                    break;
+                                }
+                            }
+                            if (!placed) {
+                                console.error("CRITICAL: Could not place accessory", accessory, "on", equipmentToUpdate.equipment.id);
+                            }
+                        }
+                        equipmentToUpdate.accessories = newAccessories;
+
+                        // 更新技能总数
+                        foundAccessories.forEach(acc => {
+                            acc.skills.forEach(skill => {
+                                const current = branchContext.currentSkills.get(skill.skillId) || 0;
+                                branchContext.currentSkills.set(skill.skillId, current + skill.level);
+                            });
+                        });
+                    }
+                }
+
+                // 3d. [v7.2] 生成防具骨架 (Scaffolds)
+                console.log(`  -> Generating armor scaffolds for charm ${charm.id} with weapon skill solution...`);
+                const scaffolds = generateArmorScaffolds(branchContext, preprocessedData);
+
+                if (scaffolds.length === 0) {
+                    console.log(`  -> Pruned: No viable armor scaffolds found for this charm to satisfy series/group skills.`);
+                    continue; // 此 weapon/charm 组合无法满足 series/group 技能，剪枝
+                }
+                console.log(`  -> Found ${scaffolds.length} possible scaffold(s).`);
+
+                // 3e. [v7.2] 遍历骨架，为每个骨架创建独立上下文并进行填充搜索
+                for (const scaffold of scaffolds) {
+                    // a. 为此骨架创建独立的搜索上下文
+                    const scaffoldContext = cloneDeep(branchContext);
+
+                    // b. 将骨架信息合并到新上下文中
+                    for (const armorType of Object.keys(scaffold) as ArmorType[]) {
+                        const armorPiece = scaffold[armorType];
+                        if (armorPiece) {
+                            scaffoldContext.equipment[armorType] = armorPiece;
+                            // b1. 累加技能
+                            armorPiece.equipment.skills.forEach(skill => {
+                                const current = scaffoldContext.currentSkills.get(skill.skillId) || 0;
+                                scaffoldContext.currentSkills.set(skill.skillId, current + skill.level);
+                            });
+                            // b2. 收集孔位，并确保它们携带来源ID
+                            const slotsWithSource = armorPiece.equipment.slots.map(s => ({ ...s, sourceId: armorPiece.equipment.id, }));
+                            scaffoldContext.availableSlots.armor.push(...slotsWithSource);
+                        }
+                    }
+
+                    // c. 调用改造后的骨架填充函数
+                    const shouldContinue = fillArmorScaffold(
+                        scaffoldContext, // 传入包含骨架信息的新 context
+                        allData.armors,
+                        preprocessedData,
+                        finalResults,
+                        SEARCH_LIMIT,
+                    );
+
+                    if (!shouldContinue) {
+                        limitReached = true;
+                        break; // Exit the scaffold loop
+                    }
+                }
+            }
+        } else {
+            // 如果没有武器技能缺口，直接进入防具骨架生成阶段
+            console.log(`  -> No weapon skill deficits, proceeding directly to armor scaffolds...`);
+
+            // 3d. [v7.2] 生成防具骨架 (Scaffolds)
+            const scaffolds = generateArmorScaffolds(context, preprocessedData);
+
+            if (scaffolds.length === 0) {
+                console.log(`  -> Pruned: No viable armor scaffolds found for this charm to satisfy series/group skills.`);
+                continue; // 此 weapon/charm 组合无法满足 series/group 技能，剪枝
+            }
+            console.log(`  -> Found ${scaffolds.length} possible scaffold(s).`);
+
+            // 3e. [v7.2] 遍历骨架，为每个骨架创建独立上下文并进行填充搜索
+            for (const scaffold of scaffolds) {
+                // a. 为此骨架创建独立的搜索上下文
+                const scaffoldContext = cloneDeep(context);
+
+                // b. 将骨架信息合并到新上下文中
+                for (const armorType of Object.keys(scaffold) as ArmorType[]) {
+                    const armorPiece = scaffold[armorType];
+                    if (armorPiece) {
+                        scaffoldContext.equipment[armorType] = armorPiece;
+                        // b1. 累加技能
+                        armorPiece.equipment.skills.forEach(skill => {
+                            const current = scaffoldContext.currentSkills.get(skill.skillId) || 0;
+                            scaffoldContext.currentSkills.set(skill.skillId, current + skill.level);
+                        });
+                        // b2. 收集孔位，并确保它们携带来源ID
+                        const slotsWithSource = armorPiece.equipment.slots.map(s => ({ ...s, sourceId: armorPiece.equipment.id, }));
+                        scaffoldContext.availableSlots.armor.push(...slotsWithSource);
+                    }
+                }
+
+                // c. 调用改造后的骨架填充函数
+                const shouldContinue = fillArmorScaffold(
+                    scaffoldContext, // 传入包含骨架信息的新 context
+                    allData.armors,
+                    preprocessedData,
+                    finalResults,
+                    SEARCH_LIMIT,
                 );
 
-                if (equipmentToUpdate) {
-                    // 直接将找到的珠子放入accessories数组，剩余位置用null填充
-                    const newAccessories: (Accessory | null)[] = [...foundAccessories];
-                    while (newAccessories.length < equipmentToUpdate.equipment.slots.length) {
-                        newAccessories.push(null);
-                    }
-                    equipmentToUpdate.accessories = newAccessories;
-
-                    // 更新技能总数
-                    foundAccessories.forEach(acc => {
-                        acc.skills.forEach(skill => {
-                            const current = context.currentSkills.get(skill.skillId) || 0;
-                            context.currentSkills.set(skill.skillId, current + skill.level);
-                        });
-                    });
+                if (!shouldContinue) {
+                    limitReached = true;
+                    break; // Exit the scaffold loop
                 }
-            }
-        }
-
-        // 3d. [v7.2] 生成防具骨架 (Scaffolds)
-        console.log(`  -> Generating armor scaffolds for charm ${charm.id}...`);
-        const scaffolds = generateArmorScaffolds(context, preprocessedData);
-
-        if (scaffolds.length === 0) {
-            console.log(`  -> Pruned: No viable armor scaffolds found for this charm to satisfy series/group skills.`);
-            continue; // 此 weapon/charm 组合无法满足 series/group 技能，剪枝
-        }
-        console.log(`  -> Found ${scaffolds.length} possible scaffold(s).`);
-
-        // 3e. [v7.2] 遍历骨架，为每个骨架创建独立上下文并进行填充搜索
-        for (const scaffold of scaffolds) {
-            // a. 为此骨架创建独立的搜索上下文
-            const scaffoldContext = cloneDeep(context);
-
-            // b. 将骨架信息合并到新上下文中
-            for (const armorType of Object.keys(scaffold) as ArmorType[]) {
-                const armorPiece = scaffold[armorType];
-                if (armorPiece) {
-                    scaffoldContext.equipment[armorType] = armorPiece;
-                    // b1. 累加技能
-                    armorPiece.equipment.skills.forEach(skill => {
-                        const current = scaffoldContext.currentSkills.get(skill.skillId) || 0;
-                        scaffoldContext.currentSkills.set(skill.skillId, current + skill.level);
-                    });
-                    // b2. 收集孔位，并确保它们携带来源ID
-                    const slotsWithSource = armorPiece.equipment.slots.map(s => ({ ...s, sourceId: armorPiece.equipment.id, }));
-                    scaffoldContext.availableSlots.armor.push(...slotsWithSource);
-                }
-            }
-
-            // c. 调用改造后的骨架填充函数
-            const shouldContinue = fillArmorScaffold(
-                scaffoldContext, // 传入包含骨架信息的新 context
-                allData.armors,
-                preprocessedData,
-                finalResults,
-                SEARCH_LIMIT,
-            );
-
-            if (!shouldContinue) {
-                limitReached = true;
-                break; // Exit the scaffold loop
             }
         }
 

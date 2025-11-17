@@ -177,7 +177,7 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
 
             if (slottedEquipment) {
                 const equipmentId = slottedEquipment.equipment.id;
-                const decorationsForEquipment = finalSet.decorations.get(equipmentId) || [];
+                const decorationsForEquipment = finalSet.accessories.get(equipmentId) || [];
 
                 // 新增Log，用于验证decorationsForEquipment是否能取到值
                 if (decorationsForEquipment.length > 0) {

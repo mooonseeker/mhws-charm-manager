@@ -87,7 +87,7 @@ export interface SkillDeficit {
 }
 
 /** 装饰品填充方案的结果 */
-export interface DecorationSolution {
+export interface AccessorySolution {
     /** 是否成功找到满足所有技能需求的装饰品方案 */
     isSuccess: boolean;
     /** 装饰品的具体放置方案，Key为装备ID，Value为镶嵌的装饰品列表 */
@@ -106,7 +106,7 @@ export interface FinalSet {
     /** 最终装备组合 */
     equipment: EquipmentSet;
     /** 使用的装饰品详情 */
-    decorations: Map<string, Accessory[]>;
+    accessories: Map<string, Accessory[]>;
     /** 剩余的孔位 */
     remainingSlots: Slot[];
     /** 溢出的技能 */
