@@ -98,8 +98,13 @@ export const findOptimalSets = async (
             },
             currentSkills,
             availableSlots: {
-                weapon: fixedWeapon.slots.map(s => ({ ...s, sourceId: fixedWeapon.id })),
-                armor: charm.slots.map(s => ({ ...s, sourceId: charm.id })),
+                weapon: [
+                    ...fixedWeapon.slots.map(s => ({ ...s, sourceId: fixedWeapon.id })),
+                    ...charm.slots.filter(s => s.type === 'weapon').map(s => ({ ...s, sourceId: charm.id })),
+                ],
+                armor: [
+                    ...charm.slots.filter(s => s.type === 'armor').map(s => ({ ...s, sourceId: charm.id })),
+                ],
             },
             skillDeficits: cloneDeep(categorizedSkills), // 深拷贝以防循环间的状态污染
         };
