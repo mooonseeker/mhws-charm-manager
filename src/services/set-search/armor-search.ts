@@ -69,8 +69,7 @@ function backtrack(
     const indent = '    '.repeat(armorTypeIndex + 2);
 
     // 1. 剪枝检查
-    if (shouldPrune(context.currentSkills, remainingArmorTypes, context.skillDeficits, preprocessedData)) {
-        // console.log(`${indent}[-] Pruning branch at level ${armorTypeIndex}.`); // Log is very noisy
+    if (shouldPrune(context.currentSkills, remainingArmorTypes, context.skillDeficits, preprocessedData, context.availableSlots)) {
         return true; // Prune this branch, but continue searching siblings
     }
 
@@ -189,7 +188,6 @@ function backtrack(
                     extraSkills: [], // Extra skill calculation can be added later
                 };
                 finalResults.push(finalSet);
-                console.log('[Debug] Found a solution (with accessories):', JSON.stringify(finalSet, null, 2));
                 if (finalResults.length >= limit) {
                     console.log(`${indent}  -> Search limit reached!`);
                     return false; // Stop searching

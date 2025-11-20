@@ -4,6 +4,7 @@ import type {
     EquipmentSet,
     PreprocessedData,
     SkillWithLevel,
+    Slot,
 } from '@/types';
 
 /**
@@ -16,6 +17,7 @@ import type {
  * @param remainingArmorTypes - 剩余待选的防具部位列表
  * @param skillDeficits - 尚未被满足的技能需求
  * @param preprocessedData - 包含 `maxPotentialPerArmorType` 的预处理数据
+ * @param availableSlots - 当前可用的孔位（来自已选装备）
  * @returns {boolean} - 如果确定无法满足需求，应进行剪枝，则返回 true
  */
 export function shouldPrune(
@@ -23,6 +25,7 @@ export function shouldPrune(
     remainingArmorTypes: ArmorType[],
     skillDeficits: CategorizedSkills,
     preprocessedData: PreprocessedData,
+    availableSlots?: { weapon: Slot[], armor: Slot[] },
 ): boolean {
     const skillsToEvaluate: SkillWithLevel[] = [
         ...skillDeficits.noAccessorySkills,
@@ -38,6 +41,7 @@ export function shouldPrune(
             continue;
         }
 
+        // 1. 计算剩余防具部位的潜力 (包含自带技能 + 那个部位的孔位潜力)
         let remainingPotential = 0;
         for (const armorType of remainingArmorTypes) {
             const potentialOnType = preprocessedData.maxPotentialPerArmorType.get(armorType);
@@ -46,8 +50,32 @@ export function shouldPrune(
             }
         }
 
-        // 如果 当前等级 + 剩余所有部位的最大潜力 < 目标等级，则不可能满足，进行剪枝
-        if (currentLevel + remainingPotential < requiredLevel) {
+        // 2. 计算当前已存在孔位的潜力 (仅针对 armorSkills)
+        let currentSlotsPotential = 0;
+        if (availableSlots && preprocessedData.accessoriesBySkill.has(skillId)) {
+            const accessories = preprocessedData.accessoriesBySkill.get(skillId) || [];
+            if (accessories.length > 0) {
+                // 简单的贪心估算：所有可用孔位都插上该技能最好的珠子
+                // 注意：这里不区分 weapon/armor 孔位类型限制，因为大多数 armorSkill 珠子都可以插
+                // 如果有严格限制，需要更细致的判断。目前假设 armorSkills 珠子通用。
+                const allSlots = [...availableSlots.weapon, ...availableSlots.armor];
+
+                for (const slot of allSlots) {
+                    let maxLevelForSlot = 0;
+                    for (const acc of accessories) {
+                        if (acc.slotLevel <= slot.level) {
+                            const skillVal = acc.skills.find(s => s.skillId === skillId)?.level || 0;
+                            maxLevelForSlot = Math.max(maxLevelForSlot, skillVal);
+                        }
+                    }
+                    currentSlotsPotential += maxLevelForSlot;
+                }
+            }
+        }
+
+        // 如果 当前等级 + 剩余所有部位的最大潜力 + 当前孔位潜力 < 目标等级，则不可能满足，进行剪枝
+        if (currentLevel + remainingPotential + currentSlotsPotential < requiredLevel) {
+            // console.log(`[Prune] Skill ${skillId}: Current ${currentLevel} + RemPot ${remainingPotential} + SlotPot ${currentSlotsPotential} < Required ${requiredLevel}`);
             return true; // Prune this branch
         }
     }
