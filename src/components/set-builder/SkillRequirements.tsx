@@ -1,3 +1,6 @@
+import { Search } from 'lucide-react';
+
+import { SkillSelector } from '@/components/skills';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSkills } from '@/contexts';
@@ -5,7 +8,7 @@ import { useSetBuilder } from '@/contexts/SetBuilderContext';
 import { cn } from '@/lib/utils';
 
 export function SkillRequirements() {
-    const { requiredSkills, updateRequiredSkillLevel } = useSetBuilder();
+    const { requiredSkills, updateRequiredSkillLevel, startSearch, isSearching, addRequiredSkill } = useSetBuilder();
     const { getSkillById } = useSkills();
 
     const handleLevelChange = (skillId: string, currentLevel: number, change: number) => {
@@ -18,9 +21,9 @@ export function SkillRequirements() {
             <CardHeader>
                 <CardTitle>技能需求</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
                 {requiredSkills.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">请通过上方的工具栏添加技能需求。</p>
+                    <p className="text-muted-foreground text-sm">请通过下方的技能选择器添加技能需求。</p>
                 ) : (
                     <ul className="space-y-2">
                         {requiredSkills.map(skill => {
@@ -53,6 +56,26 @@ export function SkillRequirements() {
                         })}
                     </ul>
                 )}
+
+                {/* 底部：技能选择器和搜索按钮 */}
+                <div className="pt-4 border-t border-border">
+                    <div className="flex items-end gap-2">
+                        <div className="flex-1">
+                            <SkillSelector
+                                onSelect={addRequiredSkill}
+                                excludeSkillIds={requiredSkills.map(s => s.skillId)}
+                            />
+                        </div>
+                        <Button
+                            onClick={startSearch}
+                            disabled={isSearching}
+                            className="flex-shrink-0"
+                        >
+                            <Search className="h-4 w-4 mr-2" />
+                            搜索
+                        </Button>
+                    </div>
+                </div>
             </CardContent>
         </Card>
     );

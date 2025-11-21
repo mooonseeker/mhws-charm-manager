@@ -1,35 +1,61 @@
-import { List, RefreshCw, Search } from 'lucide-react';
+import { ClipboardList, RefreshCw, ScrollText, Search, Sparkles, Square } from 'lucide-react';
 
-import { SkillSelector } from '@/components/skills';
 import { Button } from '@/components/ui/button';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useSetBuilder } from '@/contexts/SetBuilderContext';
 
-export function AutoModeToolbar() {
-    const { addRequiredSkill, startSearch, requiredSkills, setIsResultsModalOpen, searchResults } = useSetBuilder();
+export function AutoModeActions() {
+    const {
+        startSearch,
+        resetBuilder,
+        isSearching
+    } = useSetBuilder();
 
     return (
-        <div className="flex-1 flex justify-end items-center gap-2">
-            <div className="w-64">
-                <SkillSelector
-                    onSelect={addRequiredSkill}
-                    excludeSkillIds={requiredSkills.map(s => s.skillId)}
-                />
-            </div>
-            <Button variant="outline" size="icon" onClick={() => console.log('Reset clicked')}>
-                <RefreshCw className="h-4 w-4" />
-            </Button>
-            <Button onClick={startSearch}>
+        <div className="flex items-center gap-2">
+            <Button
+                onClick={startSearch}
+                disabled={isSearching}
+                size="sm"
+            >
                 <Search className="h-4 w-4 mr-2" />
                 搜索
             </Button>
-            <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setIsResultsModalOpen(true)}
-                disabled={searchResults.length === 0}
-            >
-                <List className="h-4 w-4" />
+            {isSearching && (
+                <Button variant="outline" size="sm" className="px-2.5" onClick={() => console.log('Stop clicked')}>
+                    <Square className="h-4 w-4" />
+                </Button>
+            )}
+            <Button variant="outline" size="sm" className="px-2.5" onClick={resetBuilder}>
+                <RefreshCw className="h-4 w-4" />
             </Button>
         </div>
+    );
+}
+
+export function AutoModeViewToggle() {
+    const {
+        autoModeView,
+        setAutoModeView,
+    } = useSetBuilder();
+
+    return (
+        <ToggleGroup
+            type="single"
+            value={autoModeView}
+            onValueChange={(v) => v && setAutoModeView(v as 'requirements' | 'results' | 'summary')}
+            size="sm"
+            className="border border-border rounded-md p-1"
+        >
+            <ToggleGroupItem value="requirements" aria-label="技能需求">
+                <ClipboardList className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="results" aria-label="搜索结果">
+                <Sparkles className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="summary" aria-label="套装汇总">
+                <ScrollText className="h-4 w-4" />
+            </ToggleGroupItem>
+        </ToggleGroup>
     );
 }

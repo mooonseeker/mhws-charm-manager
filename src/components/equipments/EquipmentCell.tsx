@@ -1,3 +1,5 @@
+import { Lock, Unlock } from 'lucide-react';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +12,8 @@ export interface EquipmentCellProps {
     slottedEquipment?: SlottedEquipment<Weapon | Armor | Charm>;
     onEquipmentClick: () => void;
     onSlotClick: (slotIndex: number, slot: Slot) => void;
+    isLocked?: boolean;
+    onToggleLock?: () => void;
 }
 
 const typeToLabel: Record<EquipmentCellType, string> = {
@@ -33,16 +37,43 @@ const getAccessoryIcon = (slotType: 'weapon' | 'armor', level: number) => {
     return `/slot/${slotType}-slot-${validLevel}.png`;
 };
 
-export function EquipmentCell({ type, isSelected, slottedEquipment, onEquipmentClick, onSlotClick }: EquipmentCellProps) {
+export function EquipmentCell({
+    type,
+    isSelected,
+    slottedEquipment,
+    onEquipmentClick,
+    onSlotClick,
+    isLocked = false,
+    onToggleLock
+}: EquipmentCellProps) {
     const label = typeToLabel[type];
     const iconPath = getIconPath(type);
     const { equipment, accessories } = slottedEquipment || {};
 
+    const handleToggleLock = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onToggleLock?.();
+    };
+
     return (
         <Card className={cn(
-            "h-full w-full", // 占满父容器
+            "h-full w-full relative", // 占满父容器，添加 relative 定位
             isSelected && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
         )}>
+            {/* 锁定图标 - 仅在自动模式下显示 */}
+            {onToggleLock && (
+                <button
+                    onClick={handleToggleLock}
+                    className="absolute top-1 right-1 z-10 p-1 rounded-md bg-background/80 hover:bg-background transition-colors"
+                    aria-label={isLocked ? "解锁" : "锁定"}
+                >
+                    {isLocked ? (
+                        <Lock className="h-3 w-3 text-muted-foreground" />
+                    ) : (
+                        <Unlock className="h-3 w-3 text-muted-foreground" />
+                    )}
+                </button>
+            )}
             <CardContent className="p-2 h-full w-full flex items-stretch gap-2" onClick={onEquipmentClick}>
                 {/* 左侧图标区 */}
                 <div className="w-12 aspect-square self-center flex items-center justify-center p-1 shrink-0">

@@ -33,6 +33,9 @@ interface SetBuilderState {
     currentEquipmentSet: EquipmentSet;
     selectionContext: SelectionContext | null;
     isResultsModalOpen: boolean;
+    lockedSlots: Record<EquipmentCellType, boolean>;
+    autoModeView: 'requirements' | 'results' | 'summary';
+    isSearchPrimed: boolean;
 }
 
 interface SetBuilderActions {
@@ -46,6 +49,9 @@ interface SetBuilderActions {
     handleSlotClick: (slotType: EquipmentCellType, slotIndex: number, slot: Slot) => void;
     handleAccessorySelect: (accessory: Accessory) => void;
     setIsResultsModalOpen: (isOpen: boolean) => void;
+    toggleSlotLock: (type: EquipmentCellType) => void;
+    setAutoModeView: (view: 'requirements' | 'results' | 'summary') => void;
+    resetBuilder: () => void;
 }
 
 const SetBuilderContext = createContext<(SetBuilderState & SetBuilderActions) | undefined>(undefined);
@@ -68,6 +74,17 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
     const [currentEquipmentSet, setCurrentEquipmentSet] = useState<EquipmentSet>({});
     const [selectionContext, setSelectionContext] = useState<SelectionContext | null>(null);
     const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
+    const [lockedSlots, setLockedSlots] = useState<Record<EquipmentCellType, boolean>>({
+        weapon: false,
+        helm: false,
+        body: false,
+        arm: false,
+        waist: false,
+        leg: false,
+        charm: false,
+    });
+    const [autoModeView, setAutoModeViewState] = useState<'requirements' | 'results' | 'summary'>('requirements');
+    const [isSearchPrimed, setIsSearchPrimed] = useState<boolean>(false);
 
     const handleEqSlotClick = (type: EquipmentCellType) => {
         if (selectionContext?.type === 'equipment' && selectionContext.equipmentType === type) {
@@ -133,6 +150,27 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
     };
 
     const startSearch = useCallback(async (): Promise<void> => {
+        // 第一步：准备搜索
+        if (!isSearchPrimed) {
+            setIsSearchPrimed(true);
+
+            // 清空未被锁定的装备槽
+            setCurrentEquipmentSet(prev => {
+                const newSet = { ...prev };
+                Object.keys(newSet).forEach(key => {
+                    const equipmentType = key as EquipmentCellType;
+                    if (!lockedSlots[equipmentType]) {
+                        delete newSet[equipmentType];
+                    }
+                });
+                return newSet;
+            });
+
+            setAutoModeView('requirements');
+            return;
+        }
+
+        // 第二步：执行搜索
         let fixedWeapon = currentEquipmentSet.weapon?.equipment;
 
         if (!fixedWeapon) {
@@ -147,6 +185,9 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
 
         console.log('Starting a real search for skills:', requiredSkills, 'with weapon:', fixedWeapon.name);
         setIsSearching(true);
+        setIsSearchPrimed(false);
+        setAutoModeView('results');
+
         try {
             const results = await findOptimalSets(
                 requiredSkills,
@@ -155,16 +196,13 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
             );
             console.log('Search completed with results:', results);
             setSearchResults(results);
-            if (results.length > 0) {
-                setIsResultsModalOpen(true);
-            }
         } catch (error) {
             console.error("An error occurred during search:", error);
             setSearchResults([]); // 出错时清空结果
         } finally {
             setIsSearching(false);
         }
-    }, [requiredSkills, currentEquipmentSet, armor, weapons, accessories, skills, charms]);
+    }, [requiredSkills, currentEquipmentSet, armor, weapons, accessories, skills, charms, isSearchPrimed, lockedSlots]);
 
     const loadSetToBuilder = (finalSet: FinalSet) => {
         console.log('[Debug] loadSetToBuilder received finalSet:', JSON.stringify(finalSet, null, 2));
@@ -197,7 +235,49 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
 
         console.log('[Debug] Processed newEquipmentSet for UI:', JSON.stringify(newEquipmentSet, null, 2));
         setCurrentEquipmentSet(newEquipmentSet);
-        setIsResultsModalOpen(false);
+
+        // 加载套装后锁定所有装备槽
+        const allLocked: Record<EquipmentCellType, boolean> = {
+            weapon: true,
+            helm: true,
+            body: true,
+            arm: true,
+            waist: true,
+            leg: true,
+            charm: true,
+        };
+        setLockedSlots(allLocked);
+
+        setAutoModeView('summary');
+    };
+
+    const toggleSlotLock = (type: EquipmentCellType) => {
+        setLockedSlots(prev => ({
+            ...prev,
+            [type]: !prev[type]
+        }));
+    };
+
+    const setAutoModeView = (view: 'requirements' | 'results' | 'summary') => {
+        setAutoModeViewState(view);
+    };
+
+    const resetBuilder = () => {
+        setRequiredSkills([]);
+        setSearchResults([]);
+        setIsSearchPrimed(false);
+
+        // 只重置未锁定的装备槽
+        setCurrentEquipmentSet(prev => {
+            const newSet = { ...prev };
+            Object.keys(newSet).forEach(key => {
+                const equipmentType = key as EquipmentCellType;
+                if (!lockedSlots[equipmentType]) {
+                    delete newSet[equipmentType];
+                }
+            });
+            return newSet;
+        });
     };
 
     const value = {
@@ -208,6 +288,9 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
         currentEquipmentSet,
         selectionContext,
         isResultsModalOpen,
+        lockedSlots,
+        autoModeView,
+        isSearchPrimed,
         setMode,
         addRequiredSkill,
         updateRequiredSkillLevel,
@@ -218,6 +301,9 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
         handleSlotClick,
         handleAccessorySelect,
         setIsResultsModalOpen,
+        toggleSlotLock,
+        setAutoModeView,
+        resetBuilder,
     };
 
     return (
