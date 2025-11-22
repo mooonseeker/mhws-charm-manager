@@ -50,7 +50,7 @@ export function EquipmentCard({ item, className, variant = 'full', isSelected }:
         if (isWeapon(item)) {
             return `/weapon-type/${item.type}.png`;
         }
-        return '/special.png'; // Fallback icon
+        return '/set.png'; // Fallback icon
     };
 
     return (

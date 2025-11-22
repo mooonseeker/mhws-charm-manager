@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { Footer } from './Footer';
 import { Header } from './Header';
 import { Navigation } from './Navigation';
 
@@ -24,8 +23,6 @@ export function MainLayout({ currentTab, onTabChange, children }: MainLayoutProp
                     {children}
                 </div>
             </main>
-
-            <Footer />
         </div>
     );
 }

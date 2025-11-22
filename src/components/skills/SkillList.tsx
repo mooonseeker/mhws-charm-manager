@@ -41,7 +41,7 @@ export function SkillList({ onEdit, isLocked }: SkillListProps) {
             case 'series':
             case 'group':
             default:
-                return `/special.png`;
+                return `/set.png`;
         }
     };
 
