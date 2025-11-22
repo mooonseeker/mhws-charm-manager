@@ -1,4 +1,4 @@
-import { Lock, Unlock } from 'lucide-react';
+import { Lock, Unlock, X } from 'lucide-react';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -14,6 +14,7 @@ export interface EquipmentCellProps {
     onSlotClick: (slotIndex: number, slot: Slot) => void;
     isLocked?: boolean;
     onToggleLock?: () => void;
+    onClear?: () => void;
 }
 
 const typeToLabel: Record<EquipmentCellType, string> = {
@@ -44,7 +45,8 @@ export function EquipmentCell({
     onEquipmentClick,
     onSlotClick,
     isLocked = false,
-    onToggleLock
+    onToggleLock,
+    onClear
 }: EquipmentCellProps) {
     const label = typeToLabel[type];
     const iconPath = getIconPath(type);
@@ -60,23 +62,36 @@ export function EquipmentCell({
             "h-full w-full relative", // 占满父容器，添加 relative 定位
             isSelected && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
         )}>
-            {/* 锁定图标 - 仅在自动模式下显示 */}
-            {onToggleLock && (
+            {/* 清除按钮 - 位于卡片右上角 */}
+            {onClear && slottedEquipment && (
                 <button
-                    onClick={handleToggleLock}
-                    className="absolute top-1 right-1 z-10 p-1 rounded-md bg-background/80 hover:bg-background transition-colors"
-                    aria-label={isLocked ? "解锁" : "锁定"}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onClear();
+                    }}
+                    className="absolute -top-2 -right-2 z-20 p-1 rounded-full bg-background border border-border shadow-sm hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                    aria-label="清除装备"
                 >
-                    {isLocked ? (
-                        <Lock className="h-3 w-3 text-muted-foreground" />
-                    ) : (
-                        <Unlock className="h-3 w-3 text-muted-foreground" />
-                    )}
+                    <X className="h-3 w-3" />
                 </button>
             )}
             <CardContent className="p-2 h-full w-full flex items-stretch gap-2" onClick={onEquipmentClick}>
                 {/* 左侧图标区 */}
-                <div className="w-12 aspect-square self-center flex items-center justify-center p-1 shrink-0">
+                <div className="relative w-12 aspect-square self-center flex items-center justify-center p-1 shrink-0">
+                    {/* 锁定图标 - 移至左侧图标右上角 */}
+                    {onToggleLock && (
+                        <button
+                            onClick={handleToggleLock}
+                            className="absolute -top-1 -right-1 z-10 p-0.5 rounded-md bg-background/80 hover:bg-background transition-colors"
+                            aria-label={isLocked ? "解锁" : "锁定"}
+                        >
+                            {isLocked ? (
+                                <Lock className="h-6 w-6 text-destructive" />
+                            ) : (
+                                <Unlock className="h-4 w-4 text-muted-foreground" />
+                            )}
+                        </button>
+                    )}
                     <img src={iconPath} alt={label} className="max-w-full max-h-full object-contain" />
                 </div>
                 <div className="border-l border-border/50" />

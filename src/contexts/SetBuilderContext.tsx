@@ -52,6 +52,7 @@ interface SetBuilderActions {
     toggleSlotLock: (type: EquipmentCellType) => void;
     setAutoModeView: (view: 'requirements' | 'results' | 'summary') => void;
     resetBuilder: () => void;
+    clearEquipmentSlot: (type: EquipmentCellType) => void;
 }
 
 const SetBuilderContext = createContext<(SetBuilderState & SetBuilderActions) | undefined>(undefined);
@@ -262,6 +263,17 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
         setAutoModeViewState(view);
     };
 
+    const clearEquipmentSlot = (type: EquipmentCellType) => {
+        setCurrentEquipmentSet(prev => {
+            const newSet = { ...prev };
+            // 如果该槽位未被锁定，则删除它
+            if (!lockedSlots[type]) {
+                delete newSet[type];
+            }
+            return newSet;
+        });
+    };
+
     const resetBuilder = () => {
         setRequiredSkills([]);
         setSearchResults([]);
@@ -304,6 +316,7 @@ export const SetBuilderProvider: React.FC<SetBuilderProviderProps> = ({ children
         toggleSlotLock,
         setAutoModeView,
         resetBuilder,
+        clearEquipmentSlot,
     };
 
     return (

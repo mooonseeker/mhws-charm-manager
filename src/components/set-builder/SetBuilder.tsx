@@ -26,6 +26,7 @@ export function SetBuilder() {
         lockedSlots,
         toggleSlotLock,
         autoModeView,
+        clearEquipmentSlot,
     } = useSetBuilder();
 
     return (
@@ -77,6 +78,7 @@ export function SetBuilder() {
                             onSlotClick={(slotIndex: number, slot: Slot) => handleSlotClick(type, slotIndex, slot)}
                             isLocked={lockedSlots[type]}
                             onToggleLock={mode === 'auto' ? () => toggleSlotLock(type) : undefined}
+                            onClear={currentEquipmentSet[type] && !lockedSlots[type] ? () => clearEquipmentSlot(type) : undefined}
                         />
                     ))}
                 </div>
