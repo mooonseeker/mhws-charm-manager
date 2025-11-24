@@ -1,5 +1,5 @@
 export * from './SetBuilder';
 export * from './SetSummary';
-export * from './AutoModeToolbar';
+export * from './SetBuilderToolbar';
 export * from './SkillRequirements';
 export * from './SearchResultsView';

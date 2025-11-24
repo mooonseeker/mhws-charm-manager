@@ -4,7 +4,11 @@ import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useSetBuilder } from '@/contexts/SetBuilderContext';
 
-export function AutoModeActions() {
+interface SetBuilderActionsProps {
+    mode: 'manual' | 'auto';
+}
+
+export function SetBuilderActions({ mode }: SetBuilderActionsProps) {
     const {
         startSearch,
         resetBuilder,
@@ -13,18 +17,22 @@ export function AutoModeActions() {
 
     return (
         <div className="flex items-center gap-2">
-            <Button
-                onClick={startSearch}
-                disabled={isSearching}
-                size="sm"
-            >
-                <Search className="h-4 w-4 mr-2" />
-                搜索
-            </Button>
-            {isSearching && (
-                <Button variant="outline" size="sm" className="px-2.5" onClick={() => console.log('Stop clicked')}>
-                    <Square className="h-4 w-4" />
-                </Button>
+            {mode === 'auto' && (
+                <>
+                    <Button
+                        onClick={startSearch}
+                        disabled={isSearching}
+                        size="sm"
+                    >
+                        <Search className="h-4 w-4 mr-2" />
+                        搜索
+                    </Button>
+                    {isSearching && (
+                        <Button variant="outline" size="sm" className="px-2.5" onClick={() => console.log('Stop clicked')}>
+                            <Square className="h-4 w-4" />
+                        </Button>
+                    )}
+                </>
             )}
             <Button variant="outline" size="sm" className="px-2.5" onClick={resetBuilder}>
                 <RefreshCw className="h-4 w-4" />
@@ -47,14 +55,17 @@ export function AutoModeViewToggle() {
             size="sm"
             className="border border-border rounded-md p-1"
         >
-            <ToggleGroupItem value="requirements" aria-label="技能需求">
-                <ClipboardList className="h-4 w-4" />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="results" aria-label="搜索结果">
+            <ToggleGroupItem value="requirements" aria-label="技能需求" className="px-3">
                 <Sparkles className="h-4 w-4" />
+                技能需求
             </ToggleGroupItem>
-            <ToggleGroupItem value="summary" aria-label="套装汇总">
+            <ToggleGroupItem value="results" aria-label="搜索结果" className="px-3">
+                <ClipboardList className="h-4 w-4" />
+                搜索结果
+            </ToggleGroupItem>
+            <ToggleGroupItem value="summary" aria-label="套装汇总" className="px-3">
                 <ScrollText className="h-4 w-4" />
+                套装汇总
             </ToggleGroupItem>
         </ToggleGroup>
     );

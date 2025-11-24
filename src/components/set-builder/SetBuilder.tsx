@@ -4,8 +4,8 @@ import { AccessorySelector, EquipmentCell, EquipmentSelector } from '@/component
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useSetBuilder } from '@/contexts/SetBuilderContext';
 
-import { AutoModeActions, AutoModeViewToggle } from './AutoModeToolbar';
 import { SearchResultsView } from './SearchResultsView';
+import { AutoModeViewToggle, SetBuilderActions } from './SetBuilderToolbar';
 import { SetSummary } from './SetSummary';
 import { SkillRequirements } from './SkillRequirements';
 
@@ -56,7 +56,7 @@ export function SetBuilder() {
                             </ToggleGroupItem>
                         </ToggleGroup>
                     </div>
-                    {mode === 'auto' && <AutoModeActions />}
+                    <SetBuilderActions mode={mode} />
                 </div>
                 <div className="w-full lg:w-11/20 flex items-center justify-end">
                     {mode === 'auto' && <AutoModeViewToggle />}
