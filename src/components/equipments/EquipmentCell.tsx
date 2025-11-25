@@ -1,7 +1,11 @@
 import { Lock, Unlock, X } from 'lucide-react';
+import { useState } from 'react';
 
 import { Card, CardContent } from '@/components/ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+
+import { EquipmentCard } from './EquipmentCard';
 
 import type { Slot, Weapon, Armor, Charm } from '@/types';
 import type { EquipmentCellType, SlottedEquipment } from '@/types/set-builder';
@@ -51,6 +55,7 @@ export function EquipmentCell({
     const label = typeToLabel[type];
     const iconPath = getIconPath(type);
     const { equipment, accessories } = slottedEquipment || {};
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
     const handleToggleLock = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -92,7 +97,33 @@ export function EquipmentCell({
                             )}
                         </button>
                     )}
-                    <img src={iconPath} alt={label} className="max-w-full max-h-full object-contain" />
+                    {equipment ? (
+                        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                            <PopoverTrigger asChild>
+                                <div
+                                    onMouseEnter={() => setIsPopoverOpen(true)}
+                                    onMouseLeave={() => setIsPopoverOpen(false)}
+                                >
+                                    <img
+                                        src={iconPath}
+                                        alt={label}
+                                        className="max-w-full max-h-full object-contain"
+                                    />
+                                </div>
+                            </PopoverTrigger>
+                            <PopoverContent
+                                onMouseEnter={() => setIsPopoverOpen(true)}
+                                onMouseLeave={() => setIsPopoverOpen(false)}
+                                className="w-80"
+                                align="start"
+                                sideOffset={5}
+                            >
+                                <EquipmentCard item={equipment} variant="full" />
+                            </PopoverContent>
+                        </Popover>
+                    ) : (
+                        <img src={iconPath} alt={label} className="max-w-full max-h-full object-contain" />
+                    )}
                 </div>
                 <div className="border-l border-border/50" />
 
